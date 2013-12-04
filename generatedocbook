@@ -14,6 +14,16 @@ from optparse import OptionParser
 import codecs
 
 from xml2po import Main
+from xml2po.modes.docbook import docbookXmlMode
+
+class myDocbookXmlMode(docbookXmlMode):
+    def __init__(self):
+        self.lists = ['itemizedlist', 'orderedlist', 'variablelist',
+                      'segmentedlist', 'simplelist', 'calloutlist', 'varlistentry', 'userinput',
+                      'computeroutput','prompt','command','screen']
+        self.objects = [ 'figure', 'textobject', 'imageobject', 'mediaobject',
+                         'screenshot','literallayout', 'programlisting' ]
+
 default_mode = 'docbook'
 operation = 'merge'
 options = {
@@ -68,6 +78,7 @@ def mergeSingleDocument(folder, language):
             outputpath = os.path.join(os.path.curdir,  "generated", language, relpath)
             try:
                 xml2po_main = Main(default_mode, operation, outputpath, options)
+                xml2po_main.current_mode = myDocbookXmlMode()
                 xml2po_main.merge(mofile_tmppath, aXML)
                 outputfiles.append(outputpath)
             except IOError:
