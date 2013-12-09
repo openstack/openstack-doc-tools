@@ -54,14 +54,14 @@ eg
 2) Grouping of flags
 
 This is currently done manually, by using the flag name file and placing
-a category after a space.
+one or more categories after a space.
 
 eg
 
      $ head flagmappings/glance.flagmappings
-     admin\_password registry
+     admin\_password registry api
      admin\_role api
-     admin\_tenant\_name registry
+     admin\_tenant\_name registry api
      admin\_user registry
      ...
 

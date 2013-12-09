@@ -37,18 +37,20 @@ def populate_groups(filepath):
     """
     Takes a file formatted with lines of config option and group
     separated by a space and constructs a dictionary indexed by
-    group, which is returned..
+    group, which is returned.
     """
     groups = defaultdict(list)
     groups_file = open(os.path.expanduser(filepath), 'r')
     for line in groups_file:
         try:
-            option, group = line.split(None, 1)
+            option, group_list = line.split(None, 1)
+            group_list = group_list.split(None)
         except ValueError:
             print "Couldn't read groups file line:%s" % line
             print "Check for formatting errors - did you add the group?"
             sys.exit(1)
-        groups[group.strip()].append(option)
+        for group in group_list:
+            groups[group.strip()].append(option)
     return groups
 
 
