@@ -239,8 +239,8 @@ def write_docbook(directory, flags, groups, package_name, verbose=0):
            <col width="50%"/>\n\
            <thead>\n\
               <tr>\n\
-                  <td>Configuration option=Default value</td>\n\
-                  <td>Description</td>\n\
+                  <th>Configuration option=Default value</th>\n\
+                  <th>Description</th>\n\
               </tr>\n\
           </thead>\n\
           <tbody>')
