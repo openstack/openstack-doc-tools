@@ -748,52 +748,8 @@ def build_affected_books(rootdir, book_exceptions,
         print("Building of books finished successfully.\n")
 
 
-def main(args):
+def main():
 
-    if args.check_all:
-        args.check_deletions = True
-        args.check_syntax = True
-        args.check_build = True
-        args.check_niceness = True
-
-    if not args.force and only_www_touched():
-        print("Only files in www directory changed, nothing to do.\n")
-        return
-
-    if args.check_syntax or args.check_niceness:
-        if args.force:
-            validate_all_files(args.path, FILE_EXCEPTIONS, args.verbose,
-                               args.check_syntax, args.check_niceness,
-                               args.ignore_errors)
-        else:
-            validate_individual_files(args.path, FILE_EXCEPTIONS,
-                                      args.verbose, args.check_syntax,
-                                      args.check_niceness,
-                                      args.ignore_errors)
-
-    if args.check_deletions:
-        check_deleted_files(args.path, FILE_EXCEPTIONS, args.verbose)
-
-    if args.check_build:
-        build_affected_books(args.path, BOOK_EXCEPTIONS,
-                             args.verbose, args.force, args.ignore_errors)
-
-
-def default_root():
-    """Return the location of openstack-manuals/doc/
-
-    The current working directory must be inside of the openstack-manuals
-    repository for this method to succeed"""
-    try:
-        git_args = ["git", "rev-parse", "--show-toplevel"]
-        gitroot = check_output(git_args).rstrip()
-    except (subprocess.CalledProcessError, OSError) as e:
-        print("git failed: %s" % e)
-        sys.exit(1)
-
-    return os.path.join(gitroot, "doc")
-
-if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Validate XML files against "
                                      "the DocBook 5 RELAX NG schema")
     parser.add_argument('path', nargs='?', default=default_root(),
@@ -821,4 +777,49 @@ if __name__ == '__main__':
     if (len(sys.argv) == 1):
         # No arguments given, use check-all
         prog_args.check_all = True
-    main(prog_args)
+
+    if prog_args.check_all:
+        prog_args.check_deletions = True
+        prog_args.check_syntax = True
+        prog_args.check_build = True
+        prog_args.check_niceness = True
+
+    if not prog_args.force and only_www_touched():
+        print("Only files in www directory changed, nothing to do.\n")
+        return
+
+    if prog_args.check_syntax or prog_args.check_niceness:
+        if prog_args.force:
+            validate_all_files(prog_args.path, FILE_EXCEPTIONS, prog_args.verbose,
+                               prog_args.check_syntax, prog_args.check_niceness,
+                               prog_args.ignore_errors)
+        else:
+            validate_individual_files(prog_args.path, FILE_EXCEPTIONS,
+                                      prog_args.verbose, prog_args.check_syntax,
+                                      prog_args.check_niceness,
+                                      prog_args.ignore_errors)
+
+    if prog_args.check_deletions:
+        check_deleted_files(prog_args.path, FILE_EXCEPTIONS, prog_args.verbose)
+
+    if prog_args.check_build:
+        build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
+                             prog_args.verbose, prog_args.force, prog_args.ignore_errors)
+
+
+def default_root():
+    """Return the location of openstack-manuals/doc/
+
+    The current working directory must be inside of the openstack-manuals
+    repository for this method to succeed"""
+    try:
+        git_args = ["git", "rev-parse", "--show-toplevel"]
+        gitroot = check_output(git_args).rstrip()
+    except (subprocess.CalledProcessError, OSError) as e:
+        print("git failed: %s" % e)
+        sys.exit(1)
+
+    return os.path.join(gitroot, "doc")
+
+if __name__ == "__main__":
+    sys.exit(main())

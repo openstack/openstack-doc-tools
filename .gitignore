@@ -2,3 +2,8 @@
 .bak
 *.swp
 *~
+AUTHORS
+ChangeLog
+build
+dist
+openstack_doc_tools.egg-info

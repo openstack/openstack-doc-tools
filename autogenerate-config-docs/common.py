@@ -2,15 +2,15 @@
 # A collection of shared functions for managing help flag mapping files.
 #
 
+from oslo.config import cfg
+
 import os
 import string
 import sys
 import pkgutil
 import glob
-
 from collections import defaultdict
 from xml.sax.saxutils import escape
-from oslo.config import cfg
 
 # gettext internationalisation function requisite:
 import __builtin__

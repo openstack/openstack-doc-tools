@@ -1,0 +1,10 @@
+include README.rst
+include AUTHORS 
+include LICENSE
+include ChangeLog
+recursive-include doc *
+recursive-include tools *
+recursive-include sitemap *
+
+exclude .gitignore
+exclude .gitreview
