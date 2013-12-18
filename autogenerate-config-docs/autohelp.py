@@ -6,7 +6,6 @@
 # For an example of usage, run this program with the -h switch.
 #
 
-import os
 import sys
 
 # this is for the internationalisation function in gettext
@@ -54,7 +53,7 @@ def main(action, file, format, repo, verbose=0, name=False, test=False):
 
     sys.exit(0)
 
-if  __name__ == "__main__":
+if __name__ == "__main__":
     args = common.parse_me_args()
     main(args['action'],
          args['file'],

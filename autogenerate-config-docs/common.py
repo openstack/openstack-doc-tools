@@ -7,7 +7,6 @@ from oslo.config import cfg
 import os
 import string
 import sys
-import pkgutil
 import glob
 from collections import defaultdict
 from xml.sax.saxutils import escape
@@ -64,15 +63,20 @@ def extract_flags(repo_location, module_name, verbose=0, names_only=True):
     for root, dirs, files in os.walk(module_location + '/' + module_name):
         for name in dirs:
             abs_path = os.path.join(root.split(module_location)[1][1:], name)
-            if ('/tests' not in abs_path and '/locale' not in abs_path and
-                '/cmd' not in abs_path and '/db/migration' not in abs_path and
-                '/transfer' not in abs_path):
-                usable_dirs.append(os.path.join(root.split(module_location)[1][1:], name))
+            if ('/tests' not in abs_path and
+                    '/locale' not in abs_path and
+                    '/cmd' not in abs_path and
+                    '/db/migration' not in abs_path and
+                    '/transfer' not in abs_path):
+                usable_dirs.append(os.path.join(root.split(module_location)
+                                                [1][1:], name))
 
     for directory in usable_dirs:
-        for python_file in glob.glob(module_location + '/' + directory + "/*.py"):
+        for python_file in glob.glob(module_location + '/' + directory
+                                     + "/*.py"):
             if '__init__' not in python_file:
-                usable_dirs.append(os.path.splitext(python_file)[0][len(module_location) + 1:])
+                usable_dirs.append(os.path.splitext(python_file)
+                                   [0][len(module_location) + 1:])
 
         package_name = directory.replace('/', '.')
         try:
@@ -112,20 +116,24 @@ def extract_flags_test(repo_loc, module, verbose=0):
     TEST TEST TEST TEST TEST TEST
     """
     flag_data = {}
-    flag_files = []
     usable_dirs = []
     module_location = os.path.dirname(repo_loc + '/' + module)
     for root, dirs, files in os.walk(module_location + '/' + module):
         for name in dirs:
             abs_path = os.path.join(root.split(module_location)[1][1:], name)
-            if ('/tests' not in abs_path and '/locale' not in abs_path and
-                '/cmd' not in abs_path and '/db/migration' not in abs_path):
-                usable_dirs.append(os.path.join(root.split(module_location)[1][1:], name))
+            if ('/tests' not in abs_path and
+                    '/locale' not in abs_path and
+                    '/cmd' not in abs_path and
+                    '/db/migration' not in abs_path):
+                usable_dirs.append(os.path.join(root.split(module_location)
+                                                [1][1:], name))
 
     for directory in usable_dirs:
-        for python_file in glob.glob(module_location + '/' + directory + "/*.py"):
+        for python_file in glob.glob(module_location + '/' + directory +
+                                     "/*.py"):
             if '__init__' not in python_file:
-                usable_dirs.append(os.path.splitext(python_file)[0][len(module_location) + 1:])
+                usable_dirs.append(os.path.splitext(python_file)[0]
+                                   [len(module_location) + 1:])
 
         package_name = directory.replace('/', '.')
         try:
@@ -165,7 +173,7 @@ def write_test(file, repo_dir, pkg_name):
             print "\n -- end file name area --\n"
             print len(flag_info)
             for name, value in flag_info:
-                opt = value['opt']
+                #opt = value['opt']
                 #print type(opt)
                 #print opt
                 #print name
@@ -183,7 +191,9 @@ def write_header(filepath, verbose=0):
 
 def write_buffer(file, flags, verbose=0):
     """
-    Write flag data to file.  (The header is written with the write_header function.)
+    Write flag data to file.
+
+    Note that the header is written with the write_header function.
     """
     pass
     #with open(os.path.expanduser(filepath), 'wb') as f:
@@ -253,7 +263,8 @@ def write_docbook(directory, flags, groups, package_name, verbose=0):
                     opt = flag[1]["opt"]
                     if not opt.help:
                         opt.help = "No help text available for this option"
-                    if type(opt).__name__ == "ListOpt" and opt.default is not None:
+                    if (type(opt).__name__ == "ListOpt" and
+                            opt.default is not None):
                         opt.default = ",".join(opt.default)
                     groups_file.write('\n              <tr>\n\
                        <td>' + flag_name + '=' + str(opt.default) + '</td>\n\
