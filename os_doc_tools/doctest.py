@@ -791,12 +791,15 @@ def main():
 
     if prog_args.check_syntax or prog_args.check_niceness:
         if prog_args.force:
-            validate_all_files(prog_args.path, FILE_EXCEPTIONS, prog_args.verbose,
-                               prog_args.check_syntax, prog_args.check_niceness,
+            validate_all_files(prog_args.path, FILE_EXCEPTIONS,
+                               prog_args.verbose,
+                               prog_args.check_syntax,
+                               prog_args.check_niceness,
                                prog_args.ignore_errors)
         else:
             validate_individual_files(prog_args.path, FILE_EXCEPTIONS,
-                                      prog_args.verbose, prog_args.check_syntax,
+                                      prog_args.verbose,
+                                      prog_args.check_syntax,
                                       prog_args.check_niceness,
                                       prog_args.ignore_errors)
 
@@ -805,7 +808,8 @@ def main():
 
     if prog_args.check_build:
         build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
-                             prog_args.verbose, prog_args.force, prog_args.ignore_errors)
+                             prog_args.verbose, prog_args.force,
+                             prog_args.ignore_errors)
 
 
 def default_root():

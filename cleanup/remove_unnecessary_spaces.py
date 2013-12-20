@@ -13,7 +13,8 @@ import tempfile
 import shutil
 
 # should be the same like in tools/validate.py
-FILE_EXCEPTIONS = ['ha-guide-docinfo.xml','bk001-ch003-associate-general.xml']
+FILE_EXCEPTIONS = ['ha-guide-docinfo.xml',
+                   'bk001-ch003-associate-general.xml']
 
 elements = [
     'listitem',
@@ -31,8 +32,10 @@ elements = [
 
 checks = []
 for element in elements:
-    checks.append(re.compile("(.*<%s>)\s+([\w\-().:!?{}\[\]]+.*\n)" % element)),
-    checks.append(re.compile("(.*[\w\-().:!?{}\[\]]+)\s+(<\/%s>.*\n)" % element))
+    checks.append(re.compile("(.*<%s>)\s+([\w\-().:!?{}\[\]]+.*\n)"
+                             % element)),
+    checks.append(re.compile("(.*[\w\-().:!?{}\[\]]+)\s+(<\/%s>.*\n)"
+                             % element))
 
 for root, dirs, files in os.walk('doc/'):
     for f in files:
@@ -42,7 +45,7 @@ for root, dirs, files in os.walk('doc/'):
             continue
         docfile = os.path.abspath(os.path.join(root, f))
         tmpfile = tempfile.mkstemp()
-        tmpfd  = os.fdopen(tmpfile[0], "w")
+        tmpfd = os.fdopen(tmpfile[0], "w")
         match = False
         for line in open(docfile, 'r'):
             for check in checks:

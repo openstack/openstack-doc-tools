@@ -80,33 +80,37 @@ def extract_descriptions_from_devref(repo, options):
                                                  + ' ' + line.strip())
                 for option in options:
                     line_parts = line.strip().split(None, 2)
-                    if ('   ' in line and len(line_parts) == 3
-                        and option == line_parts[0]
-                        and line_parts[1] != '=' and option != 'use'
-                        and (option not in option_descs or
+                    if ('   ' in line and
+                            len(line_parts) == 3 and
+                            option == line_parts[0] and
+                            line_parts[1] != '=' and
+                            option != 'use' and
+                            (option not in option_descs or
                              len(option_descs[option]) < len(line_parts[2]))):
-                          option_descs[option] = line_parts[2]
-                          prev_option = option
+                        option_descs[option] = line_parts[2]
+                        prev_option = option
     return option_descs
 
 
 def new_section_file(sample, current_section):
-     section_filename = ('swift-' +
-           path.basename(sample).split('.conf')[0]
-           + '-'
-           + current_section.replace('[', '').replace(']', '').replace(':', '-')
-           + '.xml')
-     section_file = open(section_filename, 'w')
-     section_file.write('<?xml version="1.0" encoding="UTF-8"?>\n\
+    section_filename = ('swift-' +
+                        path.basename(sample).split('.conf')[0]
+                        + '-'
+                        + current_section.replace('[', '').
+                        replace(']', '').replace(':', '-')
+                        + '.xml')
+    section_file = open(section_filename, 'w')
+    section_file.write('<?xml version="1.0" encoding="UTF-8"?>\n\
      <!-- The tool that generated this table lives in the\n\
           tools directory of this repository. As it was a one-time\n\
           generation, you can edit this file. -->\n\
      <para xmlns="http://docbook.org/ns/docbook" version="5.0">\n\
      <table rules="all">\n\
      <caption>Description of configuration options for <literal>'
-     + current_section + '</literal> in <literal>' + path.basename(sample) +
-     '</literal></caption>\n\
-     <col width="50%"/>\n\
+                       + current_section + '</literal> in <literal>'
+                       + path.basename(sample) +
+                       '</literal></caption>\n\
+                       <col width="50%"/>\n\
      <col width="50%"/>\n\
      <thead>\n\
         <tr>\n\
@@ -115,7 +119,7 @@ def new_section_file(sample, current_section):
         </tr>\n\
      </thead>\n\
      <tbody>')
-     return section_file
+    return section_file
 
 
 def create_new_tables(repo, verbose):
@@ -159,10 +163,12 @@ def create_new_tables(repo, verbose):
                     if (parsed_line[0] in options.keys()
                        and 'No help text' not in options[parsed_line[0]]):
                         # use the help text from existing tables
-                        option_desc = options[parsed_line[0]].replace(u'\xa0', u' ')
+                        option_desc = options[parsed_line[0]].replace(u'\xa0',
+                                                                      u' ')
                     elif parsed_line[0] in option_descs:
                         # use the help text from the devref
-                        option_desc = option_descs[parsed_line[0]].replace(u'\xa0', u' ')
+                        option_desc = option_descs[parsed_line[0]].replace(
+                            u'\xa0', u' ')
                     else:
                         option_desc = 'No help text available for this option'
                         if verbose > 0:
@@ -187,5 +193,5 @@ def main(repo, verbose=0):
 
     create_new_tables(repo, verbose)
 
-if  __name__ == "__main__":
+if __name__ == "__main__":
     main(sys.argv[1])
