@@ -251,7 +251,7 @@ def write_docbook(directory, flags, groups, package_name, verbose=0):
            <col width="50%"/>\n\
            <thead>\n\
               <tr>\n\
-                  <th>Configuration option=Default value</th>\n\
+                  <th>Configuration option = Default value</th>\n\
                   <th>Description</th>\n\
               </tr>\n\
           </thead>\n\
@@ -265,9 +265,9 @@ def write_docbook(directory, flags, groups, package_name, verbose=0):
                         opt.help = "No help text available for this option"
                     if (type(opt).__name__ == "ListOpt" and
                             opt.default is not None):
-                        opt.default = ",".join(opt.default)
+                        opt.default = ", ".join(opt.default)
                     groups_file.write('\n              <tr>\n\
-                       <td>' + flag_name + '=' + str(opt.default) + '</td>\n\
+                       <td>' + flag_name + ' = ' + str(opt.default) + '</td>\n\
                        <td>(' + type(opt).__name__ + ') '
                         + escape(opt.help) + '</td>\n\
               </tr>')
