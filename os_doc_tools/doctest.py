@@ -76,11 +76,21 @@ def check_output(*popenargs, **kwargs):
     return output
 
 
-def get_schema():
+def get_schema(is_api_site=False):
     """Return the DocBook RELAX NG schema"""
-    url = "http://docbook.org/xml/5.1CR1/rng/docbookxi.rng"
+    if is_api_site:
+        url = "http://docs.rackspace.com/rackbook/rackbook.rng"
+    else:
+        url = "http://docbook.org/xml/5.1CR1/rng/docbookxi.rng"
     relaxng_doc = etree.parse(urllib2.urlopen(url))
     return etree.RelaxNG(relaxng_doc)
+
+
+def get_wadl_schema():
+    """Return the Wadl schema"""
+    url = "http://docs.rackspace.com/rackbook/wadl.xsd"
+    xmlschema_doc = etree.parse(urllib2.urlopen(url))
+    return etree.XMLSchema(xmlschema_doc)
 
 
 def validation_failed(schema, doc):
@@ -393,63 +403,106 @@ def is_xml(filename):
     return filename.endswith('.xml') and not filename.endswith('/pom.xml')
 
 
-def validate_individual_files(rootdir, exceptions, verbose,
-                              check_syntax=False, check_niceness=False,
-                              ignore_errors=False):
-    """Validate list of modified files."""
+def is_xml_wadl(filename):
+    """Returns true if file ends a valid .xml or .wadl file.
 
-    schema = get_schema()
+    Skips pom.xml files as well since those are not handled.
+    """
+
+    return (filename.endswith(('.xml', '.wadl')) and
+            not filename.endswith('/pom.xml'))
+
+
+def is_wadl(filename):
+    """Returns true if file ends with .wadl"""
+
+    return filename.endswith('.wadl')
+
+
+def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
+                              check_syntax=False, check_niceness=False,
+                              ignore_errors=False, is_api_site=False):
+    """Validate list of files."""
+
+    schema = get_schema(is_api_site)
+    if is_api_site:
+        wadl_schema = get_wadl_schema()
+
     any_failures = False
     no_validated = 0
     no_failed = 0
+
+    if check_syntax and check_niceness:
+        print("Checking syntax and niceness of xml and wadl files...")
+    elif check_syntax:
+        print("Checking syntax of xml and wadl files...")
+    elif check_niceness:
+        print("Checking niceness of xml and wadl files...")
+
+    for f in files_to_check:
+        base_f = os.path.basename(f)
+        if (base_f == "pom.xml" or
+                base_f in exceptions):
+            continue
+        # Files ending with ".xml" in subdirectories of
+        # wadls and samples files are not docbook files
+        # Currently we cannot validate these, so skip validation
+        # for them.
+        if (is_api_site and ("wadls" in f or "samples" in f)):
+            skip_xml_validation = True
+        else:
+            skip_xml_validation = False
+
+        if (is_api_site and is_wadl(f)):
+            any_failures = validate_one_file(wadl_schema, rootdir, f,
+                                             verbose,
+                                             check_syntax,
+                                             check_niceness)
+            if any_failures:
+                no_failed = no_failed + 1
+            no_validated = no_validated + 1
+        elif (check_syntax and not skip_xml_validation) or check_niceness:
+            any_failures = validate_one_file(schema, rootdir, f,
+                                             verbose,
+                                             check_syntax and
+                                             not skip_xml_validation,
+                                             check_niceness)
+            if any_failures:
+                no_failed = no_failed + 1
+            no_validated = no_validated + 1
+
+    if no_failed > 0:
+        print("Check failed, validated %d xml/wadl files with %d failures.\n"
+              % (no_validated, no_failed))
+        if not ignore_errors:
+            sys.exit(1)
+    else:
+        print("Check passed, validated %d xml/wadl files.\n" % no_validated)
+
+
+def validate_modified_files(rootdir, exceptions, verbose,
+                            check_syntax=False, check_niceness=False,
+                            ignore_errors=False, is_api_site=False):
+    """Validate list of modified files."""
 
     # Do not select deleted files, just Added, Copied, Modified, Renamed,
     # or Type changed
     modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
 
-    modified_files = filter(is_xml, modified_files)
-    if check_syntax and check_niceness:
-        print("Checking syntax and niceness of xml files...")
-    elif check_syntax:
-        print("Checking syntax of xml files...")
-    elif check_niceness:
-        print("Checking niceness of xml files...")
-    modified_files = map(lambda x: os.path.abspath(x), modified_files)
+    modified_files = filter(is_xml_wadl, modified_files)
 
-    for f in modified_files:
-        base_f = os.path.basename(f)
-        if (base_f == "pom.xml" or
-                base_f in exceptions):
-            continue
-        any_failures = validate_one_file(schema, rootdir, f, verbose,
-                                         check_syntax, check_niceness)
-        if any_failures:
-            no_failed = no_failed + 1
-        no_validated = no_validated + 1
-
-    if no_failed > 0:
-        print("Check failed, validated %d xml files with %d failures.\n"
-              % (no_validated, no_failed))
-        if not ignore_errors:
-            sys.exit(1)
-    else:
-        print("Check passed, validated %d xml files.\n" % no_validated)
+    validate_individual_files(modified_files, rootdir, exceptions,
+                              verbose,
+                              check_syntax, check_niceness,
+                              ignore_errors, is_api_site)
 
 
 def validate_all_files(rootdir, exceptions, verbose,
                        check_syntax, check_niceness=False,
-                       ignore_errors=False):
+                       ignore_errors=False, is_api_site=False):
     """Validate all xml files."""
 
-    schema = get_schema()
-    no_validated = 0
-    no_failed = 0
-    if check_syntax and check_niceness:
-        print("Checking syntax and niceness of all xml files...")
-    elif check_syntax:
-        print("Checking syntax of all xml files...")
-    elif check_niceness:
-        print("Checking niceness of all xml files...")
+    files_to_check = []
 
     for root, dirs, files in os.walk(rootdir):
         # Don't descend into 'target' subdirectories
@@ -461,24 +514,16 @@ def validate_all_files(rootdir, exceptions, verbose,
 
         for f in files:
             # Ignore maven files, which are called pom.xml
-            if (f.endswith('.xml') and
+            if (f.endswith(('.xml', '.wadl')) and
                     f != 'pom.xml' and
                     f not in exceptions):
                 path = os.path.abspath(os.path.join(root, f))
-                any_failures = validate_one_file(
-                    schema, rootdir, path, verbose,
-                    check_syntax, check_niceness)
-                if any_failures:
-                    no_failed = no_failed + 1
-                no_validated = no_validated + 1
+                files_to_check.append(path)
 
-    if no_failed > 0:
-        print("Check failed, validated %d xml files with %d failures.\n"
-              % (no_validated, no_failed))
-        if not ignore_errors:
-            sys.exit(1)
-    else:
-        print("Check passed, validated %d xml files.\n" % no_validated)
+    validate_individual_files(files_to_check, rootdir, exceptions,
+                              verbose,
+                              check_syntax, check_niceness,
+                              ignore_errors, is_api_site)
 
 
 def logging_build_book(result):
@@ -602,8 +647,8 @@ def find_affected_books(rootdir, book_exceptions, verbose,
 
         if os.path.basename(root) in book_exceptions:
             break
-        # Do not process files in doc itself
-        elif root.endswith('doc'):
+        # Do not process files in doc itself or top-level directory
+        elif root.endswith('doc') or root == rootdir:
             continue
         elif "pom.xml" in files:
             books.append(root)
@@ -694,7 +739,8 @@ def find_affected_books(rootdir, book_exceptions, verbose,
 
 
 def build_affected_books(rootdir, book_exceptions,
-                         verbose, force=False, ignore_errors=False):
+                         verbose, force=False, ignore_errors=False,
+                         is_api_site=False):
     """Build all the books which are affected by modified files.
 
     Looks for all directories with "pom.xml" and checks if a
@@ -755,7 +801,7 @@ def main():
                                      "the DocBook 5 RELAX NG schema")
     parser.add_argument('path', nargs='?', default=default_root(),
                         help="Root directory that contains DocBook files, "
-                        "defaults to `git rev-parse --show-toplevel`/doc")
+                        "defaults to `git rev-parse --show-toplevel`")
     parser.add_argument("--force", help="Force the validation of all files "
                         "and build all books", action="store_true")
     parser.add_argument("--check-build", help="Try to build books using "
@@ -774,7 +820,13 @@ def main():
                         action="store_true")
     parser.add_argument("--verbose", help="Verbose execution",
                         action="store_true")
+    parser.add_argument("--api-site", help="Special handling for "
+                        "api-site repository",
+                        action="store_true")
+
     prog_args = parser.parse_args()
+    if not prog_args.api_site:
+        prog_args.path = os.path.join(prog_args.path, 'doc')
     if (len(sys.argv) == 1):
         # No arguments given, use check-all
         prog_args.check_all = True
@@ -795,13 +847,15 @@ def main():
                                prog_args.verbose,
                                prog_args.check_syntax,
                                prog_args.check_niceness,
-                               prog_args.ignore_errors)
+                               prog_args.ignore_errors,
+                               prog_args.api_site)
         else:
-            validate_individual_files(prog_args.path, FILE_EXCEPTIONS,
-                                      prog_args.verbose,
-                                      prog_args.check_syntax,
-                                      prog_args.check_niceness,
-                                      prog_args.ignore_errors)
+            validate_modified_files(prog_args.path, FILE_EXCEPTIONS,
+                                    prog_args.verbose,
+                                    prog_args.check_syntax,
+                                    prog_args.check_niceness,
+                                    prog_args.ignore_errors,
+                                    prog_args.api_site)
 
     if prog_args.check_deletions:
         check_deleted_files(prog_args.path, FILE_EXCEPTIONS, prog_args.verbose)
@@ -809,11 +863,12 @@ def main():
     if prog_args.check_build:
         build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
                              prog_args.verbose, prog_args.force,
-                             prog_args.ignore_errors)
+                             prog_args.ignore_errors,
+                             prog_args.api_site)
 
 
 def default_root():
-    """Return the location of openstack-manuals/doc/
+    """Return the location of openstack-manuals
 
     The current working directory must be inside of the openstack-manuals
     repository for this method to succeed"""
@@ -824,7 +879,7 @@ def default_root():
         print("git failed: %s" % e)
         sys.exit(1)
 
-    return os.path.join(gitroot, "doc")
+    return gitroot
 
 if __name__ == "__main__":
     sys.exit(main())
