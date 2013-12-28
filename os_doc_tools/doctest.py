@@ -544,6 +544,27 @@ def build_book(book):
                 ["mvn", "generate-sources", "-B"],
                 stderr=subprocess.STDOUT
             )
+        # Repository: identity-api
+        # Let's not check for "v3" but for the full name instead
+        elif base_book.endswith("openstack-identity-api/v3"):
+            output = subprocess.check_output(
+                ["markdown-docbook.sh", "identity-api-v3"],
+                stderr=subprocess.STDOUT
+            )
+            output = subprocess.check_output(
+                ["mvn", "generate-sources", "-B"],
+                stderr=subprocess.STDOUT
+            )
+        # Repository: image-api
+        elif base_book == "openstack-image-service-api":
+            output = subprocess.check_output(
+                ["markdown-docbook.sh", "image-api-v2.0"],
+                stderr=subprocess.STDOUT
+            )
+            output = subprocess.check_output(
+                ["mvn", "generate-sources", "-B"],
+                stderr=subprocess.STDOUT
+            )
         else:
             output = subprocess.check_output(
                 ["mvn", "generate-sources", "-B"],
