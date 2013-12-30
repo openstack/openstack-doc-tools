@@ -1,9 +1,23 @@
 .DS_Store
-.bak
-*.swp
-*~
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+sdist
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+# pbr generates these
 AUTHORS
 ChangeLog
-build
-dist
-openstack_doc_tools.egg-info
+
+# Editors
+*~
+.*.swp
+.bak
+
