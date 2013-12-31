@@ -9,6 +9,16 @@
 BRANCH=$ZUUL_REFNAME
 shopt -s extglob
 
+# Find location of db4-upgrade-xsl:
+if [ -e /usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl ] ; then
+  DB_UPGRADE=/usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl
+elif [ -e  /usr/share/xml/docbook/stylesheet/upgrade/db4-upgrade.xsl ] ; then
+  DB_UPGRADE=/usr/share/xml/docbook/stylesheet/upgrade/db4-upgrade.xsl
+else
+  echo "db4-upgrade.xsl not found"
+  exit 1
+fi
+
 # Need to get the file name to insert here so it can be reused for multiple projects
 # Filenames for the known repos that could do this are openstackapi-programming.mdown
 # and images-api-v2.0.md and openstackapi-programming and images-api-v2.0 are the names
@@ -16,6 +26,16 @@ shopt -s extglob
 FILENAME=$1
 FILEPATH=`find ./ -regextype posix-extended -regex ".*${FILENAME}\.(md|markdown|mdown)"`
 DIRPATH=`dirname $FILEPATH`
-pandoc -f markdown -t docbook -s ${FILEPATH} |  xsltproc -o - /usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl - |  xmllint  --format - | sed -e "s,<article,<chapter xml:id=\"$FILENAME\"," | sed -e 's,</article>,</chapter>,' > ${DIRPATH}/$FILENAME.xml
+
+# Check for requirements
+type -P pandoc > /dev/null 2>&1 || { echo >&2 "pandoc not installed.  Aborting."; exit 1; }
+type -P xsltproc > /dev/null 2>&1 || { echo >&2 "xsltproc not installed.  Aborting."; exit 1; }
+type -P xmllint > /dev/null 2>&1 || { echo >&2 "xmllint not installed.  Aborting."; exit 1; }
+
+pandoc -f markdown -t docbook -s ${FILEPATH} |\
+xsltproc -o - ${DB_UPGRADE} - |\
+xmllint  --format - | \
+sed -e "s,<article,<chapter xml:id=\"$FILENAME\"," | \
+sed -e 's,</article>,</chapter>,' > ${DIRPATH}/$FILENAME.xml
 
 pwd
