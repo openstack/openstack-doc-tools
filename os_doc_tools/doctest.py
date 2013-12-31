@@ -764,6 +764,11 @@ def build_affected_books(rootdir, book_exceptions,
     This will throw an exception if a book fails to build
     """
 
+    # Dependency generation in api projects does not work currently,
+    # thus build all books
+    if is_api_site:
+        force = True
+
     books = find_affected_books(rootdir, book_exceptions,
                                 verbose, force)
 
