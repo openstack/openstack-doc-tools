@@ -64,7 +64,8 @@ KNOWN_OS_VALUES = ["debian",
 # List of recognized (allowable) audience profiling directives.
 KNOWN_AUDIENCE_VALUES = ["enduser",
                          "adminuser",
-                         "installer"]
+                         "installer",
+                         "webpage"]
 
 
 # NOTE(berendt): check_output as provided in Python 2.7.5 to make script
