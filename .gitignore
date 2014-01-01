@@ -1,6 +1,8 @@
 .DS_Store
+.venv
 
 # Packages
+*.py[cod]
 *.egg
 *.egg-info
 dist
