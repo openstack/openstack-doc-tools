@@ -1,5 +1,5 @@
 OpenStack Doc Tools
-+++++++++++++++++++
+*******************
 
 This repository contains tools used by the OpenStack Documentation
 project.
