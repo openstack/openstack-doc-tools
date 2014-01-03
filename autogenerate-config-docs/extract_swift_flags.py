@@ -12,9 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import sys
-from os import path
 import glob
+import os
+import sys
+
 from xml.dom import minidom
 from xml.sax.saxutils import escape
 

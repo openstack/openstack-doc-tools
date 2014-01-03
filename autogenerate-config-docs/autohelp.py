@@ -17,13 +17,13 @@
 # For an example of usage, run this program with the -h switch.
 #
 
+import common
 import sys
 
 # this is for the internationalisation function in gettext
 import __builtin__
 __builtin__.__dict__['_'] = lambda x: x
 
-import common
 
 
 def main(action, file, format, repo, verbose=0, name=False, test=False):

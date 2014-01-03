@@ -20,8 +20,8 @@
 
 import os
 import re
-import tempfile
 import shutil
+import tempfile
 
 # should be the same like in tools/validate.py
 FILE_EXCEPTIONS = ['ha-guide-docinfo.xml',
