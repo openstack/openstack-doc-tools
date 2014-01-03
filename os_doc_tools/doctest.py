@@ -31,9 +31,6 @@ Requires:
     - Maven
 
 '''
-import os_doc_tools
-
-from lxml import etree
 
 import argparse
 import multiprocessing
@@ -43,6 +40,11 @@ import shutil
 import subprocess
 import sys
 import urllib2
+
+from lxml import etree
+
+import os_doc_tools
+
 
 # These are files that are known to not be in DocBook format
 FILE_EXCEPTIONS = ['st-training-guides.xml',
@@ -93,7 +95,7 @@ def check_output(*popenargs, **kwargs):
 
 
 def get_schema(is_api_site=False):
-    """Return the DocBook RELAX NG schema"""
+    """Return the DocBook RELAX NG schema."""
     if is_api_site:
         url = "http://docs.rackspace.com/rackbook/rackbook.rng"
     else:
@@ -103,7 +105,7 @@ def get_schema(is_api_site=False):
 
 
 def get_wadl_schema():
-    """Return the Wadl schema"""
+    """Return the Wadl schema."""
     url = "http://docs.rackspace.com/rackbook/wadl.xsd"
     xmlschema_doc = etree.parse(urllib2.urlopen(url))
     return etree.XMLSchema(xmlschema_doc)
@@ -115,7 +117,8 @@ def validation_failed(schema, doc):
     This will ignore validation failures of the type: IDREF attribute linkend
     references an unknown ID. This is because we are validating individual
     files that are being imported, and sometimes the reference isn't present
-    in the current file."""
+    in the current file.
+    """
     return not schema.validate(doc) and \
         any(log.type_name != "DTD_UNKNOWN_ID" for log in schema.error_log)
 
@@ -123,7 +126,8 @@ def validation_failed(schema, doc):
 def verify_section_tags_have_xmid(doc):
     """Check that all section tags have an xml:id attribute
 
-    Will throw an exception if there's at least one missing"""
+    Will throw an exception if there's at least one missing.
+    """
     ns = {"docbook": "http://docbook.org/ns/docbook"}
     for node in doc.xpath('//docbook:section', namespaces=ns):
         if "{http://www.w3.org/XML/1998/namespace}id" not in node.attrib:
@@ -169,13 +173,13 @@ def verify_attribute_profiling(doc, attribute, known_values):
 
 
 def verify_profiling(doc):
-    """"Check profiling information"""
+    """"Check profiling information."""
     verify_attribute_profiling(doc, "os", KNOWN_OS_VALUES)
     verify_attribute_profiling(doc, "audience", KNOWN_AUDIENCE_VALUES)
 
 
 def verify_nice_usage_of_whitespaces(docfile):
-    """Check that no unnecessary whitespaces are used"""
+    """Check that no unnecessary whitespaces are used."""
     checks = [
         re.compile(".*\s+\n$"),
     ]
@@ -237,7 +241,7 @@ def error_message(error_log):
 
 
 def only_www_touched():
-    """Check whether only files in www directory are touched"""
+    """Check whether only files in www directory are touched."""
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
@@ -258,7 +262,7 @@ def only_www_touched():
 
 
 def ha_guide_touched():
-    """Check whether files in high-availability-guide directory are touched"""
+    """Check whether files in high-availability-guide directory are touched."""
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
@@ -305,7 +309,7 @@ def check_modified_affects_all(rootdir, verbose):
 
 
 def get_modified_files(rootdir, filtering=None):
-    """Get modified files below doc directory"""
+    """Get modified files below doc directory."""
 
     # There are several tree traversals in this program that do a
     # chdir, we need to run this git command always from the rootdir,
@@ -325,10 +329,10 @@ def get_modified_files(rootdir, filtering=None):
 
 
 def check_deleted_files(rootdir, file_exceptions, verbose):
-    """ Check whether files got deleted and verify that no other file
+    """Check whether files got deleted and verify that no other file
     references them.
-
     """
+
     print("Checking that no removed files are referenced...")
     deleted_files = get_modified_files(rootdir, "--diff-filter=D")
     if not deleted_files:
@@ -400,7 +404,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
 
 def validate_one_file(schema, rootdir, path, verbose,
                       check_syntax, check_niceness):
-    """Validate a single file"""
+    """Validate a single file."""
     # We pass schema in as a way of caching it, generating it is expensive
 
     any_failures = False
@@ -427,7 +431,7 @@ def validate_one_file(schema, rootdir, path, verbose,
 
 
 def is_xml(filename):
-    """Returns true if file ends with .xml and is not a pom.xml file"""
+    """Returns true if file ends with .xml and is not a pom.xml file."""
 
     return filename.endswith('.xml') and not filename.endswith('/pom.xml')
 
@@ -443,7 +447,7 @@ def is_xml_wadl(filename):
 
 
 def is_wadl(filename):
-    """Returns true if file ends with .wadl"""
+    """Returns true if file ends with .wadl."""
 
     return filename.endswith('.wadl')
 
@@ -559,12 +563,12 @@ def validate_all_files(rootdir, exceptions, verbose,
 
 
 def logging_build_book(result):
-    """Callback for book building"""
+    """Callback for book building."""
     RESULTS_OF_BUILDS.append(result)
 
 
 def build_book(book):
-    """Build book(s) in directory book"""
+    """Build book(s) in directory book."""
 
     # Note that we cannot build in parallel several books in the same
     # directory like the Install Guide. Thus we build sequentially per
@@ -935,7 +939,9 @@ def default_root():
     """Return the location of openstack-manuals
 
     The current working directory must be inside of the openstack-manuals
-    repository for this method to succeed"""
+    repository for this method to succeed
+    """
+
     try:
         git_args = ["git", "rev-parse", "--show-toplevel"]
         gitroot = check_output(git_args).rstrip()
