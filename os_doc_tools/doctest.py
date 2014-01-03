@@ -354,6 +354,9 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
         except ValueError:
             pass
 
+        # Filter out any dot directories
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+
         os.chdir(root)
 
         for f in files:
@@ -538,6 +541,9 @@ def validate_all_files(rootdir, exceptions, verbose,
         except ValueError:
             pass
 
+        # Filter out any dot directories
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+
         for f in files:
             # Ignore maven files, which are called pom.xml
             if (f.endswith(('.xml', '.wadl')) and
@@ -691,6 +697,9 @@ def find_affected_books(rootdir, book_exceptions, verbose,
             del dirs[ind]
         except ValueError:
             pass
+
+        # Filter out any dot directories
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
 
         if os.path.basename(root) in book_exceptions:
             break
