@@ -403,7 +403,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
 
 
 def validate_one_file(schema, rootdir, path, verbose,
-                      check_syntax, check_niceness):
+                      check_syntax, check_niceness, validate_schema):
     """Validate a single file."""
     # We pass schema in as a way of caching it, generating it is expensive
 
@@ -413,11 +413,12 @@ def validate_one_file(schema, rootdir, path, verbose,
     try:
         if check_syntax:
             doc = etree.parse(path)
-            if validation_failed(schema, doc):
-                any_failures = True
-                print(error_message(schema.error_log))
-            verify_section_tags_have_xmid(doc)
-            verify_profiling(doc)
+            if validate_schema:
+                if validation_failed(schema, doc):
+                    any_failures = True
+                    print(error_message(schema.error_log))
+                verify_section_tags_have_xmid(doc)
+                verify_profiling(doc)
         if check_niceness:
             verify_nice_usage_of_whitespaces(path)
     except etree.XMLSyntaxError as e:
@@ -478,31 +479,28 @@ def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
                 base_f in exceptions):
             continue
         # Files ending with ".xml" in subdirectories of
-        # wadls and samples files are not docbook files
-        # Currently we cannot validate these, so skip validation
-        # for them.
+        # wadls and samples files are not docbook files.
+        # We cannot validate with a schema for these
         if (is_api_site and ("wadls" in f or "samples" in f)):
-            skip_xml_validation = True
+            validate_schema = False
         else:
-            skip_xml_validation = False
+            validate_schema = True
 
         if (is_api_site and is_wadl(f)):
             any_failures = validate_one_file(wadl_schema, rootdir, f,
                                              verbose,
                                              check_syntax,
-                                             check_niceness)
-            if any_failures:
-                no_failed = no_failed + 1
-            no_validated = no_validated + 1
-        elif (check_syntax and not skip_xml_validation) or check_niceness:
+                                             check_niceness,
+                                             validate_schema)
+        else:
             any_failures = validate_one_file(schema, rootdir, f,
                                              verbose,
-                                             check_syntax and
-                                             not skip_xml_validation,
-                                             check_niceness)
-            if any_failures:
-                no_failed = no_failed + 1
-            no_validated = no_validated + 1
+                                             check_syntax,
+                                             check_niceness,
+                                             validate_schema)
+        if any_failures:
+            no_failed = no_failed + 1
+        no_validated = no_validated + 1
 
     if no_failed > 0:
         print("Check failed, validated %d xml/wadl files with %d failures.\n"
@@ -618,7 +616,7 @@ def build_book(book):
             base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
         elif base_book == "high-availability-guide":
             output = subprocess.check_output(
-                ["../../tools/build-ha-guide.sh", ],
+                ["build-ha-guide.sh", ],
                 stderr=subprocess.STDOUT
             )
             output = subprocess.check_output(
@@ -799,8 +797,7 @@ def find_affected_books(rootdir, book_exceptions, verbose,
 
 
 def build_affected_books(rootdir, book_exceptions,
-                         verbose, force=False, ignore_errors=False,
-                         is_api_site=False):
+                         verbose, force=False, ignore_errors=False):
     """Build all the books which are affected by modified files.
 
     Looks for all directories with "pom.xml" and checks if a
@@ -810,11 +807,6 @@ def build_affected_books(rootdir, book_exceptions,
 
     This will throw an exception if a book fails to build
     """
-
-    # Dependency generation in api projects does not work currently,
-    # thus build all books
-    if is_api_site:
-        force = True
 
     books = find_affected_books(rootdir, book_exceptions,
                                 verbose, force)
@@ -931,8 +923,7 @@ def main():
     if prog_args.check_build:
         build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
                              prog_args.verbose, prog_args.force,
-                             prog_args.ignore_errors,
-                             prog_args.api_site)
+                             prog_args.ignore_errors)
 
 
 def default_root():
