@@ -202,16 +202,26 @@ def verify_nice_usage_of_whitespaces(docfile):
 
     lc = 0
     affected_lines = []
+    tab_lines = []
     for line in open(docfile, 'r'):
         lc = lc + 1
+        if '\t' in line:
+            tab_lines.append(str(lc))
+
         for check in checks:
             if check.match(line) and lc not in affected_lines:
                 affected_lines.append(str(lc))
 
-    if len(affected_lines) > 0:
-        raise ValueError("trailing or unnecessary whitespaces "
-                         "found in lines: %s"
-                         % ", ".join(affected_lines))
+    if len(affected_lines) > 0 and len(tab_lines) > 0:
+        msg = "trailing or unnecessary whitespaces found in lines: %s" % (
+              ", ".join(affected_lines))
+        msg = msg + "; tabs found in lines: %s" % ", ".join(tab_lines)
+        raise ValueError(msg)
+    elif len(affected_lines) > 0:
+        raise ValueError("trailing or unnecessary whitespaces found in "
+                         "lines: %s" % (", ".join(affected_lines)))
+    elif len(tab_lines) > 0:
+        raise ValueError("tabs found in lines: %s" % ", ".join(tab_lines))
 
 
 def error_message(error_log):
