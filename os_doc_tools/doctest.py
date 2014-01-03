@@ -31,6 +31,8 @@ Requires:
     - Maven
 
 '''
+import os_doc_tools
+
 from lxml import etree
 
 import argparse
@@ -863,6 +865,9 @@ def main():
     parser.add_argument("--api-site", help="Special handling for "
                         "api-site repository",
                         action="store_true")
+    parser.add_argument('--version',
+                        action='version',
+                        version=os_doc_tools.__version__)
 
     prog_args = parser.parse_args()
     if not prog_args.api_site:
