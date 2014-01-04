@@ -55,6 +55,10 @@ OPTIONS
        Special handling for api-site and other API repositories
        to handle WADL.
 
+  **--ignore-dir IGNORE_DIR**
+      Directory to ignore for building of manuals. The parameter can
+      be passed multiple times to add several directories.
+
 FILES
 =====
 

@@ -671,7 +671,7 @@ def is_book_master(filename):
 
 
 def find_affected_books(rootdir, book_exceptions, verbose,
-                        force):
+                        force, ignore_dirs):
     """Check which books are affected by modified files.
 
     Returns a set with books.
@@ -702,6 +702,10 @@ def find_affected_books(rootdir, book_exceptions, verbose,
 
         # Filter out any dot directories
         dirs[:] = [d for d in dirs if not d.startswith('.')]
+
+        # Filter out directories to be ignored
+        if ignore_dirs:
+            dirs[:] = [d for d in dirs if not d in ignore_dirs]
 
         if os.path.basename(root) in book_exceptions:
             break
@@ -797,7 +801,8 @@ def find_affected_books(rootdir, book_exceptions, verbose,
 
 
 def build_affected_books(rootdir, book_exceptions,
-                         verbose, force=False, ignore_errors=False):
+                         verbose, force=False, ignore_errors=False,
+                         ignore_dirs=[]):
     """Build all the books which are affected by modified files.
 
     Looks for all directories with "pom.xml" and checks if a
@@ -809,7 +814,7 @@ def build_affected_books(rootdir, book_exceptions,
     """
 
     books = find_affected_books(rootdir, book_exceptions,
-                                verbose, force)
+                                verbose, force, ignore_dirs)
 
     # Remove cache content which can cause build failures
     shutil.rmtree(os.path.expanduser("~/.fop"),
@@ -880,11 +885,17 @@ def main():
     parser.add_argument("--api-site", help="Special handling for "
                         "api-site repository",
                         action="store_true")
+    parser.add_argument("--ignore-dir",
+                        help="Directory to ignore for building of "
+                        "manuals. The parameter can be passed multiple "
+                        "times to add several directories.",
+                        action="append")
     parser.add_argument('--version',
                         action='version',
                         version=os_doc_tools.__version__)
 
     prog_args = parser.parse_args()
+
     if not prog_args.api_site:
         prog_args.path = os.path.join(prog_args.path, 'doc')
     if (len(sys.argv) == 1):
@@ -923,7 +934,8 @@ def main():
     if prog_args.check_build:
         build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
                              prog_args.verbose, prog_args.force,
-                             prog_args.ignore_errors)
+                             prog_args.ignore_errors,
+                             prog_args.ignore_dir)
 
 
 def default_root():
