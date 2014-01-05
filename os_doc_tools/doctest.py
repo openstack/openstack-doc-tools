@@ -368,7 +368,12 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
                     f != 'pom.xml' and
                     f not in file_exceptions):
                 path = os.path.abspath(os.path.join(root, f))
-                doc = etree.parse(path)
+                try:
+                    doc = etree.parse(path)
+                except etree.XMLSyntaxError as e:
+                    print(" Warning: file %s is invalid XML: %s" % (path, e))
+                    continue
+
                 no_checked_files = no_checked_files + 1
 
                 # Check for inclusion of files as part of imagedata
@@ -731,7 +736,11 @@ def find_affected_books(rootdir, book_exceptions, verbose,
             if (f.endswith('.xml') and
                     f != "pom.xml" and
                     f != "ha-guide-docinfo.xml"):
-                doc = etree.parse(f_abs)
+                try:
+                    doc = etree.parse(f_abs)
+                except etree.XMLSyntaxError as e:
+                    print("  Warning: file %s is invalid XML: %s" % (f_abs, e))
+                    continue
                 for node in doc.findall(
                         '//{http://docbook.org/ns/docbook}imagedata'):
                     href = node.get('fileref')
