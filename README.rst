@@ -52,6 +52,17 @@ On Ubuntu::
     apt-get install libxml2-dev libxslt-dev
 
 
+Updating RNG schema files
+=========================
+
+The repository contains in the directory ``os_doc_tools/resources`` a
+local copy of some RNG schema files so that they do not need to be
+downloaded each time for validation of XML and WADL files.
+
+Please see the ``README.txt`` in the directory for details on where
+these files come from.
+
+
 Contributing
 ============
 Our community welcomes all people interested in open source cloud computing,
