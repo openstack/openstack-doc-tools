@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="" xmlns:wadl="http://wadl.dev.java.net/2009/02" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <start>
+    <choice>
+    <element name="wadl:application">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="grammars"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="resources"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <choice>
+          <ref name="resource_type"/>
+          <ref name="method"/>
+          <ref name="representation"/>
+          <ref name="param"/>
+        </choice>
+      </zeroOrMore>
+      <ref name="foreign-attribute"/>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+      <ref name="resource"/>
+    </choice>
+  </start>
+  <define name="doc">
+    <element name="wadl:doc">
+      <optional>
+        <attribute name="xml:lang">
+          <ref name="languageTag"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="title"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <!-- <ref name="foreign-element"/>  -->
+        </choice>
+      </zeroOrMore>
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="grammars">
+    <element name="wadl:grammars">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="incl"/>
+      </zeroOrMore>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="incl">
+    <element name="wadl:include">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <attribute name="href">
+        <data type="anyURI"/>
+      </attribute>
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="resources">
+    <element name="wadl:resources">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <oneOrMore>
+        <ref name="resource"/>
+      </oneOrMore>
+      <attribute name="base">
+        <data type="anyURI"/>
+      </attribute>
+      <ref name="foreign-attribute"/>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="resource_type">
+    <element name="wadl:resource_type">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <choice>
+          <ref name="method"/>
+          <ref name="resource"/>
+        </choice>
+      </zeroOrMore>
+      <optional>
+        <attribute name="id">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="resource">
+    <element name="wadl:resource">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <choice>
+          <ref name="method"/>
+          <ref name="resource"/>
+        </choice>
+      </zeroOrMore>
+      <optional>
+        <attribute name="type">
+          <list>
+            <data type="anyURI"/>
+          </list>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="path"/>
+      </optional>
+      <optional>
+        <attribute name="id">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="queryType"/>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="method">
+    <element name="wadl:method">
+      <choice>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+        <group>
+          <zeroOrMore>
+            <ref name="doc"/>
+          </zeroOrMore>
+          <optional>
+            <ref name="request"/>
+          </optional>
+          <zeroOrMore>
+            <ref name="response"/>
+          </zeroOrMore>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <attribute name="name">
+            <choice>
+              <value>DELETE</value>
+              <value>GET</value>
+              <value>HEAD</value>
+              <value>POST</value>
+              <value>PUT</value>
+              <data type="token"/>
+            </choice>
+          </attribute>
+        </group>
+      </choice>
+      <!-- <ref name="foreign-element"/>  -->
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="request">
+    <element name="wadl:request">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="representation"/>
+      </zeroOrMore>
+      <ref name="foreign-attribute"/>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="response">
+    <element name="wadl:response">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="representation"/>
+      </zeroOrMore>
+      <optional>
+        <attribute name="status">
+          <list>
+            <oneOrMore>
+              <data type="int"/>
+            </oneOrMore>
+          </list>
+        </attribute>
+      </optional>
+      <ref name="foreign-attribute"/>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="representation">
+    <element name="wadl:representation">
+      <choice>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+        <group>
+          <zeroOrMore>
+            <ref name="doc"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="param"/>
+          </zeroOrMore>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="element">
+              <data type="QName"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="mediaType"/>
+          </optional>
+          <optional>
+            <attribute name="profile">
+              <list>
+                <data type="anyURI"/>
+              </list>
+            </attribute>
+          </optional>
+        </group>
+      </choice>
+      <ref name="foreign-attribute"/>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="param">
+    <element name="wadl:param">
+      <choice>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+        <group>
+          <zeroOrMore>
+            <ref name="doc"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="option"/>
+          </zeroOrMore>
+          <optional>
+            <ref name="link"/>
+          </optional>
+          <attribute name="name">
+            <data type="token"/>
+          </attribute>
+          <attribute name="style">
+            <choice>
+              <value>plain</value>
+              <value>query</value>
+              <value>matrix</value>
+              <value>header</value>
+              <value>template</value>
+            </choice>
+          </attribute>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="default"/>
+          </optional>
+          <optional>
+            <attribute name="path"/>
+          </optional>
+          <optional>
+            <attribute name="required">
+              <data type="boolean"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="repeating">
+              <data type="boolean"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="fixed"/>
+          </optional>
+        </group>
+      </choice>
+      <!-- <ref name="foreign-element"/>  -->
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="option">
+    <element name="wadl:option">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+      <optional>
+        <attribute name="mediaType"/>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="link">
+    <element name="wadl:link">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <optional>
+        <attribute name="resource_type">
+          <data type="anyURI"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="rel">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="rev">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <ref name="foreign-attribute"/>
+    </element>
+  </define>
+  <define name="foreign-attribute">
+    <zeroOrMore>
+      <attribute>
+        <anyName>
+          <except>
+            <nsName ns="http://wadl.dev.java.net/2009/02"/>
+            <nsName/>
+            <nsName ns="http://www.w3.org/XML/1998/namespace"/>
+          </except>
+        </anyName>
+      </attribute>
+    </zeroOrMore>
+  </define>
+<!--  <define name="foreign-element">
+    <zeroOrMore>
+      <element>
+        <anyName>
+          <except>
+            <nsName ns="http://wadl.dev.java.net/2009/02"/>
+            <nsName/>
+          </except>
+        </anyName>
+        <zeroOrMore>
+          <choice>
+            <attribute>
+              <anyName/>
+            </attribute>
+            <text/>
+            <ref name="any-element"/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </zeroOrMore>
+  </define>-->
+<!--  <define name="any-element">
+    <zeroOrMore>
+      <element>
+        <anyName/>
+        <zeroOrMore>
+          <choice>
+            <attribute>
+              <anyName/>
+            </attribute>
+            <text/>
+            <ref name="any-element"/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </zeroOrMore>
+  </define>-->
+  <define name="languageTag">
+    <data type="string">
+      <param name="pattern">[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*</param>
+    </data>
+  </define>
+</grammar>

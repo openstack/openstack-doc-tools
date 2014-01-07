@@ -39,7 +39,6 @@ import re
 import shutil
 import subprocess
 import sys
-import urllib2
 
 from lxml import etree
 
@@ -71,6 +70,11 @@ KNOWN_AUDIENCE_VALUES = ["enduser",
                          "installer",
                          "webpage"]
 
+BASE_RNG = os.path.join(os.path.dirname(__file__), 'resources')
+RACKBOOK_RNG = os.path.join(BASE_RNG, 'rackbook.rng')
+DOCBOOKXI_RNG = os.path.join(BASE_RNG, 'docbookxi.rng')
+WADL_RNG = os.path.join(BASE_RNG, 'wadl.rng')
+
 
 # NOTE(berendt): check_output as provided in Python 2.7.5 to make script
 #                usable with Python < 2.7
@@ -97,18 +101,18 @@ def check_output(*popenargs, **kwargs):
 def get_schema(is_api_site=False):
     """Return the DocBook RELAX NG schema."""
     if is_api_site:
-        url = "http://docs.rackspace.com/rackbook/rackbook.rng"
+        url = RACKBOOK_RNG
     else:
-        url = "http://docbook.org/xml/5.1CR1/rng/docbookxi.rng"
-    relaxng_doc = etree.parse(urllib2.urlopen(url))
+        url = DOCBOOKXI_RNG
+    relaxng_doc = etree.parse(url)
     return etree.RelaxNG(relaxng_doc)
 
 
 def get_wadl_schema():
     """Return the Wadl schema."""
-    url = "http://docs.rackspace.com/rackbook/wadl.xsd"
-    xmlschema_doc = etree.parse(urllib2.urlopen(url))
-    return etree.XMLSchema(xmlschema_doc)
+    url = WADL_RNG
+    relaxng_doc = etree.parse(url, base_url=BASE_RNG)
+    return etree.RelaxNG(relaxng_doc)
 
 
 def validation_failed(schema, doc):

@@ -6,6 +6,7 @@ recursive-include bin *
 recursive-include doc *
 recursive-include tools *
 recursive-include sitemap *
+recursive-include os_doc_tools *
 
 exclude .gitignore
 exclude .gitreview

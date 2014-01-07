@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:wadl="http://wadl.dev.java.net/2009/02" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:s="http://www.ascc.net/xml/schematron" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook" xmlns:ctrl="http://nwalsh.com/xmlns/schema-control/" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" ns="http://docbook.org/ns/docbook">
+
+  <include href="docbookxi.rng"/> 
+  <include href="extensions.rng"/>
+
+  <define name="db.para.blocks" combine="choice">
+    <choice>
+      <ref name="resources"/>
+    </choice>
+  </define>
+  
+  <define name="db.info.elements" combine="choice">
+    <optional>
+    <choice>
+      <ref name="rax.extensions"/>
+      <ref name="rax.extension"/>
+    </choice>
+    </optional>
+  </define>
+
+  <s:pattern name="xml:id required on book, part, section, chapter, appendix, and preface">
+    <s:rule context="//db:book|//db:part|//db:section|//db:chapter|//db:appendix|//db:preface">
+      <s:assert test="@xml:id">xml:id required on book, part, section, chapter, appendix, and preface.</s:assert>
+    </s:rule>
+  </s:pattern>
+  
+  <s:pattern name="The fileref attribute must not be null">
+    <s:rule context="//db:imagedata">
+      <s:assert test="not(normalize-space(@fileref) = '')">The fileref attribute on olink must not be empty.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <!-- <s:pattern name="The glossterm element must have a linkend attribute"> -->
+  <!--   <s:rule context="//db:glossterm[not(parent::db:glossentry)]"> -->
+  <!--     <s:assert test="@linkend and not(normalize-space(@linkend) = '')">The glossentry/glossterm element must have a linkend attribute.</s:assert> -->
+  <!--   </s:rule> -->
+  <!-- </s:pattern> -->
+  <s:pattern name="The targetptr and targetdoc attributes must not be null">
+    <s:rule context="//db:olink">
+      <s:assert test="not(normalize-space(@targetptr) = '') and not(normalize-space(@targetdoc) = '')">The targetptr and targetdoc attributes on olink must not be empty.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The primary, secondary, and tertiary elements must not be null">
+    <s:rule context="//db:primary|//db:secondary|//db:tertiary">
+      <s:assert test="not(normalize-space(.) = '')">The primary, secondary, and tertiary elements must not be empty.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The remark element must not be empty">
+    <s:rule context="//db:remark">
+      <s:assert test="not(normalize-space(.) = '')">The remark element must not be empty.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The filename element must not be empty">
+    <s:rule context="//db:filename">
+      <s:assert test="not(normalize-space(.) = '')">The filename element must not be empty.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The code element must not be empty">
+    <s:rule context="//db:code">
+      <s:assert test="not(normalize-space(.) = '')">The code element must not be empty.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The title element is required and must not be null">
+    <s:rule context="//db:title">
+      <s:assert test="not(normalize-space(.) = '') and not(@security = 'writeronly') and not(@security = 'reviewer') and not(@security = 'internal') and not(@revisionflag = 'deleted') and not(@condition)">The title element must not be empty or conditioned out.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="If the language is English or not set, then the procedure element must have a title that begins with 'To'">
+    <s:rule context="//db:procedure[not(ancestor-or-self::*[@xml:lang]) or starts-with(ancestor-or-self::*[@xml:lang][1]/@xml:lang,'en')] ">
+      <s:assert test="./db:title[starts-with(normalize-space(.),'To ')]|./db:info/db:title[starts-with(normalize-space(.),'To ')]">The procedure element must have a title that begins with 'To'.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The security attribute should be put on the ancestor listitem">
+    <s:rule context="//db:listitem[not(ancestor-or-self::*[@security='reviewer']) and not(ancestor-or-self::*[@security='writeronly'])]/*">
+      <s:assert test="../*[not(@security) or @security = 'external'] or (not(@security = 'reviewer') and not(@security = 'internal') and not(@security = 'writeronly'))">The security attribute should be put on the ancestor listitem.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="The security attribute should be put on the ancestor step">
+    <s:rule context="//db:step[not(ancestor-or-self::*[@security='reviewer']) and not(ancestor-or-self::*[@security='writeronly'])]/*">
+      <s:assert test="../*[not(@security) or @security = 'external'] or (not(@security = 'reviewer') and not(@security = 'internal') and not(@security = 'writeronly'))">The security attribute should be put on the ancestor step.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="revisionflag=deleted attribute should be put on the ancestor listitem">
+    <s:rule context="//db:listitem[not(ancestor-or-self::*[@revisionflag='deleted'])]/*|//db:step[not(ancestor-or-self::*[@revisionflag='deleted'])]/*">
+      <s:assert test="../*[not(@revisionflag) or @revisionflag != 'deleted'] or (not(@revisionflag = 'deleted'))">The revisionflag=deleted attribute should be put on the ancestor listitem or step.</s:assert>
+    </s:rule>
+  </s:pattern>
+  <s:pattern name="No roles on indexterms">
+    <s:rule context="db:indexterm">
+      <s:assert test="not(@role)">The indexterm element must not have a role attribute</s:assert>
+    </s:rule>
+  </s:pattern>
+
+  <s:pattern name="No CALS tables">
+    <s:rule context="db:table|db:informaltable">
+      <s:assert test="not(db:tgroup)">Please use HTML tables instead of CALS tables.</s:assert>
+    </s:rule>
+  </s:pattern>
+
+  <define name="rax._any.attribute">
+    <attribute>
+      <a:documentation>Any attribute including in any attribute in any namespace.</a:documentation>
+      <anyName/>
+    </attribute>
+  </define>
+  
+  <div>
+    <define name="rax._any.xhtml">
+      <element>
+        <a:documentation>Any element from the SVG namespace</a:documentation>
+        <nsName ns="http://www.w3.org/1999/xhtml"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="rax._any.attribute"/>
+            <text/>
+            <ref name="rax._any.xhtml"/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </define>
+  </div>
+  
+
+  <define name="doc">
+    <element name="wadl:doc">
+      <optional>
+        <attribute name="xml:lang">
+          <ref name="languageTag"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="title"/>
+      </optional>
+      <zeroOrMore>
+        <choice>
+          <ref name="db.all.blocks"/>
+          <ref name="rax._any.xhtml"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="grammars">
+    <element name="wadl:grammars">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="incl"/>
+      </zeroOrMore>
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="incl">
+    <element name="wadl:include">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <attribute name="href">
+        <data type="anyURI"/>
+      </attribute>
+      <!-- <ref name="foreign-attribute"/>  -->
+    </element>
+  </define>
+  <define name="resources">
+    <element name="wadl:resources">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="resource"/>
+      </zeroOrMore>
+  <optional>
+      <attribute name="base">
+        <data type="anyURI"/>
+      </attribute>
+  </optional>
+  <optional>
+      <attribute name="href">
+        <data type="anyURI"/>
+      </attribute>
+  </optional>
+      <!-- <ref name="foreign-attribute"/>  -->
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="resource_type">
+    <element name="wadl:resource_type">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <choice>
+          <ref name="method"/>
+          <ref name="resource"/>
+        </choice>
+      </zeroOrMore>
+      <optional>
+        <attribute name="id">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <!-- <ref name="foreign-attribute"/>  -->
+    </element>
+  </define>
+  <define name="resource">
+    <element name="wadl:resource">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <choice>
+          <ref name="method"/>
+          <ref name="resource"/>
+        </choice>
+      </zeroOrMore>
+      <choice>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+        <group>
+          <optional>
+            <attribute name="type">
+              <list>
+                <data type="anyURI"/>
+              </list>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="path"/>
+          </optional>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="queryType"/>
+          </optional>
+          <!-- <ref name="foreign-element"/>  -->
+          <!-- <ref name="foreign-attribute"/>  -->          
+          </group>
+      </choice>
+    </element>
+  </define>
+  <define name="method">
+    <element name="wadl:method">
+      <choice>
+        <group>
+          <attribute name="href">
+            <data type="anyURI"/>
+           </attribute>
+          <!-- Allow wadl:doc in methods with hrefs so writers can supplement method docs in the DocBook -->
+           <zeroOrMore>
+             <ref name="doc"/>
+           </zeroOrMore>          
+        </group>
+        <group>
+          <zeroOrMore>
+            <ref name="doc"/>
+          </zeroOrMore>
+          <optional>
+            <ref name="request"/>
+          </optional>
+          <zeroOrMore>
+            <ref name="response"/>
+          </zeroOrMore>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <attribute name="name">
+            <choice>
+              <value>DELETE</value>
+              <value>GET</value>
+              <value>HEAD</value>
+              <value>POST</value>
+              <value>PUT</value>
+              <data type="token"/>
+            </choice>
+          </attribute>
+        </group>
+      </choice>
+      <!-- <ref name="foreign-element"/>  -->
+      <!-- <ref name="foreign-attribute"/>  -->
+    </element>
+  </define>
+  <define name="request">
+    <element name="wadl:request">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="representation"/>
+      </zeroOrMore>
+      <!-- <ref name="foreign-attribute"/>  -->
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="response">
+    <element name="wadl:response">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="param"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="representation"/>
+      </zeroOrMore>
+      <optional>
+        <attribute name="status">
+          <list>
+            <oneOrMore>
+              <data type="int"/>
+            </oneOrMore>
+          </list>
+        </attribute>
+      </optional>
+      <!-- <ref name="foreign-attribute"/>  -->
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="representation">
+    <element name="wadl:representation">
+      <choice>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+        <group>
+          <zeroOrMore>
+            <ref name="doc"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="param"/>
+          </zeroOrMore>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="element">
+              <data type="QName"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="mediaType"/>
+          </optional>
+          <optional>
+            <attribute name="profile">
+              <list>
+                <data type="anyURI"/>
+              </list>
+            </attribute>
+          </optional>
+        </group>
+      </choice>
+      <!-- <ref name="foreign-attribute"/>  -->
+      <!-- <ref name="foreign-element"/>  -->
+    </element>
+  </define>
+  <define name="param">
+    <element name="wadl:param">
+      <choice>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+        <group>
+          <zeroOrMore>
+            <ref name="doc"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="option"/>
+          </zeroOrMore>
+          <optional>
+            <ref name="link"/>
+          </optional>
+          <attribute name="name">
+            <data type="token"/>
+          </attribute>
+          <attribute name="style">
+            <choice>
+              <value>plain</value>
+              <value>query</value>
+              <value>matrix</value>
+              <value>header</value>
+              <value>template</value>
+            </choice>
+          </attribute>
+          <optional>
+            <attribute name="id">
+              <data type="token"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="type"/>
+          </optional>
+          <optional>
+            <attribute name="default"/>
+          </optional>
+          <optional>
+            <attribute name="path"/>
+          </optional>
+          <optional>
+            <attribute name="required">
+              <data type="boolean"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="repeating">
+              <data type="boolean"/>
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="fixed"/>
+          </optional>
+        </group>
+      </choice>
+      <!-- <ref name="foreign-element"/>  -->
+      <!-- <ref name="foreign-attribute"/>  -->
+    </element>
+  </define>
+  <define name="option">
+    <element name="wadl:option">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+      <optional>
+        <attribute name="mediaType"/>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <!-- <ref name="foreign-attribute"/>  -->
+    </element>
+  </define>
+  <define name="link">
+    <element name="wadl:link">
+      <zeroOrMore>
+        <ref name="doc"/>
+      </zeroOrMore>
+      <optional>
+        <attribute name="resource_type">
+          <data type="anyURI"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="rel">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="rev">
+          <data type="token"/>
+        </attribute>
+      </optional>
+      <!-- <ref name="foreign-element"/>  -->
+      <!-- <ref name="foreign-attribute"/>  -->
+    </element>
+  </define>
+  <define name="foreign-attribute">
+    <zeroOrMore>
+      <attribute>
+        <anyName>
+          <except>
+            <nsName ns="http://wadl.dev.java.net/2009/02"/>
+            <nsName/>
+            <nsName ns="http://www.w3.org/XML/1998/namespace"/>
+          </except>
+        </anyName>
+      </attribute>
+    </zeroOrMore>
+  </define>
+  <!--  <define name="foreign-element">
+    <zeroOrMore>
+      <element>
+        <anyName>
+          <except>
+            <nsName ns="http://wadl.dev.java.net/2009/02"/>
+            <nsName/>
+          </except>
+        </anyName>
+        <zeroOrMore>
+          <choice>
+            <attribute>
+              <anyName/>
+            </attribute>
+            <text/>
+            <ref name="any-element"/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </zeroOrMore>
+  </define>-->
+  <!--  <define name="any-element">
+    <zeroOrMore>
+      <element>
+        <anyName/>
+        <zeroOrMore>
+          <choice>
+            <attribute>
+              <anyName/>
+            </attribute>
+            <text/>
+            <ref name="any-element"/>
+          </choice>
+        </zeroOrMore>
+      </element>
+    </zeroOrMore>
+  </define>-->
+  <define name="languageTag">
+    <data type="string">
+      <param name="pattern">[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*</param>
+    </data>
+  </define>
+
+</grammar>
