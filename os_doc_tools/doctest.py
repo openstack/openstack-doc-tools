@@ -909,6 +909,8 @@ def main():
 
     prog_args = parser.parse_args()
 
+    print ("OpenStack Doc Checks (using openstack-doc-tools version %s)\n"
+           % os_doc_tools.__version__)
     if not prog_args.api_site:
         prog_args.path = os.path.join(prog_args.path, 'doc')
     if (len(sys.argv) == 1):
