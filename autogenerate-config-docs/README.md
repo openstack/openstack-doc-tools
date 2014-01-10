@@ -99,9 +99,10 @@ Making the flag names update
 
   ../../openstack-doc-tools/autogenerate-config/autohelp.py -vvv --action update -i nova.flagmappings -o names --path ~/nova | more    
 
-At this point, seach through nova.flagmappings.new for anything labelled Unknown and fix,
-once that is done use:     
+At this point, search through nova.flagmappings.new for anything
+labelled Unknown and fix, once that is done use:
      
  ../../openstack-doc-tools/autogenerate-config/autohelp.py -vvv --action create -i nova.flagmappings -o docbook --path ~/nova    
 
-to generate the XML files and move those into the appropriate part ofthe git repo
+to generate the XML files and move those into the appropriate part of
+the git repo

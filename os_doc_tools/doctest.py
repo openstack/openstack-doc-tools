@@ -143,7 +143,7 @@ def verify_attribute_profiling(doc, attribute, known_values):
     """Check for elements with attribute profiling set that conflicts with
        the attribute profiling of nodes below them in the DOM
        tree. This picks up cases where content is accidentally
-       ommitted via conflicting profiling. Checks known_values also for
+       omitted via conflicting profiling. Checks known_values also for
        supported profiling values.
     """
 
