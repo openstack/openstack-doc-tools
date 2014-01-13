@@ -14,14 +14,13 @@
 # under the License.
 #
 
-from oslo.config import cfg
-
+import importlib
 import os
-import string
 import sys
-import glob
-from collections import defaultdict
 from xml.sax.saxutils import escape
+
+import openstack.common.config.generator as generator
+
 
 # gettext internationalisation function requisite:
 import __builtin__
@@ -44,212 +43,125 @@ def git_check(repo_path):
     return package_name
 
 
-def populate_groups(filepath):
-    """
-    Takes a file formatted with lines of config option and group
-    separated by a space and constructs a dictionary indexed by
-    group, which is returned.
-    """
-    groups = defaultdict(list)
-    groups_file = open(os.path.expanduser(filepath), 'r')
-    for line in groups_file:
-        try:
-            option, group_list = line.split(None, 1)
-            group_list = group_list.split(None)
-        except ValueError:
-            print "Couldn't read groups file line:%s" % line
-            print "Check for formatting errors - did you add the group?"
-            sys.exit(1)
-        for group in group_list:
-            groups[group.strip()].append(option)
-    return groups
-
-
-def extract_flags(repo_location, module_name, verbose=0, names_only=True):
+def import_modules(repo_location, package_name, verbose=0):
     """
     Loops through the repository, importing module by module to
     populate the configuration object (cfg.CONF) created from Oslo.
     """
-    usable_dirs = []
-    module_location = os.path.dirname(repo_location + '/' + module_name)
-    for root, dirs, files in os.walk(module_location + '/' + module_name):
-        for name in dirs:
-            abs_path = os.path.join(root.split(module_location)[1][1:], name)
-            if ('/tests' not in abs_path and
-                    '/locale' not in abs_path and
-                    '/cmd' not in abs_path and
-                    '/db/migration' not in abs_path and
-                    '/transfer' not in abs_path):
-                usable_dirs.append(os.path.join(root.split(module_location)
-                                                [1][1:], name))
-
-    for directory in usable_dirs:
-        for python_file in glob.glob(module_location + '/' + directory
-                                     + "/*.py"):
-            if '__init__' not in python_file:
-                usable_dirs.append(os.path.splitext(python_file)
-                                   [0][len(module_location) + 1:])
-
-        package_name = directory.replace('/', '.')
-        try:
-            __import__(package_name)
-            if verbose >= 1:
-                print "imported %s" % package_name
-
-        except ImportError as e:
-            """
-            work around modules that don't like being imported in this way
-            FIXME This could probably be better, but does not affect the
-            configuration options found at this stage
-            """
-            if verbose >= 2:
-                print str(e)
-                print "Failed to import: %s (%s)" % (package_name, e)
-
+    modules = {}
+    pkg_location = os.path.join(repo_location, package_name)
+    for root, dirs, files in os.walk(pkg_location):
+        skipdir = False
+        for excludedir in ('tests', 'locale', 'cmd',
+                           os.path.join('db', 'migration'), 'transfer'):
+            if ((os.path.sep + excludedir + os.path.sep) in root or (
+                    root.endswith(os.path.sep + excludedir))):
+                skipdir = True
+                break
+        if skipdir:
             continue
-
-    flags = cfg.CONF._opts.items()
-
-    #extract group information
-    for group in cfg.CONF._groups.keys():
-        flags = flags + cfg.CONF._groups[group]._opts.items()
-    flags.sort()
-
-    return flags
-
-
-def extract_flags_test(repo_loc, module, verbose=0):
-    """
-    TEST TEST TEST TEST TEST TEST
-    TEST TEST TEST TEST TEST TEST
-    Loops through the repository, importing module by module to
-    populate the configuration object (cfg.CONF) created from Oslo.
-    TEST TEST TEST TEST TEST TEST
-    TEST TEST TEST TEST TEST TEST
-    """
-    flag_data = {}
-    usable_dirs = []
-    module_location = os.path.dirname(repo_loc + '/' + module)
-    for root, dirs, files in os.walk(module_location + '/' + module):
-        for name in dirs:
-            abs_path = os.path.join(root.split(module_location)[1][1:], name)
-            if ('/tests' not in abs_path and
-                    '/locale' not in abs_path and
-                    '/cmd' not in abs_path and
-                    '/db/migration' not in abs_path):
-                usable_dirs.append(os.path.join(root.split(module_location)
-                                                [1][1:], name))
-
-    for directory in usable_dirs:
-        for python_file in glob.glob(module_location + '/' + directory +
-                                     "/*.py"):
-            if '__init__' not in python_file:
-                usable_dirs.append(os.path.splitext(python_file)[0]
-                                   [len(module_location) + 1:])
-
-        package_name = directory.replace('/', '.')
-        try:
-            __import__(package_name)
-            if verbose >= 1:
-                print "imported %s" % package_name
-            flag_data[str(package_name)] = sorted(cfg.CONF._opts.items())
-
-        except ImportError as e:
-            """
-            work around modules that don't like being imported in this way
-            FIXME This could probably be better, but does not affect the
-            configuration options found at this stage
-            """
-            if verbose >= 2:
-                print str(e)
-                print "Failed to import: %s (%s)" % (package_name, e)
-
-            continue
-
-    return flag_data
+        for pyfile in files:
+            if pyfile.endswith('.py'):
+                modfile = os.path.join(root, pyfile).split(repo_location)[1]
+                modname = os.path.splitext(modfile)[0].split(os.path.sep)
+                modname = '.'.join(modname)
+                if modname.endswith('.__init__'):
+                    modname = modname[:modname.rfind(".")]
+                try:
+                    module = importlib.import_module(modname)
+                    modules[modname] = module
+                    if verbose >= 1:
+                        print "imported %s" % modname
+                except ImportError as e:
+                    """
+                    work around modules that don't like being imported in
+                    this way FIXME This could probably be better, but does
+                    not affect the configuration options found at this stage
+                    """
+                    if verbose >= 2:
+                        print "Failed to import: %s (%s)" % (modname, e)
+                    continue
+    return modules
 
 
-def write_test(file, repo_dir, pkg_name):
-    """
-    """
-    file1 = file + ".test"
-    flags = extract_flags_test(repo_dir, pkg_name)
-    with open(file1, 'a+') as f:
-        f.write("\n")
-        for filename, flag_info in flags.iteritems():
-            f.write("\n -- start file name area --\n")
-            f.write(filename)
-            f.write("\n -- end file name area --\n")
-            print "\n -- start file name area --\n"
-            print filename
-            print "\n -- end file name area --\n"
-            print len(flag_info)
-            for name, value in flag_info:
-                #opt = value['opt']
-                #print type(opt)
-                #print opt
-                #print name
-                #print value
-                f.write(name)
-                f.write("\n")
+class OptionsCache(object):
+    def __init__(self, modules, verbose=0):
+        self._opts_by_module = {}
+        self._opts_by_name = {}
+        self._opt_names = []
+
+        for modname in modules.keys():
+            modopts = generator._list_opts(modules[modname])
+            if len(modopts) == 0:
+                continue
+            self._opts_by_module[modname] = []
+            for group, opts in modopts:
+                for opt in opts:
+                    self._opts_by_module[modname].append((group, opt))
+                    if group == 'DEFAULT':
+                        optname = opt.name
+                    else:
+                        optname = group + '.' + opt.name
+                    if optname in self._opts_by_name:
+                        oldmod = self._opts_by_name[optname][0]
+                        if oldmod.startswith(modname + '.'):
+                            if verbose >= 2:
+                                print (("Duplicate option name %s" +
+                                        " from %s and %s. Using %s.") %
+                                       (optname, modname, oldmod, oldmod))
+                        elif modname.startswith(oldmod + '.'):
+                            self._opts_by_name[optname] = (modname, group, opt)
+                            if verbose >= 2:
+                                print (("Duplicate option name %s"
+                                        " from %s and %s. Using %s.") %
+                                       (optname, modname, oldmod, modname))
+                        elif verbose >= 2:
+                            print (("Duplicate option name %s"
+                                    " from %s and %s. Taking one at random.") %
+                                   (optname, modname, oldmod))
+                    else:
+                        self._opts_by_name[optname] = (modname, group, opt)
+                        self._opt_names.append(optname)
+
+        self._opt_names.sort(OptionsCache._cmpopts)
+
+    def __len__(self):
+        return len(self._opt_names)
+
+    def get_option_names(self):
+        return self._opt_names
+
+    def get_option(self, name):
+        return self._opts_by_name[name]
+
+    @staticmethod
+    def _cmpopts(x, y):
+        if '.' in x and '.' in y:
+            prex = x[:x.find('.')]
+            prey = y[:x.find('.')]
+            if prex != prey:
+                return cmp(prex, prey)
+            return cmp(x, y)
+        elif '.' in x:
+            return 1
+        elif '.' in y:
+            return -1
+        else:
+            return cmp(x, y)
 
 
-def write_header(filepath, verbose=0):
-    """
-    Write header to output flag file.
-    """
-    pass
-
-
-def write_buffer(file, flags, verbose=0):
-    """
-    Write flag data to file.
-
-    Note that the header is written with the write_header function.
-    """
-    pass
-    #with open(os.path.expanduser(filepath), 'wb') as f:
-
-
-def write_flags(filepath, flags, name_only=True, verbose=0):
-    """
-    write out the list of flags in the cfg.CONF object to filepath
-    if name_only is True - write only a list of names, one per line,
-    otherwise use MediaWiki syntax to write out the full table with
-    help text and default values.
-    """
-    with open(os.path.expanduser(filepath), 'wb') as f:
-        if not name_only:
-            f.write("{|\n")  # start table
-            # print headers
-            f.write("!")
-            f.write("!!".join(["name", "default", "description"]))
-            f.write("\n|-\n")
-
-        for name, value in flags:
-            opt = value['opt']
-            if not opt.help:
-                opt.help = "No help text available for this option"
-            if not name_only:
-                f.write("|")
-                f.write("||".join([string.strip(name),
-                                   string.strip(str(opt.default)),
-                                   string.strip(opt.help.replace("\n", " "))]))
-                f.write("\n|-\n")
-            else:
-                f.write(name + "\n")
-
-        if not name_only:
-            f.write("|}\n")  # end table
-
-
-def write_docbook(directory, flags, groups, package_name, verbose=0):
+def write_docbook(package_name, options, verbose=0):
     """
     Prints a docbook-formatted table for every group of options.
     """
-    count = 0
-    for group in groups.items():
-        groups_file = open(package_name + '-' + group[0] + '.xml', 'w')
+    options_by_cat = {}
+    with open(package_name + '.flagmappings') as f:
+        for line in f:
+            opt, category = line.split()
+            options_by_cat.setdefault(category, []).append(opt)
+
+    for cat in options_by_cat.keys():
+        groups_file = open(package_name + '-' + cat + '.xml', 'w')
         groups_file.write('<?xml version="1.0" encoding="UTF-8"?>\n\
         <!-- Warning: Do not edit this file. It is automatically\n\
              generated and your changes will be overwritten.\n\
@@ -257,7 +169,7 @@ def write_docbook(directory, flags, groups, package_name, verbose=0):
              repository -->\n\
         <para xmlns="http://docbook.org/ns/docbook" version="5.0">\n\
         <table rules="all">\n\
-          <caption>Description of configuration options for ' + group[0] +
+          <caption>Description of configuration options for ' + cat +
                           '</caption>\n\
            <col width="50%"/>\n\
            <col width="50%"/>\n\
@@ -268,159 +180,78 @@ def write_docbook(directory, flags, groups, package_name, verbose=0):
               </tr>\n\
           </thead>\n\
           <tbody>')
-        for flag_name in group[1]:
-            for flag in flags:
-                if flag[0] == flag_name:
-                    count = count + 1
-                    opt = flag[1]["opt"]
-                    if not opt.help:
-                        opt.help = "No help text available for this option"
-                    if (type(opt).__name__ == "ListOpt" and
-                            opt.default is not None):
-                        opt.default = ", ".join(opt.default)
-                    groups_file.write('\n              <tr>\n\
-                       <td>' + flag_name + ' = ' + str(opt.default) + '</td>\n\
-                       <td>(' + type(opt).__name__ + ') '
-                        + escape(opt.help) + '</td>\n\
+        for optname in options_by_cat[cat]:
+            modname, group, option = options.get_option(optname)
+            if not option.help:
+                option.help = "No help text available for this option"
+            if ((type(option).__name__ == "ListOpt") and (
+                    option.default is not None)):
+                option.default = ", ".join(option.default)
+            groups_file.write('\n              <tr>\n\
+                       <td>' + option.name + ' = ' +
+                              str(option.default) + '</td>\n\
+                       <td>(' + type(option).__name__ + ') ' +
+                              escape(option.help) + '</td>\n\
               </tr>')
         groups_file.write('\n       </tbody>\n\
         </table>\n\
-        </para>')
+        </para>\n')
         groups_file.close()
 
 
-def create(flag_file, repo_path):
+def create_flagmappings(package_name, options, verbose=0):
     """
-        Create new flag mappings file, containing help information for
-        the project whose repo location has been passed in at the command line.
+    Create a flagmappings file. This will create a new file called
+    $package_name.flagmappings with all the categories set to Unknown.
     """
-
-    # flag_file testing.
-    #try:
-        # Test for successful creation of flag_file.
-    #except:
-        # If the test(s) fail, exit noting the problem(s).
-
-    # repo_path git repo validity testing.
-    #try:
-        # Test to be sure the repo_path passed in is a valid directory
-        # and that directory is a valid existing git repo.
-    #except:
-        # If the test(s) fail, exit noting the problem(s).
-
-    # get as much help as possible, searching recursively through the
-    # entire repo source directory tree.
-    #help_data = get_help(repo_path)
-
-    # Write this information to the file.
-    #write_file(flag_file, help_data)
+    with open(package_name + '.flagmappings', 'w') as f:
+        for opt in options.get_option_names():
+            f.write(opt + ' Unknown\n')
 
 
-def update(filepath, flags, name_only=True, verbose=0):
+def update_flagmappings(package_name, options, verbose=0):
     """
-        Update flag mappings file, adding or removing entries as needed.
-        This will update the file content, essentially overriding the data.
-        The primary difference between create and update is that create will
-        make a new file, and update will just work with the data that is
-        data that is already there.
+    Update a flagmappings file, adding or removing entries as needed.
+    This will create a new file $package_name.flagmappings.new with
+    category information merged from the existing $package_name.flagmappings.
     """
-    original_flags = []
+    original_flags = {}
+    with open(package_name + '.flagmappings') as f:
+        for line in f:
+            flag, category = line.split()
+            original_flags.setdefault(flag, []).append(category)
+
     updated_flags = []
-    write_flags(filepath + '.new', flags, name_only=True, verbose=0)
-    original_flag_file = open(filepath)
-    updated_flag_file = open(filepath + '.new', 'r')
-    for line in original_flag_file:
-        original_flags.append(line.split()[0])
-    for line in updated_flag_file:
-        updated_flags.append(line.rstrip())
-    updated_flag_file.close()
+    for opt in options.get_option_names():
+        if len(original_flags.get(opt, [])) == 1:
+            updated_flags.append((opt, original_flags[opt][0]))
+            continue
 
-    removed_flags = set(original_flags) - set(updated_flags)
-    added_flags = set(updated_flags) - set(original_flags)
+        if '.' in opt:
+            # Compaitibility hack for old-style flagmappings, where grouped
+            # options didn't have their group names prefixed. If there's only
+            # one category, we assume there wasn't a conflict, and use it.
+            barename = opt[opt.find('.') + 1:]
+            if len(original_flags.get(barename, [])) == 1:
+                updated_flags.append((opt, original_flags[barename][0]))
+                continue
 
-    print "\nRemoved Flags\n"
-    for line in sorted(removed_flags):
-        print line
+        updated_flags.append((opt, 'Unknown'))
 
-    print "\nAdded Flags\n"
-    for line in sorted(added_flags):
-        print line
+    with open(package_name + '.flagmappings.new', 'w') as f:
+        for flag, category in updated_flags:
+            f.write(flag + ' ' + category + '\n')
 
-    updated_flag_file = open(filepath + '.new', 'wb')
-    original_flag_file.seek(0)
-    for line in original_flag_file:
-        flag_name = line.split()[0]
-        if flag_name not in removed_flags:
-            for added_flag in added_flags:
-                if flag_name > added_flag:
-                    updated_flag_file.write(added_flag + ' Unknown\n')
-                    added_flags.remove(added_flag)
-                    break
-            updated_flag_file.write(line)
+    if verbose >= 1:
+        removed_flags = (set(original_flags.keys()) -
+                         set([x[0] for x in updated_flags]))
+        added_flags = (set([x[0] for x in updated_flags]) -
+                       set(original_flags.keys()))
 
+        print "\nRemoved Flags\n"
+        for line in sorted(removed_flags):
+            print line
 
-def verify(flag_file):
-    """
-        Verify flag file contents.  No actions are taken.
-    """
-    pass
-
-
-def usage():
-        print "\nUsage: %s docbook <groups file> <source loc>" % sys.argv[0]
-        print "\nGenerate a list of all flags for package in source loc and"\
-              "\nwrites them in a docbook table format, grouped by the groups"\
-              "\nin the groups file, one file per group.\n"
-        print "\n       %s names <names file> <source loc>" % sys.argv[0]
-        print "\nGenerate a list of all flags names for the package in"\
-              "\nsource loc and writes them to names file, one per line \n"
-
-
-def parse_me_args():
-    import argparse
-    parser = argparse.ArgumentParser(
-        description='Manage flag files, to aid in updatingdocumentation.',
-        epilog='Example: %(prog)s -a create -in ./nova.flagfile -fmt docbook\
- -p /nova',
-        usage='%(prog)s [options]')
-    parser.add_argument('-a', '--action',
-                        choices=['create', 'update', 'verify'],
-                        dest='action',
-                        help='action (create, update, verify) [REQUIRED]',
-                        required=True,
-                        type=str,)
-    # trying str data type... instead of file.
-    parser.add_argument('-i', '-in', '--input',
-                        dest='file',
-                        help='flag file being worked with [REQUIRED]',
-                        required=True,
-                        type=str,)
-    parser.add_argument('-f', '-fmt', '--format', '-o', '-out',
-                        dest='format',
-                        help='file output format (options: docbook, names)',
-                        required=False,
-                        type=str,)
-    # ..tried having 'dir' here for the type, but the git.Repo function
-    # requires a string is passed to it.. a directory won't work.
-    parser.add_argument('-p', '--path',
-                        dest='repo',
-                        help='path to valid git repository [REQUIRED]',
-                        required=True,
-                        type=str,)
-    parser.add_argument('-v', '--verbose',
-                        action='count',
-                        default=0,
-                        dest='verbose',
-                        required=False,)
-    parser.add_argument('-no', '--name_only',
-                        action='store_true',
-                        dest='name',
-                        help='whether output should contain names only',
-                        required=False,)
-    parser.add_argument('-test',
-                        action='store_true',
-                        dest='test',
-                        help=argparse.SUPPRESS,
-                        required=False,)
-    args = vars(parser.parse_args())
-    return args
+        print "\nAdded Flags\n"
+        for line in sorted(added_flags):
+            print line
