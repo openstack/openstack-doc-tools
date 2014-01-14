@@ -62,6 +62,26 @@ downloaded each time for validation of XML and WADL files.
 Please see the ``README.txt`` in the directory for details on where
 these files come from.
 
+Release notes
+=============
+
+0.3
+---
+
+ * Fixes path for automated translation toolchain to fix lp:bug 1216153
+ * Validates .xsd .xsl and.xjb files in addition to .xml
+ * Fixes validation of WADL files to validate properly against XML schema
+
+0.2
+---
+
+ * Enables local copies of RNG schema for validation
+ * Enables ignoring directories when checking
+
+0.1
+---
+
+Initial release
 
 Contributing
 ============
