@@ -70,10 +70,11 @@ KNOWN_AUDIENCE_VALUES = ["enduser",
                          "installer",
                          "webpage"]
 
-BASE_RNG = os.path.join(os.path.dirname(__file__), 'resources')
+BASE_RNG = os.path.join(os.path.dirname(__file__), 'resources/')
 RACKBOOK_RNG = os.path.join(BASE_RNG, 'rackbook.rng')
 DOCBOOKXI_RNG = os.path.join(BASE_RNG, 'docbookxi.rng')
 WADL_RNG = os.path.join(BASE_RNG, 'wadl.rng')
+WADL_XSD = os.path.join(BASE_RNG, 'wadl.xsd')
 
 
 # NOTE(berendt): check_output as provided in Python 2.7.5 to make script
@@ -110,9 +111,15 @@ def get_schema(is_api_site=False):
 
 def get_wadl_schema():
     """Return the Wadl schema."""
-    url = WADL_RNG
-    relaxng_doc = etree.parse(url, base_url=BASE_RNG)
-    return etree.RelaxNG(relaxng_doc)
+    # NOTE(jaegerandi): We could use the RelaxNG instead
+    # like follows but this gives quite some errors at the
+    # moment, so only validate using the XMLSchema
+    #url = WADL_RNG
+    #relaxng_doc = etree.parse(url, base_url=BASE_RNG)
+    #return etree.RelaxNG(relaxng_doc)
+    url = WADL_XSD
+    schema = etree.parse(url, base_url=BASE_RNG)
+    return etree.XMLSchema(schema)
 
 
 def validation_failed(schema, doc):
@@ -446,14 +453,15 @@ def is_xml(filename):
     return filename.endswith('.xml') and not filename.endswith('/pom.xml')
 
 
-def is_xml_wadl(filename):
-    """Returns true if file ends a valid .xml or .wadl file.
+def is_xml_like(filename):
+    """Returns true if file is in some XML format we handle
 
     Skips pom.xml files as well since those are not handled.
     """
 
-    return (filename.endswith(('.xml', '.wadl')) and
-            not filename.endswith('/pom.xml'))
+    return (filename.endswith(('.xml', '.xsd', '.xsl', '.wadl',
+                               '.xjb')) and
+            not filename.endswith('pom.xml'))
 
 
 def is_wadl(filename):
@@ -476,24 +484,28 @@ def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
     no_failed = 0
 
     if check_syntax and check_niceness:
-        print("Checking syntax and niceness of xml and wadl files...")
+        print("Checking syntax and niceness of XML files...")
     elif check_syntax:
-        print("Checking syntax of xml and wadl files...")
+        print("Checking syntax of XML files...")
     elif check_niceness:
-        print("Checking niceness of xml and wadl files...")
+        print("Checking niceness of XML files...")
 
     for f in files_to_check:
         base_f = os.path.basename(f)
         if (base_f == "pom.xml" or
                 base_f in exceptions):
             continue
-        # Files ending with ".xml" in subdirectories of
-        # wadls and samples files are not docbook files.
-        # We cannot validate with a schema for these
-        if (is_api_site and ("wadls" in f or "samples" in f)):
-            validate_schema = False
-        else:
-            validate_schema = True
+        validate_schema = True
+        if is_api_site:
+            # Files ending with ".xml" in subdirectories of
+            # wadls and samples files are not docbook files.
+            if (f.endswith('.xml') and
+                ("wadls" in f or "samples" in f)):
+                validate_schema = False
+            # Right now we can only validate docbook .xml
+            # and .wadl files with a schema
+            elif not f.endswith(('.wadl', '.xml')):
+                validate_schema = False
 
         if (is_api_site and is_wadl(f)):
             any_failures = validate_one_file(wadl_schema, rootdir, f,
@@ -512,12 +524,12 @@ def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
         no_validated = no_validated + 1
 
     if no_failed > 0:
-        print("Check failed, validated %d xml/wadl files with %d failures.\n"
+        print("Check failed, validated %d XML files with %d failures.\n"
               % (no_validated, no_failed))
         if not ignore_errors:
             sys.exit(1)
     else:
-        print("Check passed, validated %d xml/wadl files.\n" % no_validated)
+        print("Check passed, validated %d XML files.\n" % no_validated)
 
 
 def validate_modified_files(rootdir, exceptions, verbose,
@@ -529,7 +541,7 @@ def validate_modified_files(rootdir, exceptions, verbose,
     # or Type changed
     modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
 
-    modified_files = filter(is_xml_wadl, modified_files)
+    modified_files = filter(is_xml_like, modified_files)
 
     validate_individual_files(modified_files, rootdir, exceptions,
                               verbose,
@@ -557,9 +569,8 @@ def validate_all_files(rootdir, exceptions, verbose,
 
         for f in files:
             # Ignore maven files, which are called pom.xml
-            if (f.endswith(('.xml', '.wadl')) and
-                    f != 'pom.xml' and
-                    f not in exceptions):
+            if (is_xml_like(f) and
+                f not in exceptions):
                 path = os.path.abspath(os.path.join(root, f))
                 files_to_check.append(path)
 
