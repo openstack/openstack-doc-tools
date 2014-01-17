@@ -17,59 +17,71 @@
 # For an example of usage, run this program with the -h switch.
 #
 
-import common
+# Must import this before argparse
+import oslo.config
+
+import argparse
+import os.path
 import sys
+
+import common
 
 # this is for the internationalisation function in gettext
 import __builtin__
 __builtin__.__dict__['_'] = lambda x: x
 
 
+def main():
+    parser = argparse.ArgumentParser(
+        description='Manage flag files, to aid in updating documentation.',
+        usage='%(prog)s <cmd> <package> [options]')
+    parser.add_argument('subcommand',
+                        help='action (create, update, verify) [REQUIRED]',
+                        choices=['create', 'update', 'docbook'])
+    parser.add_argument('package',
+                        help='name of the top-level package')
+    parser.add_argument('-v', '--verbose',
+                        action='count',
+                        default=0,
+                        dest='verbose',
+                        required=False,)
+    parser.add_argument('-i', '--input',
+                        dest='repo',
+                        help='path to valid git repository [REQUIRED]',
+                        required=True,
+                        type=str,)
+    args = parser.parse_args()
 
-def main(action, file, format, repo, verbose=0, name=False, test=False):
-    package_name = common.git_check(repo)
+    package_name = common.git_check(args.repo)
 
-    sys.path.append(repo)
+    sys.path.insert(0, args.repo)
     try:
         __import__(package_name)
     except ImportError as e:
-        if verbose >= 1:
+        if args.verbose >= 1:
             print str(e)
             print "Failed to import: %s (%s)" % (package_name, e)
 
-    if verbose >= 1:
-        flags = common.extract_flags(repo, package_name, verbose)
-    else:
-        flags = common.extract_flags(repo, package_name)
+    modules = common.import_modules(args.repo, package_name,
+                                    verbose=args.verbose)
+    options = common.OptionsCache(modules, verbose=args.verbose)
 
-    print "%s flags imported from package %s." % (len(flags),
-                                                  str(package_name))
-    if action == "update":
-        common.update(file, flags, True, verbose)
+    if args.verbose > 0:
+        print "%s options imported from package %s." % (len(options),
+                                                        str(package_name))
+
+    if args.subcommand == 'create':
+        common.create_flagmappings(package_name, options, verbose=args.verbose)
         return
 
-    if format == "names":
-        if verbose >= 1:
-            common.write_flags(file, flags, True, verbose)
-        else:
-            common.write_flags(file, flags, True)
+    if args.subcommand == 'update':
+        common.update_flagmappings(package_name, options, verbose=args.verbose)
+        return
 
-    if format == "docbook":
-        groups = common.populate_groups(file)
-        print "%s groups" % len(groups)
-        if verbose >= 1:
-            common.write_docbook('.', flags, groups, package_name, verbose)
-        else:
-            common.write_docbook('.', flags, groups, package_name)
+    if args.subcommand == 'docbook':
+        common.write_docbook(package_name, options, verbose=args.verbose)
+        return
 
-    sys.exit(0)
 
 if __name__ == "__main__":
-    args = common.parse_me_args()
-    main(args['action'],
-         args['file'],
-         args['format'],
-         args['repo'],
-         args['verbose'],
-         args['name'],
-         args['test'])
+    main()
