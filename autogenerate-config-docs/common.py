@@ -179,7 +179,7 @@ def write_docbook(package_name, options, verbose=0):
                   <th>Description</th>\n\
               </tr>\n\
           </thead>\n\
-          <tbody>')
+          <tbody>\n')
         for optname in options_by_cat[cat]:
             modname, group, option = options.get_option(optname)
             if not option.help:
@@ -187,13 +187,25 @@ def write_docbook(package_name, options, verbose=0):
             if ((type(option).__name__ == "ListOpt") and (
                     option.default is not None)):
                 option.default = ", ".join(option.default)
-            groups_file.write('\n              <tr>\n\
-                       <td>' + option.name + ' = ' +
-                              str(option.default) + '</td>\n\
-                       <td>(' + type(option).__name__ + ') ' +
-                              escape(option.help) + '</td>\n\
-              </tr>')
-        groups_file.write('\n       </tbody>\n\
+            groups_file.write('              <tr>\n')
+            default = generator._sanitize_default(option.name,
+                                                  str(option.default))
+            # This should be moved to generator._sanitize_default
+            for pathelm in sys.path:
+                if pathelm == '':
+                    continue
+                if pathelm.endswith('/'):
+                    pathelm = pathelm[:-1]
+                if default.startswith(pathelm):
+                    default = default.replace(pathelm,
+                                              '/usr/lib/python/site-packages')
+                    break
+            groups_file.write('                       <td>%s = %s</td>\n' %
+                              (option.name, default))
+            groups_file.write('                       <td>(%s) %s</td>\n' %
+                              (type(option).__name__, escape(option.help)))
+            groups_file.write('              </tr>\n')
+        groups_file.write('       </tbody>\n\
         </table>\n\
         </para>\n')
         groups_file.close()
