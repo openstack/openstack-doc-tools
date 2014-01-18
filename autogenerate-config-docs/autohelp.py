@@ -18,13 +18,12 @@
 #
 
 # Must import this before argparse
-import oslo.config
+import oslo.config   # NOQA
 
 import argparse
-import os.path
 import sys
 
-import common
+import common    # NOQA
 
 # this is for the internationalisation function in gettext
 import __builtin__
@@ -59,16 +58,16 @@ def main():
         __import__(package_name)
     except ImportError as e:
         if args.verbose >= 1:
-            print str(e)
-            print "Failed to import: %s (%s)" % (package_name, e)
+            print(str(e))
+            print("Failed to import: %s (%s)" % (package_name, e))
 
     modules = common.import_modules(args.repo, package_name,
                                     verbose=args.verbose)
     options = common.OptionsCache(modules, verbose=args.verbose)
 
     if args.verbose > 0:
-        print "%s options imported from package %s." % (len(options),
-                                                        str(package_name))
+        print("%s options imported from package %s." % (len(options),
+                                                        str(package_name)))
 
     if args.subcommand == 'create':
         common.create_flagmappings(package_name, options, verbose=args.verbose)

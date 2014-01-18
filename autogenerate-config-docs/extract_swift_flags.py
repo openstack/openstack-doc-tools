@@ -17,7 +17,7 @@ import os
 import sys
 
 from xml.dom import minidom
-from xml.sax.saxutils import escape
+import xml.sax.saxutils
 
 #Swift configuration example files live in
 # swift/etc/*.conf-sample
@@ -28,13 +28,15 @@ from xml.sax.saxutils import escape
 
 
 def parse_line(line):
-    """
-    takes a line from a swift sample configuration file and attempts
+    """Parse a line.
+
+    Takes a line from a swift sample configuration file and attempts
     to separate the lines with actual configuration option and default
     value from the rest. Returns None if the line doesn't appear to
     contain a valid configuration option = default value pair, and
     a pair of the config and its default if it does.
     """
+
     if '=' not in line:
         return None
     temp_line = line.strip('#').strip()
@@ -49,9 +51,8 @@ def parse_line(line):
 
 
 def get_existing_options(optfiles):
-    """
-    parses an existing XML table to compile a list of existing options
-    """
+    """Parse an existing XML table to compile a list of existing options."""
+
     options = {}
     for optfile in optfiles:
         xmldoc = minidom.parse(optfile)
@@ -71,11 +72,13 @@ def get_existing_options(optfiles):
 
 
 def extract_descriptions_from_devref(repo, options):
-    """
-    loop through the devref RST files, looking for lines formatted
+    """Extract descriptions from devref RST files.
+
+    Loop through the devref RST files, looking for lines formatted
     such that they might contain a description of a particular
-    option
+    option.
     """
+
     option_descs = {}
     rsts = glob.glob(repo + '/doc/source/*.rst')
     for rst in rsts:
@@ -108,7 +111,7 @@ def extract_descriptions_from_devref(repo, options):
 
 def new_section_file(sample, current_section):
     section_filename = ('swift-' +
-                        path.basename(sample).split('.conf')[0]
+                        os.path.basename(sample).split('.conf')[0]
                         + '-'
                         + current_section.replace('[', '').
                         replace(']', '').replace(':', '-')
@@ -122,7 +125,7 @@ def new_section_file(sample, current_section):
      <table rules="all">\n\
      <caption>Description of configuration options for <literal>'
                        + current_section + '</literal> in <literal>'
-                       + path.basename(sample) +
+                       + os.path.basename(sample) +
                        '</literal></caption>\n\
                        <col width="50%"/>\n\
      <col width="50%"/>\n\
@@ -137,12 +140,14 @@ def new_section_file(sample, current_section):
 
 
 def create_new_tables(repo, verbose):
-    """
-    writes a set of docbook-formatted tables, one per section in swift
+    """Create new DocBook tables.
+
+    Writes a set of DocBook-formatted tables, one per section in swift
     configuration files. Uses existing tables and swift devref as a source
     of truth in that order to determine helptext for options found in
-    sample config files
+    sample config files.
     """
+
     existing_tables = glob.glob('../../doc/common/tables/swift*xml')
     options = {}
     #use the existing tables to get a list of option names
@@ -186,10 +191,12 @@ def create_new_tables(repo, verbose):
                     else:
                         option_desc = 'No help text available for this option'
                         if verbose > 0:
-                            print parsed_line[0] + "has no help text"
-                    section_file.write('\n                    <tr>\n\
-                        <td>' + parsed_line[0] + '=' +
-                                       escape(str(parsed_line[1])) +
+                            print(parsed_line[0] + "has no help text")
+                    section_file.write('\n                    <tr>\n'
+                                       '                        <td>' +
+                                       parsed_line[0] + '=' +
+                                       xml.sax.saxutils.escape(
+                                           str(parsed_line[1])) +
                                        '</td><td>' + option_desc + '</td>\n' +
                                        '              </tr>')
         if section_file is not None:
@@ -200,9 +207,10 @@ def create_new_tables(repo, verbose):
 
 
 def main(repo, verbose=0):
-    """
-    writes a set of docbook-formatted files, based on configuration sections
-    in swift sample configuration files
+    """Write DocBook formatted files.
+
+    Writes a set of DocBook-formatted files, based on configuration sections
+    in swift sample configuration files.
     """
 
     create_new_tables(repo, verbose)

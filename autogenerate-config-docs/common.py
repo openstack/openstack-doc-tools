@@ -17,7 +17,8 @@
 import importlib
 import os
 import sys
-from xml.sax.saxutils import escape
+
+import xml.sax.saxutils
 
 import openstack.common.config.generator as generator
 
@@ -36,15 +37,16 @@ def git_check(repo_path):
         repo = Repo(repo_path)
         assert repo.bare is False
         package_name = os.path.basename(repo.remotes.origin.url).rstrip('.git')
-    except:
-        print "\nThere is a problem verifying that the directory passed in"
-        print "is a valid git repository.  Please try again.\n"
+    except Exception:
+        print("\nThere is a problem verifying that the directory passed in")
+        print("is a valid git repository.  Please try again.\n")
         sys.exit(1)
     return package_name
 
 
 def import_modules(repo_location, package_name, verbose=0):
-    """
+    """Import modules.
+
     Loops through the repository, importing module by module to
     populate the configuration object (cfg.CONF) created from Oslo.
     """
@@ -71,7 +73,7 @@ def import_modules(repo_location, package_name, verbose=0):
                     module = importlib.import_module(modname)
                     modules[modname] = module
                     if verbose >= 1:
-                        print "imported %s" % modname
+                        print("imported %s" % modname)
                 except ImportError as e:
                     """
                     work around modules that don't like being imported in
@@ -79,7 +81,7 @@ def import_modules(repo_location, package_name, verbose=0):
                     not affect the configuration options found at this stage
                     """
                     if verbose >= 2:
-                        print "Failed to import: %s (%s)" % (modname, e)
+                        print("Failed to import: %s (%s)" % (modname, e))
                     continue
     return modules
 
@@ -106,9 +108,9 @@ class OptionsCache(object):
                         oldmod = self._opts_by_name[optname][0]
                         if oldmod.startswith(modname + '/'):
                             if verbose >= 2:
-                                print (("Duplicate option name %s" +
-                                        " from %s and %s. Using %s.") %
-                                       (optname, modname, oldmod, oldmod))
+                                print(("Duplicate option name %s" +
+                                       " from %s and %s. Using %s.") %
+                                      (optname, modname, oldmod, oldmod))
                         elif modname.startswith(oldmod + '/'):
                             self._opts_by_name[optname] = (modname, group, opt)
                             if verbose >= 2:
@@ -151,7 +153,8 @@ class OptionsCache(object):
 
 
 def write_docbook(package_name, options, verbose=0):
-    """
+    """Write DocBook tables.
+
     Prints a docbook-formatted table for every group of options.
     """
     options_by_cat = {}
@@ -203,7 +206,8 @@ def write_docbook(package_name, options, verbose=0):
             groups_file.write('                       <td>%s = %s</td>\n' %
                               (option.name, default))
             groups_file.write('                       <td>(%s) %s</td>\n' %
-                              (type(option).__name__, escape(option.help)))
+                              (type(option).__name__,
+                               xml.sax.saxutils.escape(option.help)))
             groups_file.write('              </tr>\n')
         groups_file.write('       </tbody>\n\
         </table>\n\
@@ -212,7 +216,8 @@ def write_docbook(package_name, options, verbose=0):
 
 
 def create_flagmappings(package_name, options, verbose=0):
-    """
+    """Create a flagmappings file.
+
     Create a flagmappings file. This will create a new file called
     $package_name.flagmappings with all the categories set to Unknown.
     """
@@ -222,7 +227,8 @@ def create_flagmappings(package_name, options, verbose=0):
 
 
 def update_flagmappings(package_name, options, verbose=0):
-    """
+    """Update flagmappings file.
+
     Update a flagmappings file, adding or removing entries as needed.
     This will create a new file $package_name.flagmappings.new with
     category information merged from the existing $package_name.flagmappings.
@@ -260,10 +266,10 @@ def update_flagmappings(package_name, options, verbose=0):
         added_flags = (set([x[0] for x in updated_flags]) -
                        set(original_flags.keys()))
 
-        print "\nRemoved Flags\n"
+        print("\nRemoved Flags\n")
         for line in sorted(removed_flags):
-            print line
+            print(line)
 
-        print "\nAdded Flags\n"
+        print("\nAdded Flags\n")
         for line in sorted(added_flags):
-            print line
+            print(line)
