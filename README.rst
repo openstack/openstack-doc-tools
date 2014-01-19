@@ -65,6 +65,13 @@ these files come from.
 Release notes
 =============
 
+0.4
+---
+
+ * New option --exceptions-file to pass list of files to ignore
+   completely
+ * Major improvements for automatic generation of option tables
+
 0.3
 ---
 

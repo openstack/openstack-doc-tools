@@ -59,6 +59,9 @@ OPTIONS
       Directory to ignore for building of manuals. The parameter can
       be passed multiple times to add several directories.
 
+  **--exceptions-file EXCEPTIONS_FILE**
+      File that contains filenames that will be skipped during validation.
+
 FILES
 =====
 
@@ -72,4 +75,6 @@ SEE ALSO
 Bugs
 ====
 
-* openstack-doc-tools is hosted on Launchpad so you can view current bugs at `Bugs : openstack-manuals <https://bugs.launchpad.net/openstack-manuals/>`__
+* openstack-doc-tools is hosted on Launchpad so you can view current
+  bugs at
+  `Bugs : openstack-manuals <https://bugs.launchpad.net/openstack-manuals/>`__

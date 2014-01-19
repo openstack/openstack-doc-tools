@@ -690,8 +690,8 @@ def is_book_master(filename):
             filename == 'openstack-glossary.xml')
 
 
-def find_affected_books(rootdir, book_exceptions, verbose,
-                        force, ignore_dirs):
+def find_affected_books(rootdir, book_exceptions, file_exceptions,
+                        verbose, force, ignore_dirs):
     """Check which books are affected by modified files.
 
     Returns a set with books.
@@ -754,7 +754,8 @@ def find_affected_books(rootdir, book_exceptions, verbose,
                 book_bk[f_abs] = book_root
             if (f.endswith('.xml') and
                     f != "pom.xml" and
-                    f != "ha-guide-docinfo.xml"):
+                    f != "ha-guide-docinfo.xml" and
+                    f not in file_exceptions):
                 try:
                     doc = etree.parse(f_abs)
                 except etree.XMLSyntaxError as e:
@@ -824,7 +825,7 @@ def find_affected_books(rootdir, book_exceptions, verbose,
     return books
 
 
-def build_affected_books(rootdir, book_exceptions,
+def build_affected_books(rootdir, book_exceptions, file_exceptions,
                          verbose, force=False, ignore_errors=False,
                          ignore_dirs=[]):
     """Build all the books which are affected by modified files.
@@ -838,7 +839,8 @@ def build_affected_books(rootdir, book_exceptions,
     """
 
     books = find_affected_books(rootdir, book_exceptions,
-                                verbose, force, ignore_dirs)
+                                file_exceptions, verbose,
+                                force, ignore_dirs)
 
     # Remove cache content which can cause build failures
     shutil.rmtree(os.path.expanduser("~/.fop"),
@@ -881,6 +883,17 @@ def build_affected_books(rootdir, book_exceptions,
         print("Building of books finished successfully.\n")
 
 
+def parse_exceptions(exceptions_file, verbose):
+    """Read list of exceptions from exceptions_file."""
+
+    for line in open(exceptions_file, 'rU'):
+        if not line.startswith("#") and len(line) > 1:
+            filename = line.rstrip('\n\r')
+            if verbose:
+                print("Adding file to ignore list: %s" % filename)
+            FILE_EXCEPTIONS.append(filename)
+
+
 def main():
 
     parser = argparse.ArgumentParser(description="Validate XML files against "
@@ -914,6 +927,9 @@ def main():
                         "manuals. The parameter can be passed multiple "
                         "times to add several directories.",
                         action="append")
+    parser.add_argument("--exceptions-file",
+                        help="File that contains filenames that will "
+                        "be skipped during validation.")
     parser.add_argument('--version',
                         action='version',
                         version=os_doc_tools.__version__)
@@ -927,6 +943,9 @@ def main():
     if (len(sys.argv) == 1):
         # No arguments given, use check-all
         prog_args.check_all = True
+
+    if prog_args.exceptions_file:
+        parse_exceptions(prog_args.exceptions_file, prog_args.verbose)
 
     if prog_args.check_all:
         prog_args.check_deletions = True
@@ -959,6 +978,7 @@ def main():
 
     if prog_args.check_build:
         build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
+                             FILE_EXCEPTIONS,
                              prog_args.verbose, prog_args.force,
                              prog_args.ignore_errors,
                              prog_args.ignore_dir)
