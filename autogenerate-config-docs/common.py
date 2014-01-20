@@ -183,8 +183,16 @@ def write_docbook(package_name, options, verbose=0):
               </tr>\n\
           </thead>\n\
           <tbody>\n')
+        curgroup = None
         for optname in options_by_cat[cat]:
             modname, group, option = options.get_option(optname)
+            if group != curgroup:
+                curgroup = group
+                groups_file.write('              <tr>\n')
+                groups_file.write('                  ' +
+                                  '<th colspan="2">[%s]</th>\n' %
+                                  group)
+                groups_file.write('              </tr>\n')
             if not option.help:
                 option.help = "No help text available for this option"
             if ((type(option).__name__ == "ListOpt") and (
