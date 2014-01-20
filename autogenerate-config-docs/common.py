@@ -106,12 +106,12 @@ class OptionsCache(object):
                         optname = group + '/' + opt.name
                     if optname in self._opts_by_name:
                         oldmod = self._opts_by_name[optname][0]
-                        if oldmod.startswith(modname + '/'):
+                        if oldmod.startswith(modname + '.'):
                             if verbose >= 2:
                                 print(("Duplicate option name %s" +
                                        " from %s and %s. Using %s.") %
                                       (optname, modname, oldmod, oldmod))
-                        elif modname.startswith(oldmod + '/'):
+                        elif modname.startswith(oldmod + '.'):
                             self._opts_by_name[optname] = (modname, group, opt)
                             if verbose >= 2:
                                 print (("Duplicate option name %s"
