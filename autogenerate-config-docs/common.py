@@ -101,15 +101,15 @@ class OptionsCache(object):
                     if group == 'DEFAULT':
                         optname = opt.name
                     else:
-                        optname = group + '.' + opt.name
+                        optname = group + '/' + opt.name
                     if optname in self._opts_by_name:
                         oldmod = self._opts_by_name[optname][0]
-                        if oldmod.startswith(modname + '.'):
+                        if oldmod.startswith(modname + '/'):
                             if verbose >= 2:
                                 print (("Duplicate option name %s" +
                                         " from %s and %s. Using %s.") %
                                        (optname, modname, oldmod, oldmod))
-                        elif modname.startswith(oldmod + '.'):
+                        elif modname.startswith(oldmod + '/'):
                             self._opts_by_name[optname] = (modname, group, opt)
                             if verbose >= 2:
                                 print (("Duplicate option name %s"
@@ -136,15 +136,15 @@ class OptionsCache(object):
 
     @staticmethod
     def _cmpopts(x, y):
-        if '.' in x and '.' in y:
-            prex = x[:x.find('.')]
-            prey = y[:x.find('.')]
+        if '/' in x and '/' in y:
+            prex = x[:x.find('/')]
+            prey = y[:x.find('/')]
             if prex != prey:
                 return cmp(prex, prey)
             return cmp(x, y)
-        elif '.' in x:
+        elif '/' in x:
             return 1
-        elif '.' in y:
+        elif '/' in y:
             return -1
         else:
             return cmp(x, y)
@@ -239,11 +239,11 @@ def update_flagmappings(package_name, options, verbose=0):
             updated_flags.append((opt, original_flags[opt][0]))
             continue
 
-        if '.' in opt:
+        if '/' in opt:
             # Compaitibility hack for old-style flagmappings, where grouped
             # options didn't have their group names prefixed. If there's only
             # one category, we assume there wasn't a conflict, and use it.
-            barename = opt[opt.find('.') + 1:]
+            barename = opt[opt.find('/') + 1:]
             if len(original_flags.get(barename, [])) == 1:
                 updated_flags.append((opt, original_flags[barename][0]))
                 continue
