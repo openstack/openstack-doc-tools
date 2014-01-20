@@ -275,9 +275,9 @@ def update_flagmappings(package_name, options, verbose=0):
                        set(original_flags.keys()))
 
         print("\nRemoved Flags\n")
-        for line in sorted(removed_flags):
+        for line in sorted(removed_flags, OptionsCache._cmpopts):
             print(line)
 
         print("\nAdded Flags\n")
-        for line in sorted(added_flags):
+        for line in sorted(added_flags, OptionsCache._cmpopts):
             print(line)
