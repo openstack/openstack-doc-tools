@@ -1,4 +1,4 @@
-autogenerate-config-docs
+autogenerate_config_docs
 ========================
 
 Automatically generate configuration tables to document OpenStack.
@@ -63,12 +63,12 @@ This tool is divided into three parts:
 
 1) Extraction of flags names
 
-    $ openstack-doc-tools/autogenerate-config-docs/autohelp.py create nova -i /repos/nova
+    $ openstack-doc-tools/autogenerate_config_docs/autohelp.py create nova -i /repos/nova
 
 You only need to use the `create` action to add a new product.
 Otherwise, use `update`.
 
-    $ openstack-doc-tools/autogenerate-config-docs/autohelp.py update nova -i /repos/nova
+    $ openstack-doc-tools/autogenerate_config_docs/autohelp.py update nova -i /repos/nova
 
 The `create` action will create a new `nova.flagmappings` file,
 possibly overriding an existing file. The `update` action will
@@ -92,7 +92,7 @@ a category after a space.
 
 3) Creation of docbook-formatted configuration table files
 
-    $ openstack-doc-tools/autogenerate-config-docs/autohelp.py docbook nova -i /repos/nova
+    $ openstack-doc-tools/autogenerate_config_docs/autohelp.py docbook nova -i /repos/nova
 
 
 Duplicate options
@@ -135,12 +135,12 @@ This missed some requirements for nova, which were fixed by:
 
 Making the flag names update
 
- $ ../../openstack-doc-tools/autogenerate-config/autohelp.py -vvv update nova -i ~/nova > nova.log
+ $ ../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update nova -i ~/nova > nova.log
 
 At this point, search through nova.flagmappings.new for anything
 labelled Unknown and fix, once that is done use:
 
- $ ../../openstack-doc-tools/autogenerate-config/autohelp.py -vvv docbook nova -i ~/nova
+ $ ../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook nova -i ~/nova
 
 to generate the XML files and move those into the appropriate part of
 the git repo
