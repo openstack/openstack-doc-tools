@@ -160,8 +160,9 @@ def write_docbook(package_name, options, verbose=0):
     options_by_cat = {}
     with open(package_name + '.flagmappings') as f:
         for line in f:
-            opt, category = line.split()
-            options_by_cat.setdefault(category, []).append(opt)
+            opt, categories = line.split(' ', 1)
+            for category in categories.split():
+                options_by_cat.setdefault(category, []).append(opt)
 
     for cat in options_by_cat.keys():
         groups_file = open(package_name + '-' + cat + '.xml', 'w')
@@ -244,8 +245,8 @@ def update_flagmappings(package_name, options, verbose=0):
     original_flags = {}
     with open(package_name + '.flagmappings') as f:
         for line in f:
-            flag, category = line.split()
-            original_flags.setdefault(flag, []).append(category)
+            flag, category = line.split(' ', 1)
+            original_flags.setdefault(flag, []).append(category.strip())
 
     updated_flags = []
     for opt in options.get_option_names():
