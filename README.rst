@@ -71,6 +71,8 @@ Release notes
  * New option --exceptions-file to pass list of files to ignore
    completely
  * Major improvements for automatic generation of option tables
+ * New tool openstack-auto-commands to document python
+   command line clients
 
 0.3
 ---
