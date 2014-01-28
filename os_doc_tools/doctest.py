@@ -45,9 +45,9 @@ from lxml import etree
 import os_doc_tools
 
 
-# These are files that are known to not be in DocBook format
-FILE_EXCEPTIONS = ['st-training-guides.xml',
-                   'ha-guide-docinfo.xml']
+# These are files that are known to not be in DocBook format.
+# Add values via --exceptions-file
+FILE_EXCEPTIONS = []
 
 # These are books that we aren't checking yet
 BOOK_EXCEPTIONS = []
