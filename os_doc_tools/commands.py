@@ -44,7 +44,17 @@ def check_output(*popenargs, **kwargs):
 def quote_xml(line):
     """Convert special characters for XML output."""
 
-    return line.replace('&', '&amp;').replace('<', '&lt;')
+    line = line.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+    if 'DEPRECATED!' in line:
+        line = line.replace('DEPRECATED!', '<emphasis>DEPRECATED!</emphasis>')
+    elif 'DEPRECATED' in line:
+        line = line.replace('DEPRECATED', '<emphasis>DEPRECATED</emphasis>')
+
+    if 'env[' in line:
+        line = line.replace('env[', '<code>env[').replace(']', ']</code>')
+
+    return line
 
 
 def generate_heading(os_command, api_name, os_file):
@@ -82,6 +92,142 @@ def generate_heading(os_command, api_name, os_file):
     os_file.write(header.format(os_command, api_name))
 
 
+def is_option(str):
+    """Returns True if string specifies an argument."""
+
+    for x in str:
+        if not (x.isupper() or x == '_' or x == ','):
+            return False
+
+    if str.startswith('DEPRECATED'):
+        return False
+    return True
+
+
+def extract_options(line):
+    """Extract command or option from line."""
+
+    # We have a command or parameter to handle
+    # Differentiate:
+    # 1. --version
+    # 2. --timeout <seconds>
+    # 3. --service <service>, --service-id <service>
+    # 4. -v, --verbose
+    # 5. -p PORT, --port PORT
+    # 6. <backup>              ID of the backup to restore.
+    # 7. --alarm-action <Webhook URL>
+    # 8.   <NAME or ID>  Name or ID of stack to resume.
+
+    split_line = line.split(None, 2)
+
+    if split_line[0].startswith("-"):
+        last_was_option = True
+    else:
+        last_was_option = False
+
+    if (len(split_line) > 1 and
+        ('<' in split_line[0] or
+         '<' in split_line[1] or
+         '--' in split_line[1] or
+         split_line[1].startswith(("-", '<', '{', '[')) or
+         is_option(split_line[1]))):
+
+        words = line.split(None)
+
+        i = 0
+        while i < len(words) - 1:
+            if ('<' in words[i] and
+                '>' not in words[i]):
+                words[i] += ' ' + words[i + 1]
+                del words[i + 1]
+            else:
+                i += 1
+
+        while len(words) > 1:
+            if words[1].startswith('DEPRECATED'):
+                break
+            if last_was_option:
+                if (words[1].startswith(("-", '<', '{', '[')) or
+                    is_option(words[1])):
+                    words[0] = words[0] + ' ' + words[1]
+                    del words[1]
+                else:
+                    break
+            else:
+                if words[1].startswith("-"):
+                    words[0] = words[0] + ' ' + words[1]
+                    del words[1]
+                else:
+                    break
+
+        w0 = words[0]
+        del words[0]
+        w1 = ''
+        if len(words) > 0:
+            w1 = words[0]
+            del words[0]
+            for w in words:
+                w1 += " " + w
+
+        if len(w1) == 0:
+            split_line = [w0]
+        else:
+            split_line = [w0, w1]
+    else:
+        split_line = line.split(None, 1)
+
+    return split_line
+
+
+def format_table(title, lines, os_file):
+    """Nicely print section of lines."""
+
+    close_entry = False
+    os_file.write("  <variablelist wordsize=\"10\">\n")
+    if len(title) > 0:
+        os_file.write("    <title>%s</title>\n" % title)
+
+    for line in lines:
+        if len(line) == 0 or line[0] != ' ':
+            break
+        # We have to handle these cases:
+        # 1. command  Explanation
+        # 2. command
+        #             Explanation on next line
+        # 3. command  Explanation continued
+        #             on next line
+        # If there are more than 8 spaces, let's treat it as
+        # explanation.
+        if line.startswith('        '):
+            # Explanation
+            os_file.write("      %s\n" % quote_xml(line.lstrip(' ')))
+            continue
+        # Now we have a command or parameter to handle
+        split_line = extract_options(line)
+
+        if not close_entry:
+            close_entry = True
+        else:
+            os_file.write("      </para>\n")
+            os_file.write("    </listitem>\n")
+            os_file.write("  </varlistentry>\n")
+
+        os_file.write("  <varlistentry>\n")
+        os_file.write("    <term><command>%s</command></term>\n"
+                      % quote_xml(split_line[0]))
+        os_file.write("    <listitem>\n")
+        os_file.write("      <para>\n")
+        if len(split_line) > 1:
+            os_file.write("        %s\n" % quote_xml(split_line[1]))
+
+    os_file.write("      </para>\n")
+    os_file.write("    </listitem>\n")
+    os_file.write("  </varlistentry>\n")
+    os_file.write(" </variablelist>\n")
+
+    return
+
+
 def generate_command(os_command, os_file):
     """Convert os_command --help to DocBook.
 
@@ -93,31 +239,58 @@ def generate_command(os_command, os_file):
 
     ignore_next_lines = False
     next_line_screen = True
+    line_index = -1
+    in_screen = False
     for line in help_lines:
+        line_index += 1
         xline = quote_xml(line)
         if len(line) > 0 and line[0] != ' ':
-            if '<subcommand>' in line:
+            # XXX: Might have whitespace before!!
+            if '<subcommands>' in line:
                 ignore_next_lines = False
                 continue
             if 'Positional arguments' in line:
-                ignore_next_lines = False
+                ignore_next_lines = True
                 next_line_screen = True
+                os_file.write("</computeroutput></screen>\n")
+                in_screen = False
+                format_table('Subcommands', help_lines[line_index + 2:],
+                             os_file)
                 continue
             if line.startswith(('Optional arguments:', 'Optional:',
-                                'Options:')):
-                os_file.write("</computeroutput></screen>\n")
+                                'Options:', 'optional arguments')):
+                if in_screen:
+                    os_file.write("</computeroutput></screen>\n")
+                    in_screen = False
                 os_file.write("    </section>\n")
                 os_file.write("    <section ")
                 os_file.write("xml:id=\"%sclient_command_optional\">\n"
                               % os_command)
                 os_file.write("        <title>%s optional arguments</title>\n"
                               % os_command)
+                format_table('', help_lines[line_index + 1:],
+                             os_file)
                 next_line_screen = True
-                ignore_next_lines = False
+                ignore_next_lines = True
+                continue
+            # neutron
+            if line.startswith('Commands for API v2.0:'):
+                if in_screen:
+                    os_file.write("</computeroutput></screen>\n")
+                    in_screen = False
+                os_file.write("    </section>\n")
+                os_file.write("    <section ")
+                os_file.write("xml:id=\"%sclient_command_api_2_0\">\n"
+                              % os_command)
+                os_file.write("        <title>%s API v2.0 commands</title>\n"
+                              % os_command)
+                format_table('', help_lines[line_index + 1:],
+                             os_file)
+                next_line_screen = True
+                ignore_next_lines = True
                 continue
             # swift
             if line.startswith('Examples:'):
-                os_file.write("</computeroutput></screen>\n")
                 os_file.write("    </section>\n")
                 os_file.write("    <section ")
                 os_file.write("xml:id=\"%sclient_command_examples\">\n"
@@ -125,25 +298,20 @@ def generate_command(os_command, os_file):
                 os_file.write("        <title>%s examples</title>\n"
                               % os_command)
                 next_line_screen = True
+                ignore_next_lines = False
                 continue
-            continue
-        if '<subcommand> ...' in line:
-            os_file.write("%s</computeroutput></screen>\n" % xline)
-            os_file.write("    </section>\n")
-            os_file.write("    <section xml:id=\"%sclient_command_pos\">\n"
-                          % os_command)
-            os_file.write("        <title>%s positional arguments</title>\n"
-                          % os_command)
-            ignore_next_lines = True
             continue
         if not ignore_next_lines:
             if next_line_screen:
                 os_file.write("        <screen><computeroutput>%s\n" % xline)
                 next_line_screen = False
+                in_screen = True
             elif len(line) > 0:
                 os_file.write("%s\n" % (xline))
 
-    os_file.write("</computeroutput></screen>\n")
+    if in_screen:
+        os_file.write("</computeroutput></screen>\n")
+
     os_file.write("    </section>\n")
 
 
@@ -168,7 +336,46 @@ def generate_subcommand(os_command, os_subcommand, os_file):
                   % (os_command, os_subcommand))
 
     next_line_screen = True
+    line_index = -1
+    # Content is:
+    # usage...
+    #
+    # Description
+    #
+    # Arguments
+
+    in_para = False
+    skip_lines = False
     for line in help_lines:
+        line_index += 1
+        if line.startswith(('Arguments:', 'Positional arguments:',
+                            'positional arguments', 'Optional arguments',
+                            'optional arguments')):
+            if in_para:
+                in_para = False
+                os_file.write("        </para>")
+            if line.startswith(('Positional arguments',
+                                'positional arguments')):
+                format_table('Positional arguments',
+                             help_lines[line_index + 1:], os_file)
+                skip_lines = True
+                continue
+            elif line.startswith(('Optional arguments:',
+                                  'optional arguments')):
+                format_table('Optional arguments',
+                             help_lines[line_index + 1:], os_file)
+                break
+            else:
+                format_table('Arguments', help_lines[line_index + 1:], os_file)
+                break
+        if skip_lines:
+            continue
+        if len(line) == 0:
+            if not in_para:
+                os_file.write("        </computeroutput></screen>\n")
+                os_file.write("        <para>\n")
+            in_para = True
+            continue
         xline = quote_xml(line)
         if next_line_screen:
             os_file.write("        <screen><computeroutput>%s\n" % xline)
@@ -176,7 +383,8 @@ def generate_subcommand(os_command, os_subcommand, os_file):
         else:
             os_file.write("%s\n" % (xline))
 
-    os_file.write("</computeroutput></screen>\n")
+    if in_para:
+        os_file.write("        </para>")
     os_file.write("    </section>\n")
 
 

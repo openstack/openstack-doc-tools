@@ -18,6 +18,7 @@ import importlib
 import os
 import sys
 
+import git
 import xml.sax.saxutils
 
 import openstack.common.config.generator as generator
@@ -29,12 +30,10 @@ __builtin__.__dict__['_'] = lambda x: x
 
 
 def git_check(repo_path):
-    from git import Repo
-    """
-    Check a passed directory to verify it is a valid git repository.
-    """
+    """Check a passed directory to verify it is a valid git repository."""
+
     try:
-        repo = Repo(repo_path)
+        repo = git.Repo(repo_path)
         assert repo.bare is False
         package_name = os.path.basename(repo.remotes.origin.url).rstrip('.git')
     except Exception:

@@ -65,6 +65,11 @@ these files come from.
 Release notes
 =============
 
+0.5
+---
+
+ * Improve formatting of python command line clients
+
 0.4
 ---
 
