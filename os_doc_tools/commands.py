@@ -68,7 +68,7 @@ def generate_heading(os_command, api_name, os_file):
     print("Documenting '%s help'" % os_command)
 
     header = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<section xmlns=\"http://docbook.org/ns/docbook\"
+<chapter xmlns=\"http://docbook.org/ns/docbook\"
     xmlns:xi=\"http://www.w3.org/2001/XInclude\"
     xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"5.0\"
     xml:id=\"{0}client_commands\">
@@ -421,7 +421,7 @@ def generate_end(os_file):
     """
 
     print("Finished.\n")
-    os_file.write("</section>\n")
+    os_file.write("</chapter>\n")
 
 
 def document_single_project(os_command):
@@ -467,7 +467,7 @@ def document_single_project(os_command):
         print("Not yet handled command")
         sys.exit(-1)
 
-    os_file = open("section_cli_" + os_command + "_commands.xml",
+    os_file = open("ch_cli_" + os_command + "_commands.xml",
                    'w')
     generate_heading(os_command, api_name, os_file)
     generate_command(os_command, os_file)
