@@ -68,7 +68,8 @@ Release notes
 0.5
 ---
 
- * Improve formatting of python command line clients
+ * Test that resources in wadl files have an xml:id (lp:bug 1275007)
+ * Improve formatting of python command line clients (lp:bug 1274699)
 
 0.4
 ---
