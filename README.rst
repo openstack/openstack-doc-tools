@@ -70,6 +70,10 @@ Release notes
 
  * Test that resources in wadl files have an xml:id (lp:bug 1275007)
  * Improve formatting of python command line clients (lp:bug 1274699)
+ * Copy all generated books to directory publish-docs in the git
+   top-level (lp:blueprint draft-docs-on-docs-draft)
+ * Requires now a config file in top-level git directory named
+   doc-test.conf
 
 0.4
 ---

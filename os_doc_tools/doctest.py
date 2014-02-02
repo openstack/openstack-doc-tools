@@ -26,13 +26,12 @@ Options:
 Ignores pom.xml files and subdirectories named "target".
 
 Requires:
-    - Python 2.7 or greater (for argparse)
+    - Python 2.7 or greater
     - lxml Python library
     - Maven
 
 '''
 
-import argparse
 import multiprocessing
 import os
 import re
@@ -43,6 +42,7 @@ import sys
 from lxml import etree
 
 import os_doc_tools
+from oslo.config import cfg
 
 
 # These are files that are known to not be in DocBook format.
@@ -51,6 +51,9 @@ FILE_EXCEPTIONS = []
 
 # These are books that we aren't checking yet
 BOOK_EXCEPTIONS = []
+
+# Mappings from books to directories
+BOOK_MAPPINGS = {}
 
 RESULTS_OF_BUILDS = []
 
@@ -263,8 +266,12 @@ def error_message(error_log):
     return "\n".join(errs)
 
 
-def only_www_touched():
-    """Check whether only files in www directory are touched."""
+def www_touched(check_only_www):
+    """Check whether files in www directory are touched.
+
+    If check_only_www is True: Check that only files in www are touched.
+    Otherwise check that files in www are touched.
+    """
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
@@ -281,7 +288,9 @@ def only_www_touched():
         else:
             other_changed = True
 
-    return www_changed and not other_changed
+    if check_only_www:
+        return www_changed and not other_changed
+    return www_changed
 
 
 def ha_guide_touched():
@@ -599,7 +608,60 @@ def logging_build_book(result):
     RESULTS_OF_BUILDS.append(result)
 
 
-def build_book(book):
+def get_gitroot():
+    """Return path to top-level of git repository."""
+
+    try:
+        git_args = ["git", "rev-parse", "--show-toplevel"]
+        gitroot = check_output(git_args).rstrip()
+    except (subprocess.CalledProcessError, OSError) as e:
+        print("git failed: %s" % e)
+        sys.exit(1)
+
+    return gitroot
+
+
+def get_publish_path():
+    """Return path to use of publishing books."""
+
+    return os.path.join(get_gitroot(), 'publish-docs')
+
+
+def publish_www():
+    """Copy www files."""
+
+    publish_path = get_publish_path()
+    www_path = os.path.join(publish_path, 'www')
+    shutil.rmtree(www_path, ignore_errors=True)
+
+    source = os.path.join(get_gitroot(), 'www')
+    shutil.copytree(source, www_path)
+
+
+def publish_book(publish_path, book):
+    """Copy generated files to publish_path."""
+
+    # Assumption: The path for the book is the same as the name of directory
+    # the book is in. We need to special case any exceptions.
+
+    book_path = os.path.join(publish_path, book)
+
+    # Note that shutil.copytree does not allow an existing target directory,
+    # thus delete it.
+    shutil.rmtree(book_path, ignore_errors=True)
+
+    if os.path.isdir(os.path.join('target/docbkx/webhelp', book)):
+        source = os.path.join('target/docbkx/webhelp', book)
+    elif os.path.isdir(os.path.join('target/docbkx/webhelp/local', book)):
+        source = os.path.join('target/docbkx/webhelp/local', book)
+    elif (book in BOOK_MAPPINGS):
+        source = BOOK_MAPPINGS[book]
+
+    shutil.copytree(source, book_path,
+                    ignore=shutil.ignore_patterns('*.xml'))
+
+
+def build_book(book, publish_path):
     """Build book(s) in directory book."""
 
     # Note that we cannot build in parallel several books in the same
@@ -609,6 +671,7 @@ def build_book(book):
     result = True
     returncode = 0
     base_book = os.path.basename(book)
+    base_book_orig = base_book
     try:
         # Clean first and then build so that the output of all guides
         # is available
@@ -688,6 +751,7 @@ def build_book(book):
         returncode = e.returncode
         result = False
 
+    publish_book(publish_path, base_book_orig)
     return (base_book, result, output, returncode)
 
 
@@ -868,9 +932,10 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
         maxjobs = 4
     pool = multiprocessing.Pool(maxjobs)
     print("Queuing the following books for building:")
+    publish_path = get_publish_path()
     for book in sorted(books):
         print("  %s" % os.path.basename(book))
-        pool.apply_async(build_book, (book, ),
+        pool.apply_async(build_book, (book, publish_path),
                          callback=logging_build_book)
     pool.close()
     print("Building all queued %d books now..." % len(books))
@@ -897,122 +962,145 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
         print("Building of books finished successfully.\n")
 
 
-def parse_exceptions(exceptions_file, verbose):
-    """Read list of exceptions from exceptions_file."""
+def add_exceptions(file_exception, verbose):
+    """Add list of exceptions from file_exceptions."""
 
-    for line in open(exceptions_file, 'rU'):
-        if not line.startswith("#") and len(line) > 1:
-            filename = line.rstrip('\n\r')
-            if verbose:
-                print("Adding file to ignore list: %s" % filename)
-            FILE_EXCEPTIONS.append(filename)
+    for entry in file_exception:
+        if verbose:
+            print(" Adding file to ignore list: %s" % entry)
+        FILE_EXCEPTIONS.append(entry)
+
+
+cli_OPTS = [
+    cfg.BoolOpt("api-site", default=False,
+                help="Enable special handling for api-site repository."),
+    cfg.BoolOpt('check-all', default=False,
+                help="Run all checks."),
+    cfg.BoolOpt('check-build', default=False,
+                help="Check building of books using modified files."),
+    cfg.BoolOpt("check-deletions", default=False,
+                help="Check that deleted files are not used."),
+    cfg.BoolOpt("check-niceness", default=False,
+                help="Check the niceness of files, for example whitespace."),
+    cfg.BoolOpt("check-syntax", default=False,
+                help="Check the syntax of modified files"),
+    cfg.BoolOpt('force', default=False,
+                help="Force the validation of all files "
+                "and build all books."),
+    cfg.BoolOpt("ignore-errors", default=False,
+                help="Do not exit on failures."),
+    cfg.BoolOpt('verbose', default=False, short='v',
+                help="Verbose execution."),
+    cfg.StrOpt('exceptions-file',
+               help="Ignored, for compatibility only"),
+    cfg.MultiStrOpt("file-exception",
+                    help="File that will be skipped during validation."),
+    cfg.MultiStrOpt("ignore-dir",
+                    help="Directory to ignore for building of manuals. The "
+                         "parameter can be passed multiple times to add "
+                         "several directories."),
+]
+
+OPTS = [
+    # NOTE(jaegerandi): books and target-dirs could be a DictOpt
+    # but I could not get this working properly.
+    cfg.MultiStrOpt("book", default=None,
+                    help="Name of book that needs special mapping."),
+    cfg.MultiStrOpt("target-dir", default=None,
+                    help="Target directory for a book. The option "
+                    "must be in the same order as the book option."),
+    cfg.StrOpt("repo-name", default=None,
+               help="Name of repository."),
+]
+
+
+def handle_options():
+    """Setup configuration variables from config file and options."""
+
+    CONF = cfg.CONF
+    CONF.register_cli_opts(cli_OPTS)
+    CONF.register_opts(OPTS)
+
+    default_config_files = [os.path.join(get_gitroot(), 'doc-test.conf')]
+    CONF(sys.argv[1:], project='documentation', prog='openstack-doc-test',
+         version=os_doc_tools.__version__,
+         default_config_files=default_config_files)
+
+    if CONF.repo_name:
+        print ("Testing repository '%s'\n" % CONF.repo_name)
+
+    if CONF.verbose:
+        print("Verbose execution")
+    if CONF.file_exception:
+        add_exceptions(CONF.file_exception, CONF.verbose)
+
+    if (not CONF.check_build and not CONF.check_deletions and
+        not CONF.check_niceness and not CONF.check_syntax):
+        CONF.check_all = True
+
+    if CONF.check_all:
+        CONF.check_deletions = True
+        CONF.check_syntax = True
+        CONF.check_build = True
+        CONF.check_niceness = True
+
+    if CONF.check_build and CONF.book and CONF.target_dir:
+        if len(CONF.book) != len(CONF.target_dir):
+            print("ERROR: books and target-dirs need to have a 1:1 "
+                  "relationship.")
+            sys.exit(1)
+        for i in range(len(CONF.book)):
+            BOOK_MAPPINGS[CONF.book[i]] = CONF.target_dir[i]
+            if CONF.verbose:
+                print(" Target dir for %s is %s" %
+                      (CONF.book[i], BOOK_MAPPINGS[CONF.book[i]]))
 
 
 def main():
 
-    parser = argparse.ArgumentParser(description="Validate XML files against "
-                                     "the DocBook 5 RELAX NG schema")
-    parser.add_argument('path', nargs='?', default=default_root(),
-                        help="Root directory that contains DocBook files, "
-                        "defaults to `git rev-parse --show-toplevel`")
-    parser.add_argument("--force", help="Force the validation of all files "
-                        "and build all books", action="store_true")
-    parser.add_argument("--check-build", help="Try to build books using "
-                        "modified files", action="store_true")
-    parser.add_argument("--check-syntax", help="Check the syntax of modified "
-                        "files", action="store_true")
-    parser.add_argument("--check-deletions", help="Check that deleted files "
-                        "are not used.", action="store_true")
-    parser.add_argument("--check-niceness", help="Check the niceness of "
-                        "files, for example whitespace.",
-                        action="store_true")
-    parser.add_argument("--check-all", help="Run all checks "
-                        "(default if no arguments are given)",
-                        action="store_true")
-    parser.add_argument("--ignore-errors", help="Do not exit on failures",
-                        action="store_true")
-    parser.add_argument("--verbose", help="Verbose execution",
-                        action="store_true")
-    parser.add_argument("--api-site", help="Special handling for "
-                        "api-site repository",
-                        action="store_true")
-    parser.add_argument("--ignore-dir",
-                        help="Directory to ignore for building of "
-                        "manuals. The parameter can be passed multiple "
-                        "times to add several directories.",
-                        action="append")
-    parser.add_argument("--exceptions-file",
-                        help="File that contains filenames that will "
-                        "be skipped during validation.")
-    parser.add_argument('--version',
-                        action='version',
-                        version=os_doc_tools.__version__)
-
-    prog_args = parser.parse_args()
-
-    print ("OpenStack Doc Checks (using openstack-doc-tools version %s)\n"
+    CONF = cfg.CONF
+    print ("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
            % os_doc_tools.__version__)
-    if not prog_args.api_site:
-        prog_args.path = os.path.join(prog_args.path, 'doc')
-    if (len(sys.argv) == 1):
-        # No arguments given, use check-all
-        prog_args.check_all = True
 
-    if prog_args.exceptions_file:
-        parse_exceptions(prog_args.exceptions_file, prog_args.verbose)
+    handle_options()
 
-    if prog_args.check_all:
-        prog_args.check_deletions = True
-        prog_args.check_syntax = True
-        prog_args.check_build = True
-        prog_args.check_niceness = True
+    doc_path = get_gitroot()
+    if not CONF.api_site:
+        doc_path = os.path.join(doc_path, 'doc')
 
-    if not prog_args.force and only_www_touched():
+    if CONF.check_build and www_touched(False):
+        publish_www()
+
+    if not CONF.force and www_touched(True):
         print("Only files in www directory changed, nothing to do.\n")
         return
 
-    if prog_args.check_syntax or prog_args.check_niceness:
-        if prog_args.force:
-            validate_all_files(prog_args.path, FILE_EXCEPTIONS,
-                               prog_args.verbose,
-                               prog_args.check_syntax,
-                               prog_args.check_niceness,
-                               prog_args.ignore_errors,
-                               prog_args.api_site)
+    if CONF.check_syntax or CONF.check_niceness:
+        if CONF.force:
+            validate_all_files(doc_path, FILE_EXCEPTIONS,
+                               CONF.verbose,
+                               CONF.check_syntax,
+                               CONF.check_niceness,
+                               CONF.ignore_errors,
+                               CONF.api_site)
         else:
-            validate_modified_files(prog_args.path, FILE_EXCEPTIONS,
-                                    prog_args.verbose,
-                                    prog_args.check_syntax,
-                                    prog_args.check_niceness,
-                                    prog_args.ignore_errors,
-                                    prog_args.api_site)
+            validate_modified_files(doc_path, FILE_EXCEPTIONS,
+                                    CONF.verbose,
+                                    CONF.check_syntax,
+                                    CONF.check_niceness,
+                                    CONF.ignore_errors,
+                                    CONF.api_site)
 
-    if prog_args.check_deletions:
-        check_deleted_files(prog_args.path, FILE_EXCEPTIONS, prog_args.verbose)
+    if CONF.check_deletions:
+        check_deleted_files(doc_path, FILE_EXCEPTIONS, CONF.verbose)
 
-    if prog_args.check_build:
-        build_affected_books(prog_args.path, BOOK_EXCEPTIONS,
+    if CONF.check_build:
+        build_affected_books(doc_path, BOOK_EXCEPTIONS,
                              FILE_EXCEPTIONS,
-                             prog_args.verbose, prog_args.force,
-                             prog_args.ignore_errors,
-                             prog_args.ignore_dir)
+                             CONF.verbose, CONF.force,
+                             CONF.ignore_errors,
+                             CONF.ignore_dir)
 
-
-def default_root():
-    """Return the location of openstack-manuals
-
-    The current working directory must be inside of the openstack-manuals
-    repository for this method to succeed
-    """
-
-    try:
-        git_args = ["git", "rev-parse", "--show-toplevel"]
-        gitroot = check_output(git_args).rstrip()
-    except (subprocess.CalledProcessError, OSError) as e:
-        print("git failed: %s" % e)
-        sys.exit(1)
-
-    return gitroot
 
 if __name__ == "__main__":
     sys.exit(main())
