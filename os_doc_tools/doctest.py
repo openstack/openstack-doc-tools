@@ -644,7 +644,10 @@ def publish_book(publish_path, book):
     # Assumption: The path for the book is the same as the name of directory
     # the book is in. We need to special case any exceptions.
 
-    book_path = os.path.join(publish_path, book)
+    if cfg.CONF.language:
+        book_path = os.path.join(publish_path, cfg.CONF.language, book)
+    else:
+        book_path = os.path.join(publish_path, book)
 
     # Note that shutil.copytree does not allow an existing target directory,
     # thus delete it.
@@ -654,6 +657,10 @@ def publish_book(publish_path, book):
         source = os.path.join('target/docbkx/webhelp', book)
     elif os.path.isdir(os.path.join('target/docbkx/webhelp/local', book)):
         source = os.path.join('target/docbkx/webhelp/local', book)
+    elif os.path.isdir(os.path.join('target/docbkx/webhelp/',
+                                    cfg.CONF.release_path, book)):
+        source = os.path.join('target/docbkx/webhelp/',
+                              cfg.CONF.release_path, book)
     elif (book in BOOK_MAPPINGS):
         source = BOOK_MAPPINGS[book]
 
@@ -672,6 +679,8 @@ def build_book(book, publish_path):
     returncode = 0
     base_book = os.path.basename(book)
     base_book_orig = base_book
+    comments = "-Dcomments.enabled=%s" % cfg.CONF.comments_enabled
+    release = "-Drelease.path.name=%s" % cfg.CONF.release_path
     try:
         # Clean first and then build so that the output of all guides
         # is available
@@ -684,6 +693,7 @@ def build_book(book, publish_path):
             base_book = "install-guide (for debian)"
             output = subprocess.check_output(
                 ["mvn", "generate-sources", "-B",
+                 comments, release,
                  "-Doperating.system=apt-debian", "-Dprofile.os=debian"],
                 stderr=subprocess.STDOUT
             )
@@ -691,6 +701,7 @@ def build_book(book, publish_path):
             base_book = "install-guide (for Fedora)"
             output = subprocess.check_output(
                 ["mvn", "generate-sources", "-B",
+                 comments, release,
                  "-Doperating.system=yum",
                  "-Dprofile.os=centos;fedora;rhel"],
                 stderr=subprocess.STDOUT
@@ -699,6 +710,7 @@ def build_book(book, publish_path):
             base_book = "install-guide (for openSUSE)"
             output = subprocess.check_output(
                 ["mvn", "generate-sources", "-B",
+                 comments, release,
                  "-Doperating.system=zypper", "-Dprofile.os=opensuse;sles"],
                 stderr=subprocess.STDOUT
             )
@@ -706,6 +718,7 @@ def build_book(book, publish_path):
             base_book = "install-guide (for Ubuntu)"
             output = subprocess.check_output(
                 ["mvn", "generate-sources", "-B",
+                 comments, release,
                  "-Doperating.system=apt", "-Dprofile.os=ubuntu"],
                 stderr=subprocess.STDOUT
             )
@@ -717,7 +730,7 @@ def build_book(book, publish_path):
                 stderr=subprocess.STDOUT
             )
             output = subprocess.check_output(
-                ["mvn", "generate-sources", "-B"],
+                ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
             )
         # Repository: identity-api
@@ -728,22 +741,22 @@ def build_book(book, publish_path):
                 stderr=subprocess.STDOUT
             )
             output = subprocess.check_output(
-                ["mvn", "generate-sources", "-B"],
+                ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
             )
         # Repository: image-api
         elif base_book == "openstack-image-service-api":
             output = subprocess.check_output(
-                ["markdown-docbook.sh", "image-api-v2.0"],
+                ["markdown-docbook.sh", comments, release, "image-api-v2.0"],
                 stderr=subprocess.STDOUT
             )
             output = subprocess.check_output(
-                ["mvn", "generate-sources", "-B"],
+                ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
             )
         else:
             output = subprocess.check_output(
-                ["mvn", "generate-sources", "-B"],
+                ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
             )
     except subprocess.CalledProcessError as e:
@@ -779,7 +792,8 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     books = []
     affected_books = set()
 
-    build_all_books = force or check_modified_affects_all(rootdir, verbose)
+    build_all_books = (force or check_modified_affects_all(rootdir, verbose) or
+                       cfg.CONF.only_book)
 
     # Dictionary that contains a set of files.
     # The key is a filename, the set contains files that include this file.
@@ -811,8 +825,11 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
         elif root.endswith('doc') or root == rootdir:
             continue
         elif "pom.xml" in files:
-            books.append(root)
-            book_root = root
+            if (not cfg.CONF.only_book or
+                (cfg.CONF.only_book and
+                 os.path.basename(root) in cfg.CONF.only_book)):
+                books.append(root)
+                book_root = root
 
         # No need to check single books if we build all, we just
         # collect list of books
@@ -893,7 +910,9 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
                         new_files.append(g)
                         affected_files.add(g)
 
-    if build_all_books:
+    if cfg.CONF.only_book:
+        print("Building specified books.")
+    elif build_all_books:
         print("Building all books.")
     elif affected_books:
         books = affected_books
@@ -962,6 +981,22 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
         print("Building of books finished successfully.\n")
 
 
+def read_properties():
+    """Read gerrit-doc.properties."""
+
+    gerrit_file = os.path.join(get_gitroot(), 'gerrit-doc.properties')
+
+    if os.path.isfile(gerrit_file):
+
+        for line in open(gerrit_file, 'r'):
+            content = line.strip().split('=')
+            if len(content) > 1:
+                if content[0] == "DOC_RELEASE_PATH":
+                    cfg.CONF.release_path = content[1]
+                elif content[0] == "DOC_COMMENTS_ENABLED":
+                    cfg.CONF.comments_enabled = content[1]
+
+
 def add_exceptions(file_exception, verbose):
     """Add list of exceptions from file_exceptions."""
 
@@ -999,6 +1034,11 @@ cli_OPTS = [
                     help="Directory to ignore for building of manuals. The "
                          "parameter can be passed multiple times to add "
                          "several directories."),
+    cfg.StrOpt('language', default=None, short='l',
+               help="Build translated manual for language in path "
+               "generate/$LANGUAGE ."),
+    cfg.MultiStrOpt('only-book', default=None,
+                    help="Build each specified manual."),
 ]
 
 OPTS = [
@@ -1011,6 +1051,10 @@ OPTS = [
                     "must be in the same order as the book option."),
     cfg.StrOpt("repo-name", default=None,
                help="Name of repository."),
+    cfg.StrOpt("release-path", default="trunk",
+               help="Value to pass to maven for release.path.name."),
+    cfg.StrOpt("comments-enabled", default="0",
+               help="Value to pass to maven for comments.enabled."),
 ]
 
 
@@ -1031,6 +1075,10 @@ def handle_options():
 
     if CONF.verbose:
         print("Verbose execution")
+
+    if CONF.language:
+        print("Building for language '%s'" % CONF.language)
+
     if CONF.file_exception:
         add_exceptions(CONF.file_exception, CONF.verbose)
 
@@ -1065,7 +1113,11 @@ def main():
     handle_options()
 
     doc_path = get_gitroot()
-    if not CONF.api_site:
+    if CONF.language:
+        doc_path = os.path.join(doc_path, 'generated', CONF.language)
+        if CONF.verbose:
+            print("Using %s as root" % doc_path)
+    elif not CONF.api_site:
         doc_path = os.path.join(doc_path, 'doc')
 
     if CONF.check_build and www_touched(False):
@@ -1095,6 +1147,7 @@ def main():
         check_deleted_files(doc_path, FILE_EXCEPTIONS, CONF.verbose)
 
     if CONF.check_build:
+        read_properties()
         build_affected_books(doc_path, BOOK_EXCEPTIONS,
                              FILE_EXCEPTIONS,
                              CONF.verbose, CONF.force,

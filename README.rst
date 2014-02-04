@@ -68,39 +68,41 @@ Release notes
 0.5
 ---
 
- * Test that resources in wadl files have an xml:id (lp:bug 1275007)
- * Improve formatting of python command line clients (lp:bug 1274699)
+ * Test that resources in wadl files have an xml:id (lp:bug 1275007).
+ * Improve formatting of python command line clients (lp:bug 1274699).
  * Copy all generated books to directory publish-docs in the git
-   top-level (lp:blueprint draft-docs-on-docs-draft)
+   top-level (lp:blueprint draft-docs-on-docs-draft).
  * Requires now a config file in top-level git directory named
-   doc-test.conf
+   doc-test.conf.
+ * Allow building of translated manuals, these need to be setup first
+   with "generatedocbook -l LANGUAGE -b BOOK".
 
 0.4
 ---
 
  * New option --exceptions-file to pass list of files to ignore
-   completely
- * Major improvements for automatic generation of option tables
+   completely.
+ * Major improvements for automatic generation of option tables.
  * New tool openstack-auto-commands to document python
-   command line clients
+   command line clients.
 
 0.3
 ---
 
- * Fixes path for automated translation toolchain to fix lp:bug 1216153
- * Validates .xsd .xsl and.xjb files in addition to .xml
- * Fixes validation of WADL files to validate properly against XML schema
+ * Fixes path for automated translation toolchain to fix lp:bug 1216153.
+ * Validates .xsd .xsl and.xjb files in addition to .xml.
+ * Fixes validation of WADL files to validate properly against XML schema.
 
 0.2
 ---
 
- * Enables local copies of RNG schema for validation
- * Enables ignoring directories when checking
+ * Enables local copies of RNG schema for validation.
+ * Enables ignoring directories when checking.
 
 0.1
 ---
 
-Initial release
+Initial release.
 
 Contributing
 ============
