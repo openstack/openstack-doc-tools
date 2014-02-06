@@ -8,5 +8,5 @@ recursive-include tools *
 recursive-include sitemap *
 recursive-include os_doc_tools *
 
-exclude .gitignore
+recursive-exclude * .gitignore
 exclude .gitreview
