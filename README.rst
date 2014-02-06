@@ -65,6 +65,11 @@ these files come from.
 Release notes
 =============
 
+0.6
+---
+ * Fix python packaging bugs that prevented sitepackages usage and
+   installed .gitignore in packages
+
 0.5
 ---
 
