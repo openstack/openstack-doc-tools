@@ -668,6 +668,15 @@ def publish_book(publish_path, book):
                     ignore=shutil.ignore_patterns('*.xml'))
 
 
+def ensure_exists(program):
+    """Check that program exists, abort if not."""
+    retcode = subprocess.call("type " + program, shell=True,
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if retcode != 0:
+        print("Program '%s' does not exist, please install!" % program)
+        sys.exit(1)
+
+
 def build_book(book, publish_path):
     """Build book(s) in directory book."""
 
@@ -1147,6 +1156,9 @@ def main():
         check_deleted_files(doc_path, FILE_EXCEPTIONS, CONF.verbose)
 
     if CONF.check_build:
+        # Some programs are called in subprocesses,  make sure that they
+        # really exist.
+        ensure_exists("mvn")
         read_properties()
         build_affected_books(doc_path, BOOK_EXCEPTIONS,
                              FILE_EXCEPTIONS,
