@@ -119,6 +119,11 @@ def get_xml_list (sms, dr, flst):
         if ((f.endswith(".xml") and (f != "pom.xml"))) :
             sms.append(os.path.join(dr,f))
 
+
+def get_default_book():
+    return os.listdir(root)[0]
+
+
 def main(argv):
 
     usage = "usage: %prog [options] command [cmd_options]"
@@ -133,7 +138,7 @@ def main(argv):
         "-l", "--language", dest="language", help=("specified language")
     )
     parser.add_option(
-        "-b", "--book", dest="book", help=("specified docbook")
+        "-b", "--book", dest="book", default=get_default_book(), help=("specified docbook")
     )
     (options, args) = parser.parse_args()
     if (options.language == None) :
