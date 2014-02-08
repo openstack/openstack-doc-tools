@@ -32,6 +32,7 @@ Requires:
 
 '''
 
+import gzip
 import multiprocessing
 import os
 import re
@@ -677,7 +678,7 @@ def ensure_exists(program):
         sys.exit(1)
 
 
-def build_book(book, publish_path):
+def build_book(book, publish_path, log_path):
     """Build book(s) in directory book."""
 
     # Note that we cannot build in parallel several books in the same
@@ -690,6 +691,8 @@ def build_book(book, publish_path):
     base_book_orig = base_book
     comments = "-Dcomments.enabled=%s" % cfg.CONF.comments_enabled
     release = "-Drelease.path.name=%s" % cfg.CONF.release_path
+    out_file = gzip.open(os.path.join(log_path, "build-" + base_book +
+                                      ".log.gz"), 'w')
     try:
         # Clean first and then build so that the output of all guides
         # is available
@@ -749,6 +752,7 @@ def build_book(book, publish_path):
                 ["markdown-docbook.sh", "identity-api-v3"],
                 stderr=subprocess.STDOUT
             )
+            out_file.write(output)
             # File gets generated at wrong directory, we need to move it
             # around
             shutil.move("src/markdown/identity-api-v3.xml", ".")
@@ -762,6 +766,7 @@ def build_book(book, publish_path):
                 ["markdown-docbook.sh", "image-api-v2.0"],
                 stderr=subprocess.STDOUT
             )
+            out_file.write(output)
             output = subprocess.check_output(
                 ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
@@ -772,10 +777,13 @@ def build_book(book, publish_path):
                 stderr=subprocess.STDOUT
             )
     except subprocess.CalledProcessError as e:
+        out_file.write(output)
         output = e.output
         returncode = e.returncode
         result = False
 
+    out_file.write(output)
+    out_file.close()
     publish_book(publish_path, base_book_orig)
     return (base_book, result, output, returncode)
 
@@ -964,10 +972,14 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
     pool = multiprocessing.Pool(maxjobs)
     print("Queuing the following books for building:")
     publish_path = get_publish_path()
+    log_path = get_gitroot()
     for book in sorted(books):
         print("  %s" % os.path.basename(book))
-        pool.apply_async(build_book, (book, publish_path),
-                         callback=logging_build_book)
+        if cfg.CONF.debug:
+            build_book(book, publish_path, log_path)
+        else:
+            pool.apply_async(build_book, (book, publish_path, log_path),
+                             callback=logging_build_book)
     pool.close()
     print("Building all queued %d books now..." % len(books))
     pool.join()
@@ -1030,7 +1042,9 @@ cli_OPTS = [
     cfg.BoolOpt("check-niceness", default=False,
                 help="Check the niceness of files, for example whitespace."),
     cfg.BoolOpt("check-syntax", default=False,
-                help="Check the syntax of modified files"),
+                help="Check the syntax of modified files."),
+    cfg.BoolOpt('debug', default=False,
+                help="Enable debug code."),
     cfg.BoolOpt('force', default=False,
                 help="Force the validation of all files "
                 "and build all books."),
@@ -1039,7 +1053,7 @@ cli_OPTS = [
     cfg.BoolOpt('verbose', default=False, short='v',
                 help="Verbose execution."),
     cfg.StrOpt('exceptions-file',
-               help="Ignored, for compatibility only"),
+               help="Ignored, for compatibility only."),
     cfg.MultiStrOpt("file-exception",
                     help="File that will be skipped during validation."),
     cfg.MultiStrOpt("ignore-dir",
@@ -1087,6 +1101,9 @@ def handle_options():
 
     if CONF.verbose:
         print("Verbose execution")
+
+    if CONF.debug:
+        print("Enabling debug code")
 
     if CONF.language:
         print("Building for language '%s'" % CONF.language)

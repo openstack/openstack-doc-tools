@@ -44,6 +44,9 @@ OPTIONS
        Path to a config file to use. Multiple config files can be
        specified, with values in later files taking precedence.
 
+  **--debug**
+      Enable debug code.
+
   **--file-exception FILE_EXCEPTION**
       File that will be skipped during validation.
 
@@ -77,6 +80,12 @@ FILES
 
 Reads the file `doc-test.conf` in the top-level directory of the git
 repository for option processing.
+
+Building of books will generate in the top-level directory of the git
+repository:
+
+* a directory `publish-docs` with a copy of the build results.
+* for each book build a log file named `build-${book}.log.gz`.
 
 SEE ALSO
 ========
