@@ -65,6 +65,10 @@ these files come from.
 Release notes
 =============
 
+0.7
+---
+ * Fix building of identity-api and image-api books.
+
 0.6
 ---
  * Fix python packaging bugs that prevented sitepackages usage and

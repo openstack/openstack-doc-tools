@@ -26,13 +26,14 @@ fi
 FILENAME=$1
 FILEPATH=`find ./ -regextype posix-extended -regex ".*${FILENAME}\.(md|markdown|mdown)"`
 DIRPATH=`dirname $FILEPATH`
+SOURCES=`ls $DIRPATH/*.md`
 
 # Check for requirements
 type -P pandoc > /dev/null 2>&1 || { echo >&2 "pandoc not installed.  Aborting."; exit 1; }
 type -P xsltproc > /dev/null 2>&1 || { echo >&2 "xsltproc not installed.  Aborting."; exit 1; }
 type -P xmllint > /dev/null 2>&1 || { echo >&2 "xmllint not installed.  Aborting."; exit 1; }
 
-pandoc -f markdown -t docbook -s ${FILEPATH} |\
+pandoc -f markdown -t docbook -s ${SOURCES} |\
 xsltproc -o - ${DB_UPGRADE} - |\
 xmllint  --format - | \
 sed -e "s,<article,<chapter xml:id=\"$FILENAME\"," | \
