@@ -68,9 +68,20 @@ Release notes
 0.7
 ---
 
- * Fix building of identity-api and image-api books.
- * Add option --debug.
- * Generate log file for each build.
+ * openstack-doc-test:
+
+   - Fix building of identity-api and image-api books.
+   - Add option --debug.
+   - Generate log file for each build.
+   - Do not install build-ha-guide.sh and markdown-docbook.sh in
+     /usr/bin, use special scripts dir instead.
+
+ * generatedocbook and generatepot have been merged into a single
+   file, the command has been renamed to
+   openstack-generate-docbook/openstack-generate-pot.  For
+   compatibility, wrapper scripts are installed that will be removed
+   in version 0.8.
+
 
 0.6
 ---
