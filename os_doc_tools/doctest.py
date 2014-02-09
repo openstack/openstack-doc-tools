@@ -47,7 +47,7 @@ from oslo.config import cfg
 
 
 # These are files that are known to not be in DocBook format.
-# Add values via --exceptions-file
+# Add values via --file-exceptions
 FILE_EXCEPTIONS = []
 
 # These are books that we aren't checking yet
@@ -1052,8 +1052,6 @@ cli_OPTS = [
                 help="Do not exit on failures."),
     cfg.BoolOpt('verbose', default=False, short='v',
                 help="Verbose execution."),
-    cfg.StrOpt('exceptions-file',
-               help="Ignored, for compatibility only."),
     cfg.MultiStrOpt("file-exception",
                     help="File that will be skipped during validation."),
     cfg.MultiStrOpt("ignore-dir",
