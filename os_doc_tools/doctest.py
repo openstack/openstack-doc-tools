@@ -691,8 +691,12 @@ def build_book(book, publish_path, log_path):
     base_book_orig = base_book
     comments = "-Dcomments.enabled=%s" % cfg.CONF.comments_enabled
     release = "-Drelease.path.name=%s" % cfg.CONF.release_path
-    out_file = gzip.open(os.path.join(log_path, "build-" + base_book +
-                                      ".log.gz"), 'w')
+    if cfg.CONF.language:
+        out_filename = ("build-" + cfg.CONF.language + "-" + base_book +
+                        ".log.gz")
+    else:
+        out_filename = "build-" + base_book + ".log.gz"
+    out_file = gzip.open(os.path.join(log_path, out_filename), 'w')
     try:
         # Clean first and then build so that the output of all guides
         # is available
@@ -700,6 +704,7 @@ def build_book(book, publish_path, log_path):
             ["mvn", "clean"],
             stderr=subprocess.STDOUT
         )
+        out_file.write(output)
         if base_book == "install-guide":
             # Build Debian
             base_book = "install-guide (for debian)"
@@ -709,6 +714,7 @@ def build_book(book, publish_path, log_path):
                  "-Doperating.system=apt-debian", "-Dprofile.os=debian"],
                 stderr=subprocess.STDOUT
             )
+            out_file.write(output)
             # Build Fedora
             base_book = "install-guide (for Fedora)"
             output = subprocess.check_output(
@@ -718,6 +724,7 @@ def build_book(book, publish_path, log_path):
                  "-Dprofile.os=centos;fedora;rhel"],
                 stderr=subprocess.STDOUT
             )
+            out_file.write(output)
             # Build openSUSE
             base_book = "install-guide (for openSUSE)"
             output = subprocess.check_output(
@@ -726,6 +733,7 @@ def build_book(book, publish_path, log_path):
                  "-Doperating.system=zypper", "-Dprofile.os=opensuse;sles"],
                 stderr=subprocess.STDOUT
             )
+            out_file.write(output)
             # Build Ubuntu
             base_book = "install-guide (for Ubuntu)"
             output = subprocess.check_output(
