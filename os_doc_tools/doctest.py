@@ -53,8 +53,11 @@ FILE_EXCEPTIONS = []
 # These are books that we aren't checking yet
 BOOK_EXCEPTIONS = []
 
-# Mappings from books to directories
+# Mappings from books to build directories under target
 BOOK_MAPPINGS = {}
+
+# Mappings from books to publish directories
+BOOK_PUBLISH_MAPPINGS = {}
 
 RESULTS_OF_BUILDS = []
 
@@ -648,25 +651,37 @@ def publish_book(publish_path, book):
     # Assumption: The path for the book is the same as the name of directory
     # the book is in. We need to special case any exceptions.
 
-    if cfg.CONF.language:
-        book_path = os.path.join(publish_path, cfg.CONF.language, book)
-    else:
-        book_path = os.path.join(publish_path, book)
+    # Publishing directory
+    book_path = publish_path
 
-    # Note that shutil.copytree does not allow an existing target directory,
-    # thus delete it.
-    shutil.rmtree(book_path, ignore_errors=True)
+    if cfg.CONF.language:
+        book_path = os.path.join(book_path, cfg.CONF.language)
 
     if os.path.isdir(os.path.join('target/docbkx/webhelp', book)):
         source = os.path.join('target/docbkx/webhelp', book)
     elif os.path.isdir(os.path.join('target/docbkx/webhelp/local', book)):
         source = os.path.join('target/docbkx/webhelp/local', book)
+        book_path = os.path.join(book_path, 'local')
     elif os.path.isdir(os.path.join('target/docbkx/webhelp/',
                                     cfg.CONF.release_path, book)):
         source = os.path.join('target/docbkx/webhelp/',
                               cfg.CONF.release_path, book)
+        book_path = os.path.join(book_path, cfg.CONF.release_path)
     elif (book in BOOK_MAPPINGS):
         source = BOOK_MAPPINGS[book]
+
+    if book in BOOK_PUBLISH_MAPPINGS:
+        book_publish_dir = BOOK_PUBLISH_MAPPINGS[book]
+    else:
+        book_publish_dir = book
+
+    book_path = os.path.join(book_path, book_publish_dir)
+    if cfg.CONF.debug:
+        print("Uploading book %s to %s" % (book, book_path))
+
+    # Note that shutil.copytree does not allow an existing target directory,
+    # thus delete it.
+    shutil.rmtree(book_path, ignore_errors=True)
 
     shutil.copytree(source, book_path,
                     ignore=shutil.ignore_patterns('*.xml'))
@@ -1079,13 +1094,22 @@ cli_OPTS = [
 ]
 
 OPTS = [
-    # NOTE(jaegerandi): books and target-dirs could be a DictOpt
-    # but I could not get this working properly.
+    # NOTE(jaegerandi): books, target-dirs, publish-dir could be a
+    # DictOpt but I could not get this working properly.
     cfg.MultiStrOpt("book", default=None,
-                    help="Name of book that needs special mapping."),
+                    help="Name of book that needs special mapping. "
+                    "This is the name of directory where the pom.xml "
+                    "file lives."),
     cfg.MultiStrOpt("target-dir", default=None,
-                    help="Target directory for a book. The option "
-                    "must be in the same order as the book option."),
+                    help="Directory name in target dir for a book. "
+                    "The option must be in the same order as the book "
+                    "option."),
+    cfg.MultiStrOpt("publish-dir", default=None,
+                    help="Directory name where book will be copied to "
+                    "in publish-docs directory. This option must be in "
+                    "same order as the book option. Either give this option "
+                    "for all books or for none. If publish-dir is not "
+                    "specified, book is used as publish-dir."),
     cfg.StrOpt("repo-name", default=None,
                help="Name of repository."),
     cfg.StrOpt("release-path", default="trunk",
@@ -1134,14 +1158,25 @@ def handle_options():
 
     if CONF.check_build and CONF.book and CONF.target_dir:
         if len(CONF.book) != len(CONF.target_dir):
-            print("ERROR: books and target-dirs need to have a 1:1 "
+            print("ERROR: book and target_dir options need to have a 1:1 "
                   "relationship.")
+            sys.exit(1)
+        if (CONF.publish_dir and
+            len(CONF.publish_dir) != len(CONF.target_dir)):
+            print("ERROR: publish_dir and target_dir need to have a 1:1 "
+                  "relationship if publish_dir is specified.")
             sys.exit(1)
         for i in range(len(CONF.book)):
             BOOK_MAPPINGS[CONF.book[i]] = CONF.target_dir[i]
             if CONF.verbose:
                 print(" Target dir for %s is %s" %
                       (CONF.book[i], BOOK_MAPPINGS[CONF.book[i]]))
+        if CONF.publish_dir:
+            for i in range(len(CONF.book)):
+                BOOK_PUBLISH_MAPPINGS[CONF.book[i]] = CONF.publish_dir[i]
+                if CONF.verbose:
+                    print(" Publish dir for %s is %s" %
+                          (CONF.book[i], BOOK_PUBLISH_MAPPINGS[CONF.book[i]]))
 
 
 def main():

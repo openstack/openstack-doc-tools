@@ -9,9 +9,13 @@ file_exception=os-object-api-1.0.wadl
 ignore_dir=incubation
 ignore_dir=openstack-compute-api-1.0
 
-# These two options need to come as pairs:
-book=api-quick-start
-target_dir=target/docbkx/webhelp/api-quick-start-onepager-external
+# These two (or three) options need to come as pairs/triplets.
+# Either add publish_pair for each book/target_dir pair or not at all.
+# If publish_dir is not specified, book is used as publish_dir.
+book = api-quick-start
+target_dir = target/docbkx/webhelp/api-quick-start-onepager-external
+#publish_dir = api-quick-start
 
-book=api-ref
-target_dir=target/docbkx/html
+book = api-ref
+target_dir = target/docbkx/html
+#publish_dir = api-ref
