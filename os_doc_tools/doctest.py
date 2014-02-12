@@ -74,11 +74,14 @@ KNOWN_AUDIENCE_VALUES = ["enduser",
                          "installer",
                          "webpage"]
 
-BASE_RNG = os.path.join(os.path.dirname(__file__), 'resources/')
+os_doc_tools_dir = os.path.dirname(__file__)
+BASE_RNG = os.path.join(os_doc_tools_dir, 'resources')
 RACKBOOK_RNG = os.path.join(BASE_RNG, 'rackbook.rng')
 DOCBOOKXI_RNG = os.path.join(BASE_RNG, 'docbookxi.rng')
 WADL_RNG = os.path.join(BASE_RNG, 'wadl.rng')
 WADL_XSD = os.path.join(BASE_RNG, 'wadl.xsd')
+
+SCRIPTS_DIR = os.path.join(os_doc_tools_dir, 'scripts')
 
 
 # NOTE(berendt): check_output as provided in Python 2.7.5 to make script
@@ -746,7 +749,7 @@ def build_book(book, publish_path, log_path):
             base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
         elif base_book == "high-availability-guide":
             output = subprocess.check_output(
-                ["build-ha-guide.sh", ],
+                [os.path.join(SCRIPTS_DIR, 'build-ha-guide.sh'), ],
                 stderr=subprocess.STDOUT
             )
             output = subprocess.check_output(
@@ -757,7 +760,8 @@ def build_book(book, publish_path, log_path):
         # Let's not check for "v3" but for the full name instead
         elif book.endswith("openstack-identity-api/v3"):
             output = subprocess.check_output(
-                ["markdown-docbook.sh", "identity-api-v3"],
+                [os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
+                 "identity-api-v3"],
                 stderr=subprocess.STDOUT
             )
             out_file.write(output)
@@ -771,7 +775,8 @@ def build_book(book, publish_path, log_path):
         # Repository: image-api
         elif book.endswith('openstack-image-service-api/src/markdown'):
             output = subprocess.check_output(
-                ["markdown-docbook.sh", "image-api-v2.0"],
+                [os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
+                 "image-api-v2.0"],
                 stderr=subprocess.STDOUT
             )
             out_file.write(output)
