@@ -975,6 +975,41 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     return books
 
 
+def generate_index_file():
+    """Generate index.html file in publish_path."""
+
+    publish_path = get_publish_path()
+    if not os.path.isdir(publish_path):
+        os.mkdir(publish_path)
+
+    index_file = open(os.path.join(get_publish_path(), 'index.html'), 'w')
+
+    index_file.write(
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN\"n'
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
+        '<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">\n'
+        '<body>\n'
+        '<h1>Results of checkbuild</h1>\n')
+
+    for root, dirs, files in os.walk(publish_path):
+
+        dirs[:] = [d for d in dirs if not d in ['common', 'webapp', 'content']]
+
+        # Ignore top-level index.html files
+        if root == publish_path:
+            continue
+
+        if os.path.isfile(os.path.join(root, 'content/index.html')):
+            path = os.path.relpath(root, publish_path)
+            index_file.write('<a href="%s/content/index.html">%s</a>\n' %
+                             (path, path))
+            index_file.write('<br/>')
+
+    index_file.write('</body>\n'
+                     '</html>\n')
+    index_file.close()
+
+
 def build_affected_books(rootdir, book_exceptions, file_exceptions,
                          verbose, force=False, ignore_errors=False,
                          ignore_dirs=[]):
@@ -1023,6 +1058,9 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
             print(">>> Build of book %s succeeded." % book)
         else:
             any_failures = True
+
+    if cfg.CONF.create_index:
+        generate_index_file()
 
     if any_failures:
         for book, result, output, returncode in RESULTS_OF_BUILDS:
@@ -1076,6 +1114,9 @@ cli_OPTS = [
                 help="Check the niceness of files, for example whitespace."),
     cfg.BoolOpt("check-syntax", default=False,
                 help="Check the syntax of modified files."),
+    cfg.BoolOpt("create-index", default=True,
+                help="When publishing create an index.html file to find books "
+                "in an easy way."),
     cfg.BoolOpt('debug', default=False,
                 help="Enable debug code."),
     cfg.BoolOpt('force', default=False,
