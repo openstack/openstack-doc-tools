@@ -642,6 +642,11 @@ def publish_www():
     shutil.copytree(source, www_path)
 
 
+def ignore_most_xml(path, names):
+    f = [n for n in names if n.endswith('.xml') and n != 'atom.xml']
+    return f
+
+
 def publish_book(publish_path, book):
     """Copy generated files to publish_path."""
 
@@ -669,7 +674,7 @@ def publish_book(publish_path, book):
         source = BOOK_MAPPINGS[book]
 
     shutil.copytree(source, book_path,
-                    ignore=shutil.ignore_patterns('*.xml'))
+                    ignore=ignore_most_xml)
 
 
 def ensure_exists(program):
