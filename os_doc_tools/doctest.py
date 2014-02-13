@@ -985,7 +985,7 @@ def generate_index_file():
     index_file = open(os.path.join(get_publish_path(), 'index.html'), 'w')
 
     index_file.write(
-        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN\"n'
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n'
         '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
         '<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">\n'
         '<body>\n'
@@ -1003,7 +1003,7 @@ def generate_index_file():
             path = os.path.relpath(root, publish_path)
             index_file.write('<a href="%s/content/index.html">%s</a>\n' %
                              (path, path))
-            index_file.write('<br/>')
+            index_file.write('<br/>\n')
 
     index_file.write('</body>\n'
                      '</html>\n')
