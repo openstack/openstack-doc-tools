@@ -97,6 +97,12 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.7.1
+-----
+
+ * Fix openstack-doc-test niceness and syntax checks that always
+   failed in api projects.
+
 0.7
 ---
 
