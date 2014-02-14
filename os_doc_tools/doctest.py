@@ -712,6 +712,8 @@ def build_book(book, publish_path, log_path):
     os.chdir(book)
     result = True
     returncode = 0
+    if cfg.CONF.debug:
+        print("Building in directory '%s'" % book)
     base_book = os.path.basename(book)
     base_book_orig = base_book
     comments = "-Dcomments.enabled=%s" % cfg.CONF.comments_enabled
@@ -789,6 +791,8 @@ def build_book(book, publish_path, log_path):
             out_file.write(output)
             # File gets generated at wrong directory, we need to move it
             # around
+            if os.isfile('identity-api-v3.xml'):
+                os.remove('identity-api-v3.xml')
             shutil.move("src/markdown/identity-api-v3.xml", ".")
             output = subprocess.check_output(
                 ["mvn", "generate-sources", comments, release, "-B"],
