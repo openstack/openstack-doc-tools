@@ -97,6 +97,11 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.8
+---
+
+ * Improved openstack-auto-commands output
+
 0.7.1
 -----
 

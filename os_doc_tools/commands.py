@@ -57,7 +57,7 @@ def quote_xml(line):
     return line
 
 
-def generate_heading(os_command, api_name, os_file):
+def generate_heading(os_command, api_name, title, os_file):
     """Write DocBook file header.
 
     :param os_command: client command to document
@@ -77,9 +77,10 @@ def generate_heading(os_command, api_name, os_file):
 
     <?dbhtml stop-chunking?>
 
-    <title>{0} commands</title>
-    <para>The {0} client is the command-line interface (CLI) for the
-         {1} and its extensions.</para>
+    <title>{2}</title>
+    <para>The <command>{0}</command> client is the command-line interface
+         (CLI) for the {1} and its extensions.
+    </para>
     <para>For help on a specific <command>{0}</command>
        command, enter:
     </para>
@@ -89,7 +90,7 @@ def generate_heading(os_command, api_name, os_file):
     <section xml:id=\"{0}client_command_usage\">
        <title>{0} usage</title>\n"""
 
-    os_file.write(header.format(os_command, api_name))
+    os_file.write(header.format(os_command, api_name, title))
 
 
 def is_option(str):
@@ -136,8 +137,10 @@ def extract_options(line):
 
         i = 0
         while i < len(words) - 1:
-            if ('<' in words[i] and
-                '>' not in words[i]):
+            if (('<' in words[i] and
+                '>' not in words[i]) or
+                ('[' in words[i] and
+                 ']' not in words[i])):
                 words[i] += ' ' + words[i + 1]
                 del words[i + 1]
             else:
@@ -432,44 +435,53 @@ def document_single_project(os_command):
     blacklist = []
     subcommands = []
     if os_command == 'ceilometer':
-        api_name = "OpenStack Telemetry API"
+        api_name = "Telemetry API"
+        title = "Telemetry command-line client"
         blacklist = ["alarm-create"]
     elif os_command == 'cinder':
         api_name = "OpenStack Block Storage API"
+        title = "Block Storage command-line client"
     elif os_command == 'glance':
         api_name = 'OpenStack Image Service API'
+        title = "Image Service command-line client"
         # Does not know about bash-completion yet, need to specify
         # subcommands manually
         subcommands = ["image-create", "image-delete", "image-list",
                        "image-show", "image-update", "member-create",
                        "member-delete", "member-list"]
     elif os_command == 'heat':
-        api_name = "OpenStack Orchestration API"
+        api_name = "Orchestration API"
+        title = "Orchestration command-line client"
         blacklist = ["create", "delete", "describe", "event",
                      "gettemplate", "list", "resource",
                      "update", "validate"]
     elif os_command == 'keystone':
         api_name = "OpenStack Identity API"
+        title = "Identity Service command-line client"
     elif os_command == 'neutron':
         api_name = "OpenStack Networking API"
+        title = "Networking command-line client"
     elif os_command == 'nova':
         api_name = "OpenStack Compute API"
+        title = "Compute command-line client"
         blacklist = ["add-floating-ip", "remove-floating-ip"]
     elif os_command == 'swift':
         api_name = "OpenStack Object Storage API"
+        title = "Object Storage command-line client"
         # Does not know about bash-completion yet, need to specify
         # subcommands manually
         subcommands = ["delete", "download", "list", "post",
                        "stat", "upload"]
     elif os_command == 'trove':
-        api_name = "OpenStack Database API"
+        api_name = "Database API"
+        title = "Database command-line client"
     else:
         print("Not yet handled command")
         sys.exit(-1)
 
     os_file = open("ch_cli_" + os_command + "_commands.xml",
                    'w')
-    generate_heading(os_command, api_name, os_file)
+    generate_heading(os_command, api_name, title, os_file)
     generate_command(os_command, os_file)
     generate_subcommands(os_command, os_file, blacklist,
                          subcommands)
