@@ -102,6 +102,7 @@ Release notes
 
  * Fix openstack-doc-test niceness and syntax checks that always
    failed in api projects.
+ * Fix building of image-api-v2
 
 0.7
 ---

@@ -795,7 +795,7 @@ def build_book(book, publish_path, log_path):
                 stderr=subprocess.STDOUT
             )
         # Repository: image-api
-        elif book.endswith('openstack-image-service-api/src/markdown'):
+        elif base_book == 'image-api-v2':
             output = subprocess.check_output(
                 [os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
                  "image-api-v2.0"],
