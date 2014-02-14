@@ -78,7 +78,9 @@ KNOWN_AUDIENCE_VALUES = ["enduser",
                          "webpage"]
 
 os_doc_tools_dir = os.path.dirname(__file__)
-BASE_RNG = os.path.join(os_doc_tools_dir, 'resources')
+# NOTE(jaegerandi): BASE_RNG needs to end with '/', otherwise
+# the etree.parse call in get_wadl_schema will fail.
+BASE_RNG = os.path.join(os_doc_tools_dir, 'resources/')
 RACKBOOK_RNG = os.path.join(BASE_RNG, 'rackbook.rng')
 DOCBOOKXI_RNG = os.path.join(BASE_RNG, 'docbookxi.rng')
 WADL_RNG = os.path.join(BASE_RNG, 'wadl.rng')
