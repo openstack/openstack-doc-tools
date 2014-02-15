@@ -135,12 +135,12 @@ This missed some requirements for nova, which were fixed by:
 
 Making the flag names update
 
- $ ../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update nova -i ~/nova > nova.log
+ $ ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update nova -i ~/nova > nova.log
 
 At this point, search through nova.flagmappings.new for anything
 labelled Unknown and fix, once that is done use:
 
- $ ../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook nova -i ~/nova
+ $ ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook nova -i ~/nova
 
 to generate the XML files and move those into the appropriate part of
 the git repo
