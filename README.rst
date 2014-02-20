@@ -101,6 +101,7 @@ Release notes
 ---
 
  * Improved openstack-auto-commands output
+ * Fix script invocation in openstack-doc-test.
 
 0.7.1
 -----

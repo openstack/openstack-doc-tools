@@ -773,7 +773,7 @@ def build_book(book, publish_path, log_path):
             base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
         elif base_book == "high-availability-guide":
             output = subprocess.check_output(
-                [os.path.join(SCRIPTS_DIR, 'build-ha-guide.sh'), ],
+                ["bash", os.path.join(SCRIPTS_DIR, 'build-ha-guide.sh'), ],
                 stderr=subprocess.STDOUT
             )
             output = subprocess.check_output(
@@ -784,7 +784,7 @@ def build_book(book, publish_path, log_path):
         # Let's not check for "v3" but for the full name instead
         elif book.endswith("openstack-identity-api/v3"):
             output = subprocess.check_output(
-                [os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
+                ["bash", os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
                  "identity-api-v3"],
                 stderr=subprocess.STDOUT
             )
@@ -801,7 +801,7 @@ def build_book(book, publish_path, log_path):
         # Repository: image-api
         elif base_book == 'image-api-v2':
             output = subprocess.check_output(
-                [os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
+                ["bash", os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
                  "image-api-v2.0"],
                 stderr=subprocess.STDOUT
             )
