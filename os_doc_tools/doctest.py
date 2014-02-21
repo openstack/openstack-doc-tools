@@ -724,6 +724,7 @@ def build_book(book, publish_path, log_path):
     else:
         out_filename = "build-" + base_book + ".log.gz"
     out_file = gzip.open(os.path.join(log_path, out_filename), 'w')
+    output = ""
     try:
         # Clean first and then build so that the output of all guides
         # is available
