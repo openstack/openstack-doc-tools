@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<chapter id="$xmlid$">
+  <chapterinfo>
+    <title>$if(title)$ $title$ $else$NO TITLE$endif$</title>
+$for(author)$
+    <author>
+      $author$
+    </author>
+$endfor$
+$if(date)$
+    <date>$date$</date>
+$endif$
+  </chapterinfo>
+$for(include-before)$
+$include-before$
+$endfor$
+$body$
+$for(include-after)$
+$include-after$
+$endfor$
+</chapter>

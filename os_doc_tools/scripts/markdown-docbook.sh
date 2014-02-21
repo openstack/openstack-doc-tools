@@ -9,6 +9,23 @@
 BRANCH=$ZUUL_REFNAME
 shopt -s extglob
 
+# This function figures out the location of the original script (as opposed to any chain of
+# symlinks pointing to it). Source:
+# http://muffinresearch.co.uk/archives/2008/10/10/bash-resolving-symlinks-to-shellscripts/
+function resolve_symlink {
+    SCRIPT=$1 NEWSCRIPT=''
+    until [ "$SCRIPT" = "$NEWSCRIPT" ]; do
+        if [ "${SCRIPT:0:1}" = '.' ]; then SCRIPT=$PWD/$SCRIPT; fi
+        cd $(dirname $SCRIPT)
+        if [ ! "${SCRIPT:0:1}" = '.' ]; then SCRIPT=$(basename $SCRIPT); fi
+        SCRIPT=${NEWSCRIPT:=$SCRIPT}
+        NEWSCRIPT=$(ls -l $SCRIPT | awk '{ print $NF }')
+    done
+    if [ ! "${SCRIPT:0:1}" = '/' ]; then SCRIPT=$PWD/$SCRIPT; fi
+    echo $(dirname $SCRIPT)
+}
+DIR=$(resolve_symlink $0)
+
 # Find location of db4-upgrade-xsl:
 if [ -e /usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl ] ; then
   DB_UPGRADE=/usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl
@@ -33,10 +50,8 @@ type -P pandoc > /dev/null 2>&1 || { echo >&2 "pandoc not installed.  Aborting."
 type -P xsltproc > /dev/null 2>&1 || { echo >&2 "xsltproc not installed.  Aborting."; exit 1; }
 type -P xmllint > /dev/null 2>&1 || { echo >&2 "xmllint not installed.  Aborting."; exit 1; }
 
-pandoc -f markdown -t docbook -s ${SOURCES} |\
+pandoc -V xmlid=$FILENAME --template=$DIR/pandoc-template.docbook -f markdown -t docbook -s ${SOURCES} |\
 xsltproc -o - ${DB_UPGRADE} - |\
-xmllint  --format - | \
-sed -e "s,<article,<chapter xml:id=\"$FILENAME\"," | \
-sed -e 's,</article>,</chapter>,' > ${DIRPATH}/$FILENAME.xml
+xmllint  --format - > ${DIRPATH}/$FILENAME.xml
 
 pwd
