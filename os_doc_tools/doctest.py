@@ -791,7 +791,7 @@ def build_book(book, publish_path, log_path):
             out_file.write(output)
             # File gets generated at wrong directory, we need to move it
             # around
-            if os.isfile('identity-api-v3.xml'):
+            if os.path.isfile('identity-api-v3.xml'):
                 os.remove('identity-api-v3.xml')
             shutil.move("src/markdown/identity-api-v3.xml", ".")
             output = subprocess.check_output(
