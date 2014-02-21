@@ -97,6 +97,12 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.8.1
+-----
+
+ * Fix openstack-doc-test building of image-api.
+ * Improve markdown conversion.
+
 0.8
 ---
 
