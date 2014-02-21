@@ -101,6 +101,7 @@ Release notes
 -----
 
  * Fix openstack-doc-test building of image-api.
+ * Fix publishing of api-ref.
  * Improve markdown conversion.
 
 0.8
