@@ -97,6 +97,14 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.8.2
+-----
+
+ Fixes for openstack-doc-test:
+ * Fix error handling, now really abort if an error occurs.
+ * Avoid races in initial maven setup that broke build.
+ * Add --parallel/noparallel flags to disable parallel building.
+
 0.8.1
 -----
 

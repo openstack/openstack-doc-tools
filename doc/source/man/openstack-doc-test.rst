@@ -69,6 +69,9 @@ OPTIONS
   **--only-book ONLY_BOOK**
       Build each specified manual.
 
+  **--parallel**
+      Build books in parallel (default).
+
   **--verbose**
        Verbose execution.
 

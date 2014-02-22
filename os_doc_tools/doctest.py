@@ -34,6 +34,7 @@ Requires:
 
 import gzip
 import multiprocessing
+import operator
 import os
 import re
 import shutil
@@ -77,16 +78,16 @@ KNOWN_AUDIENCE_VALUES = ["enduser",
                          "installer",
                          "webpage"]
 
-os_doc_tools_dir = os.path.dirname(__file__)
+OS_DOC_TOOLS_DIR = os.path.dirname(__file__)
 # NOTE(jaegerandi): BASE_RNG needs to end with '/', otherwise
 # the etree.parse call in get_wadl_schema will fail.
-BASE_RNG = os.path.join(os_doc_tools_dir, 'resources/')
+BASE_RNG = os.path.join(OS_DOC_TOOLS_DIR, 'resources/')
 RACKBOOK_RNG = os.path.join(BASE_RNG, 'rackbook.rng')
 DOCBOOKXI_RNG = os.path.join(BASE_RNG, 'docbookxi.rng')
 WADL_RNG = os.path.join(BASE_RNG, 'wadl.rng')
 WADL_XSD = os.path.join(BASE_RNG, 'wadl.xsd')
 
-SCRIPTS_DIR = os.path.join(os_doc_tools_dir, 'scripts')
+SCRIPTS_DIR = os.path.join(OS_DOC_TOOLS_DIR, 'scripts')
 
 
 # NOTE(berendt): check_output as provided in Python 2.7.5 to make script
@@ -676,6 +677,10 @@ def publish_book(publish_path, book):
         book_path = os.path.join(book_path, cfg.CONF.release_path)
     elif (book in BOOK_MAPPINGS):
         source = BOOK_MAPPINGS[book]
+    else:
+        if cfg.CONF.debug:
+            print("No build result found for book %s" % book)
+        return
 
     if book in BOOK_PUBLISH_MAPPINGS:
         book_publish_dir = BOOK_PUBLISH_MAPPINGS[book]
@@ -817,14 +822,14 @@ def build_book(book, publish_path, log_path):
                 stderr=subprocess.STDOUT
             )
     except subprocess.CalledProcessError as e:
-        out_file.write(output)
         output = e.output
         returncode = e.returncode
         result = False
 
     out_file.write(output)
     out_file.close()
-    publish_book(publish_path, base_book_orig)
+    if result:
+        publish_book(publish_path, base_book_orig)
     return (base_book, result, output, returncode)
 
 
@@ -1054,19 +1059,35 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
     print("Queuing the following books for building:")
     publish_path = get_publish_path()
     log_path = get_gitroot()
+    first_book = True
+
+    # First show books
     for book in sorted(books):
         print("  %s" % os.path.basename(book))
-        if cfg.CONF.debug:
-            build_book(book, publish_path, log_path)
-        else:
-            pool.apply_async(build_book, (book, publish_path, log_path),
-                             callback=logging_build_book)
-    pool.close()
     print("Building all queued %d books now..." % len(books))
+
+    # And then queue - since we wait for the first book to finish.
+    for book in sorted(books):
+        if cfg.CONF.debug or not cfg.CONF.parallel:
+            (book, result, output, retcode) = build_book(book,
+                                                         publish_path,
+                                                         log_path)
+            logging_build_book([book, result, output, retcode])
+        else:
+            res = pool.apply_async(build_book, (book, publish_path, log_path),
+                                   callback=logging_build_book)
+            if first_book:
+                first_book = False
+                # The first invocation of maven might download loads of
+                # data locally, we cannot do this in parallel. So, wait here
+                # for the first job to finish before running further mvn jobs.
+                res.get()
+    pool.close()
     pool.join()
 
     any_failures = False
-    for book, result, output, returncode in RESULTS_OF_BUILDS:
+    for book, result, _, _ in sorted(RESULTS_OF_BUILDS,
+                                     key=operator.itemgetter(0)):
         if result:
             print(">>> Build of book %s succeeded." % book)
         else:
@@ -1087,6 +1108,10 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
             sys.exit(1)
     else:
         print("Building of books finished successfully.\n")
+
+    if len(RESULTS_OF_BUILDS) != len(books):
+        print("ERROR: %d queued for building but only %d built!" %
+              (len(books), len(RESULTS_OF_BUILDS)))
 
 
 def read_properties():
@@ -1137,6 +1162,8 @@ cli_OPTS = [
                 "and build all books."),
     cfg.BoolOpt("ignore-errors", default=False,
                 help="Do not exit on failures."),
+    cfg.BoolOpt("parallel", default=True,
+                help="Build books in parallel (default)."),
     cfg.BoolOpt('verbose', default=False, short='v',
                 help="Verbose execution."),
     cfg.MultiStrOpt("file-exception",
