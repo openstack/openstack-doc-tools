@@ -97,6 +97,12 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.9
+---
+
+ * openstack-doc-test now validates JSON files for well-formed-ness and
+   whitespace.
+
 0.8.2
 -----
 

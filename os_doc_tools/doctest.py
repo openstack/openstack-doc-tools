@@ -33,6 +33,7 @@ Requires:
 '''
 
 import gzip
+import json
 import multiprocessing
 import operator
 import os
@@ -449,6 +450,32 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
           % (len(deleted_files), no_checked_files))
 
 
+def validate_one_json_file(rootdir, path, verbose, check_syntax,
+                           check_niceness):
+    """Validate a single JSON file."""
+
+    any_failures = False
+    if verbose:
+        print(" Validating %s" % os.path.relpath(path, rootdir))
+
+    try:
+        if check_syntax:
+            json_file = open(path, 'rb')
+            json.load(json_file)
+    except ValueError as e:
+        any_failures = True
+        print("  Invalid JSON file %s: %s" %
+              (os.path.relpath(path, rootdir), e))
+    try:
+        if check_niceness:
+            verify_nice_usage_of_whitespaces(path)
+    except ValueError as e:
+        any_failures = True
+        print("  %s: %s" % (os.path.relpath(path, rootdir), e))
+
+    return any_failures
+
+
 def validate_one_file(schema, rootdir, path, verbose,
                       check_syntax, check_niceness, validate_schema):
     """Validate a single file."""
@@ -493,7 +520,7 @@ def is_xml_like(filename):
     """
 
     return (filename.endswith(('.xml', '.xsd', '.xsl', '.wadl',
-                               '.xjb')) and
+                               '.xjb', '.json')) and
             not filename.endswith('pom.xml'))
 
 
@@ -501,6 +528,12 @@ def is_wadl(filename):
     """Returns true if file ends with .wadl."""
 
     return filename.endswith('.wadl')
+
+
+def is_json(filename):
+    """Returns true if file ends with .json."""
+
+    return filename.endswith('.json')
 
 
 def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
@@ -540,7 +573,12 @@ def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
             elif not f.endswith(('.wadl', '.xml')):
                 validate_schema = False
 
-        if (is_api_site and is_wadl(f)):
+        if is_json(f):
+            any_failures = validate_one_json_file(rootdir, f,
+                                                  verbose,
+                                                  check_syntax,
+                                                  check_niceness)
+        elif (is_api_site and is_wadl(f)):
             any_failures = validate_one_file(wadl_schema, rootdir, f,
                                              verbose,
                                              check_syntax,
