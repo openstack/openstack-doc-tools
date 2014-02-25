@@ -159,18 +159,6 @@ def verify_section_tags_have_xmid(doc):
                              node.sourceline)
 
 
-def verify_resources_tags_have_xmid(doc):
-    """Check that all resources tags have an xml:id attribute
-
-    Will throw an exception if there's at least one missing.
-    """
-    ns = {"wadl": "http://wadl.dev.java.net/2009/02"}
-    for node in doc.xpath('//wadl:resources', namespaces=ns):
-        if "{http://www.w3.org/XML/1998/namespace}id" not in node.attrib:
-            raise ValueError("resources missing xml:id attribute, line %d" %
-                             node.sourceline)
-
-
 def verify_attribute_profiling(doc, attribute, known_values):
     """Check for elements with attribute profiling set that conflicts with
        the attribute profiling of nodes below them in the DOM
@@ -464,8 +452,6 @@ def validate_one_file(schema, rootdir, path, verbose,
                 if validation_failed(schema, doc):
                     any_failures = True
                     print(error_message(schema.error_log))
-                if is_wadl(path):
-                    verify_resources_tags_have_xmid(doc)
                 verify_section_tags_have_xmid(doc)
                 verify_profiling(doc)
         if check_niceness:
