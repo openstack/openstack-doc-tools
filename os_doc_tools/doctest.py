@@ -358,6 +358,17 @@ def get_modified_files(rootdir, filtering=None):
     return modified_files
 
 
+def filter_dirs(dirs):
+    """Return list of directories to descend into."""
+
+    # Don't descend into 'target' and 'publish-docs' subdirectories and
+    # filter out any dot directories
+
+    return [d for d in dirs if (d != 'target' and
+                                d != 'publish-docs' and
+                                not d.startswith('.'))]
+
+
 def check_deleted_files(rootdir, file_exceptions, verbose):
     """Check whether files got deleted and verify that no other file
     references them.
@@ -381,15 +392,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
     missing_reference = False
 
     for root, dirs, files in os.walk(rootdir):
-        # Don't descend into 'target' subdirectories
-        try:
-            ind = dirs.index('target')
-            del dirs[ind]
-        except ValueError:
-            pass
-
-        # Filter out any dot directories
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = filter_dirs(dirs)
 
         os.chdir(root)
 
@@ -576,15 +579,7 @@ def validate_all_files(rootdir, exceptions, verbose,
     files_to_check = []
 
     for root, dirs, files in os.walk(rootdir):
-        # Don't descend into 'target' subdirectories
-        try:
-            ind = dirs.index('target')
-            del dirs[ind]
-        except ValueError:
-            pass
-
-        # Filter out any dot directories
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = filter_dirs(dirs)
 
         for f in files:
             # Ignore maven files, which are called pom.xml
@@ -856,15 +851,7 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     # 1. Iterate over whole tree and analyze include files.
     # This updates included_by, book_bk and books.
     for root, dirs, files in os.walk(rootdir):
-        # Don't descend into 'target' subdirectories
-        try:
-            ind = dirs.index('target')
-            del dirs[ind]
-        except ValueError:
-            pass
-
-        # Filter out any dot directories
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        dirs[:] = filter_dirs(dirs)
 
         # Filter out directories to be ignored
         if ignore_dirs:
