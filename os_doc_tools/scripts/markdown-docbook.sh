@@ -50,8 +50,10 @@ type -P pandoc > /dev/null 2>&1 || { echo >&2 "pandoc not installed.  Aborting."
 type -P xsltproc > /dev/null 2>&1 || { echo >&2 "xsltproc not installed.  Aborting."; exit 1; }
 type -P xmllint > /dev/null 2>&1 || { echo >&2 "xmllint not installed.  Aborting."; exit 1; }
 
+TITLE=`head -n1 $DIRPATH/$FILENAME.md|sed -e 's/^#* *//'`
 pandoc -V xmlid=$FILENAME --template=$DIR/pandoc-template.docbook -f markdown -t docbook -s ${SOURCES} |\
 xsltproc -o - ${DB_UPGRADE} - |\
-xmllint  --format - > ${DIRPATH}/$FILENAME.xml
+xmllint  --format -  |\
+sed -e "s|<title>NO TITLE</title>|<title>$TITLE</title>|" > ${DIRPATH}/$FILENAME.xml
 
 pwd
