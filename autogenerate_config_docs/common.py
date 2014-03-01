@@ -22,6 +22,7 @@ import git
 import xml.sax.saxutils
 
 import openstack.common.config.generator as generator
+from oslo.config import cfg
 
 
 # gettext internationalisation function requisite:
@@ -82,6 +83,14 @@ def import_modules(repo_location, package_name, verbose=0):
                     """
                     if verbose >= 2:
                         print("Failed to import: %s (%s)" % (modname, e))
+                    continue
+                except cfg.DuplicateOptError as e:
+                    """
+                    oslo.cfg doesn't allow redefinition of a config option, but
+                    we don't mind. Don't fail if this happens.
+                    """
+                    if verbose >= 2:
+                        print(e)
                     continue
     return modules
 
