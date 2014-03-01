@@ -63,7 +63,7 @@ def import_modules(repo_location, package_name, verbose=0):
             continue
         for pyfile in files:
             if pyfile.endswith('.py'):
-                modfile = os.path.join(root, pyfile).split(repo_location)[1]
+                modfile = os.path.join(root, pyfile).split(repo_location, 1)[1]
                 modname = os.path.splitext(modfile)[0].split(os.path.sep)
                 modname = [m for m in modname if m != '']
                 modname = '.'.join(modname)
