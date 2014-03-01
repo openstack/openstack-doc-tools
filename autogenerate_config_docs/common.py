@@ -254,7 +254,11 @@ def update_flagmappings(package_name, options, verbose=0):
     original_flags = {}
     with open(package_name + '.flagmappings') as f:
         for line in f:
-            flag, category = line.split(' ', 1)
+            try:
+                flag, category = line.split(' ', 1)
+            except ValueError:
+                flag = line.strip()
+                category = "Unknown"
             original_flags.setdefault(flag, []).append(category.strip())
 
     updated_flags = []
