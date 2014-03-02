@@ -48,11 +48,15 @@ import os_doc_tools
 from oslo.config import cfg
 
 
-# These are files that are known to not be in DocBook format.
-# Add values via --file-exceptions
+# These are files that are known to not pass syntax or niceness checks
+# Add values via --file-exceptions.
 FILE_EXCEPTIONS = []
 
-# These are books that we aren't checking yet
+# These are files that are known to not be in DocBook XML format.
+# Add values via --build-file-exceptions.
+BUILD_FILE_EXCEPTIONS = []
+
+# These are books that we aren't checking yet.
 BOOK_EXCEPTIONS = []
 
 # Mappings from books to build directories under target
@@ -925,7 +929,6 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
                 book_bk[f_abs] = book_root
             if (f.endswith('.xml') and
                     f != "pom.xml" and
-                    f != "ha-guide-docinfo.xml" and
                     f not in file_exceptions):
                 try:
                     doc = etree.parse(f_abs)
@@ -1150,6 +1153,15 @@ def add_exceptions(file_exception, verbose):
         FILE_EXCEPTIONS.append(entry)
 
 
+def add_build_exceptions(build_file_exception, verbose):
+    """Add list of exceptions from build_file_exceptions."""
+
+    for entry in build_file_exception:
+        if verbose:
+            print(" Adding file to build ignore list: %s" % entry)
+        BUILD_FILE_EXCEPTIONS.append(entry)
+
+
 cli_OPTS = [
     cfg.BoolOpt("api-site", default=False,
                 help="Enable special handling for api-site repository."),
@@ -1177,8 +1189,13 @@ cli_OPTS = [
                 help="Build books in parallel (default)."),
     cfg.BoolOpt('verbose', default=False, short='v',
                 help="Verbose execution."),
+    cfg.MultiStrOpt("build-file-exception",
+                    help="File that will be skipped during delete and "
+                         "build checks to generate dependencies. This should "
+                         "be done for invalid XML files only."),
     cfg.MultiStrOpt("file-exception",
-                    help="File that will be skipped during validation."),
+                    help="File that will be skipped during niceness and "
+                         "syntax validation."),
     cfg.MultiStrOpt("ignore-dir",
                     help="Directory to ignore for building of manuals. The "
                          "parameter can be passed multiple times to add "
@@ -1242,6 +1259,9 @@ def handle_options():
 
     if CONF.file_exception:
         add_exceptions(CONF.file_exception, CONF.verbose)
+
+    if CONF.build_file_exception:
+        add_build_exceptions(CONF.build_file_exception, CONF.verbose)
 
     if (not CONF.check_build and not CONF.check_deletions and
         not CONF.check_niceness and not CONF.check_syntax):
@@ -1316,7 +1336,7 @@ def main():
                                     CONF.api_site)
 
     if CONF.check_deletions:
-        check_deleted_files(doc_path, FILE_EXCEPTIONS, CONF.verbose)
+        check_deleted_files(doc_path, BUILD_FILE_EXCEPTIONS, CONF.verbose)
 
     if CONF.check_build:
         # Some programs are called in subprocesses,  make sure that they
@@ -1324,7 +1344,7 @@ def main():
         ensure_exists("mvn")
         read_properties()
         build_affected_books(doc_path, BOOK_EXCEPTIONS,
-                             FILE_EXCEPTIONS,
+                             BUILD_FILE_EXCEPTIONS,
                              CONF.verbose, CONF.force,
                              CONF.ignore_errors,
                              CONF.ignore_dir)
