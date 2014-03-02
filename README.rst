@@ -100,8 +100,12 @@ Release notes
 0.9
 ---
 
+ Fixes for openstack-doc-test:
  * openstack-doc-test now validates JSON files for well-formed-ness and
    whitespace.
+ * Create proper chapter title for markdown files.
+ * Ignore publish-docs directory completely.
+ * Do not check for xml:ids in wadl resource.
 
 0.8.2
 -----
