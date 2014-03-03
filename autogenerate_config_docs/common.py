@@ -16,6 +16,7 @@
 
 import importlib
 import os
+import re
 import sys
 
 import git
@@ -158,6 +159,14 @@ def write_docbook(package_name, options, verbose=0):
     Prints a docbook-formatted table for every group of options.
     """
     options_by_cat = {}
+
+    # Compute the absolute path of the git repository (the relative path is
+    # prepended to sys.path in autohelp.py)
+    target_abspath = os.path.abspath(sys.path[0])
+
+    # This regex will be used to sanitize file paths and uris
+    uri_re = re.compile(r'(^[^:]+://)?%s' % target_abspath)
+
     with open(package_name + '.flagmappings') as f:
         for line in f:
             opt, categories = line.split(' ', 1)
@@ -216,6 +225,9 @@ def write_docbook(package_name, options, verbose=0):
                     default = default.replace(pathelm,
                                               '/usr/lib/python/site-packages')
                     break
+            if uri_re.search(default):
+                default = default.replace(target_abspath,
+                                          '/usr/lib/python/site-packages')
             groups_file.write('                       <td>%s = %s</td>\n' %
                               (option.name, default))
             groups_file.write('                       <td>(%s) %s</td>\n' %
