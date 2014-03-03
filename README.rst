@@ -106,6 +106,8 @@ Release notes
  * Create proper chapter title for markdown files.
  * Ignore publish-docs directory completely.
  * Do not check for xml:ids in wadl resource.
+ * New option build_file_excepetion to ignore invalid XML files for
+   dependency checking in build and syntax checks.
 
 0.8.2
 -----

@@ -25,6 +25,11 @@ OPTIONS
        Special handling for api-site and other API repositories
        to handle WADL.
 
+  **--build-file-exception BUILD_FILE_EXCEPTION**
+      File that will be skipped during delete and build checks to
+      generate depenencies. This should be done for invalid XML files
+      only.
+
   **--check-build**
         Try to build books using modified files.
 
@@ -48,7 +53,7 @@ OPTIONS
       Enable debug code.
 
   **--file-exception FILE_EXCEPTION**
-      File that will be skipped during validation.
+      File that will be skipped during niceness and syntax validation.
 
   **--force**
       Force the validation of all files and build all books.
