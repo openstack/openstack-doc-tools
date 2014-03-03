@@ -4,16 +4,16 @@ autogenerate_config_docs
 Automatically generate configuration tables to document OpenStack.
 
 
-Dependencies: python-git (at least version 0.3.2 RC1), oslo.config,
-	      oslo-incubator, openstack-doc-tools
+Dependencies: python-git (at least version 0.3.2 RC1), oslo-incubator,
+openstack-doc-tools
 
 Setting up your environment
 ---------------------------
 
-Note: This tool is best run in a fresh VM environment, as running it
- requires installing the dependencies of the particular OpenStack
- product you are working with. Installing all of that on your normal
-machine could leave you with a bunch of cruft!
+Note: This tool is best run in a fresh VM environment or a python virtual
+environment, as running it requires installing the dependencies of the
+particular OpenStack product you are working with. Installing all of that on
+your normal machine could leave you with a bunch of cruft!
 
 Install git and python-pip:
 
@@ -114,35 +114,59 @@ lose an option.
 A worked example - updating the docs for Icehouse
 -------------------------------------------------
 
-Update automatically generated tables - from scratch:
+Update automatically generated tables - from scratch, using a virtual
+environment. Using a python virtual environment will avoid modifications and
+conflicts with python packages installed on the base system. The virtual
+environment can be destroyed by deleting the `venv` directory.
 
+Note that the virtual environment must be activated for every new shell you
+start. This can be done by sourcing the `venv/bin/activate` file.
+
+    $ mkdir WORKDIR
+    $ cd WORKDIR
     $ sudo apt-get update
-    $ sudo apt-get install git python-pip python-dev
-    $ sudo pip install git-review GitPython
-    $ git clone git://git.openstack.org/openstack/openstack-manuals.git
+    $ sudo apt-get install git python-virtualenv
+    $ virtualenv venv
+    $ source venv/bin/activate
     $ git clone git://git.openstack.org/openstack/openstack-doc-tools.git
-    $ cd openstack-manuals/
-    $ git review -d 35726
-    $ cd tools/autogenerate-config-flagmappings
+    $ git clone git://git.openstack.org/openstack/openstack-manuals.git
+    $ git clone git://git.openstack.org/openstack/oslo-incubator
+    $ cd oslo-incubator
+    $ python setup.py install
+    $ cd ..
+    $ pip install "GitPython>=0.3.2.RC1"
+    $ cd openstack-manuals/tools/autogenerate-config-flagmappings
 
-Now, cloning and installing requirements for nova, glance, neutron:
+Now, download and install the projects. Installation is necessary to satisfy
+dependencies between projects. This will also install required dependencies.
 
-    $ for i in nova glance neutron; do git clone git://git.openstack.org/openstack/$i.git; done
-    $ for i in nova glance neutron; do sudo pip install -r $i/requirements.txt; done
+    $ PROJECTS="ceilometer cinder glance neutron nova"
+    $ for p in $PROJECTS; do git clone git://git.openstack.org/openstack/$p.git; done
+    $ for p in $PROJECTS; do cd $p && python setup.py install && cd ..; done
 
-This missed some requirements for nova, which were fixed by:
+Install some missing requirements:
 
-    $ sudo pip install python-glanceclient websockify pyasn1 python-cinderclient error\_util
-    $ sudo apt-get install python-ldap python-lxml
+    $ pip install fixtures swift hp3parclient ryu
+
+Note that some dependencies will still be missing. They can't be installed using
+pip, they should be installed manually. Not installing those dependencies will
+not prevent the tool to work, but some configuration options might not be
+discovered.
 
 Update the flag names:
 
-    $ ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update nova -i ~/nova > nova.log
+    $ for p in $PROJECTS; do
+    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update $project -i $project
+    > done
 
-At this point, search through nova.flagmappings.new for anything
-labelled Unknown and fix it. Once that is done use:
+At this point, search through the `*.flagmappings.new` files for anything
+labelled `Unknown` and fix it. Once that is done rename the `*.flagmappings.new`
+files and run `autohelp.py` with the `docbook` subcommand:
 
-    $ ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook nova -i ~/nova
+    $ for p in $PROJECTS; do
+    > mv $p.flagmappings.new $p.flagmappings
+    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook $project -i $project
+    > done
 
 to generate the XML files and move those into the appropriate part of
 the git repo.
