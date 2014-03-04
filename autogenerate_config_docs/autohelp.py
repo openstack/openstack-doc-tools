@@ -49,6 +49,12 @@ def main():
                         help='path to valid git repository [REQUIRED]',
                         required=True,
                         type=str,)
+    parser.add_argument('-o', '--output',
+                        dest='target',
+                        help='directory in which xml files are generated',
+                        required=False,
+                        default='./',
+                        type=str,)
     args = parser.parse_args()
 
     package_name = common.git_check(args.repo)
@@ -78,7 +84,8 @@ def main():
         return
 
     if args.subcommand == 'docbook':
-        common.write_docbook(package_name, options, verbose=args.verbose)
+        common.write_docbook(package_name, options, verbose=args.verbose,
+                             target=args.target)
         return
 
 
