@@ -218,7 +218,11 @@ def write_docbook(package_name, options, verbose=0, target='./'):
             default = generator._sanitize_default(option.name,
                                                   str(option.default))
             # This should be moved to generator._sanitize_default
-            for pathelm in sys.path:
+            # NOTE(gpocentek): The first element in the path is the current
+            # project git repository path. It is not useful to test values
+            # against it, and it causes trouble if it is the same as the python
+            # module name. So we just drop it.
+            for pathelm in sys.path[1:]:
                 if pathelm == '':
                     continue
                 if pathelm.endswith('/'):
