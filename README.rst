@@ -100,14 +100,17 @@ Release notes
 0.9
 ---
 
- Fixes for openstack-doc-test:
- * openstack-doc-test now validates JSON files for well-formed-ness and
-   whitespace.
+Fixes for openstack-doc-test:
+
+ * openstack-doc-test now validates JSON files for well-formed-ness and whitespace.
  * Create proper chapter title for markdown files.
  * Ignore publish-docs directory completely.
  * Do not check for xml:ids in wadl resource.
  * New option build_file_excepetion to ignore invalid XML files for
    dependency checking in build and syntax checks.
+
+Fixes for autodoc-tools to sanitize values and handle projects.
+
 
 0.8.2
 -----
