@@ -64,8 +64,12 @@ def generate_heading(os_command, api_name, title, os_file):
     :param api_name:   string description of the API of os_command
     :param os_file:    open filehandle for output of DocBook file
     """
+    version = check_output([os_command, "--version"],
+                           stderr=subprocess.STDOUT)
+    # Extract version from "swift 0.3"
+    version = version.strip().rpartition(' ')[2]
 
-    print("Documenting '%s help'" % os_command)
+    print("Documenting '%s help (version %s)'" % (os_command, version))
 
     header = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <chapter xmlns=\"http://docbook.org/ns/docbook\"
@@ -79,7 +83,8 @@ def generate_heading(os_command, api_name, title, os_file):
 
     <title>{2}</title>
     <para>The <command>{0}</command> client is the command-line interface
-         (CLI) for the {1} and its extensions.
+         (CLI) for the {1} and its extensions. This chapter documents
+         <command>{0}</command> version {3}.
     </para>
     <para>For help on a specific <command>{0}</command>
        command, enter:
@@ -90,7 +95,7 @@ def generate_heading(os_command, api_name, title, os_file):
     <section xml:id=\"{0}client_command_usage\">
        <title>{0} usage</title>\n"""
 
-    os_file.write(header.format(os_command, api_name, title))
+    os_file.write(header.format(os_command, api_name, title, version))
 
 
 def is_option(str):
@@ -497,8 +502,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate DocBook XML files "
                                      "to document python-PROJECTclients")
     parser.add_argument('client', nargs='?',
-                        help="OpenStack command to document")
-    parser.add_argument("--all", help="Document all clients ",
+                        help="OpenStack command to document.")
+    parser.add_argument("--all", help="Document all clients",
                         action="store_true")
     prog_args = parser.parse_args()
 
