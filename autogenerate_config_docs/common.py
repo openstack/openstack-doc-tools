@@ -37,7 +37,8 @@ def git_check(repo_path):
     try:
         repo = git.Repo(repo_path)
         assert repo.bare is False
-        package_name = os.path.basename(repo.remotes.origin.url).rstrip('.git')
+        package_name = os.path.basename(repo.remotes.origin.url)
+        package_name = package_name.replace('.git', '')
     except Exception:
         print("\nThere is a problem verifying that the directory passed in")
         print("is a valid git repository.  Please try again.\n")
