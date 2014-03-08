@@ -308,7 +308,8 @@ def generate_command(os_command, os_file):
                 next_line_screen = True
                 ignore_next_lines = False
                 continue
-            continue
+            if not line.startswith('usage'):
+                continue
         if not ignore_next_lines:
             if next_line_screen:
                 os_file.write("        <screen><computeroutput>%s\n" % xline)
