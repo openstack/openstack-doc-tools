@@ -189,7 +189,7 @@ def create_new_tables(repo, verbose):
                         option_desc = option_descs[parsed_line[0]].replace(
                             u'\xa0', u' ')
                     else:
-                        option_desc = 'No help text available for this option'
+                        option_desc = 'No help text available for this option.'
                         if verbose > 0:
                             print(parsed_line[0] + "has no help text")
                     section_file.write('\n                    <tr>\n'
