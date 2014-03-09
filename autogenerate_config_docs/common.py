@@ -220,7 +220,7 @@ def write_docbook(package_name, options, verbose=0, target='./'):
                                   group)
                 groups_file.write('              </tr>\n')
             if not option.help:
-                option.help = "No help text available for this option"
+                option.help = "No help text available for this option."
             if ((type(option).__name__ == "ListOpt") and (
                     option.default is not None)):
                 option.default = ", ".join(option.default)
