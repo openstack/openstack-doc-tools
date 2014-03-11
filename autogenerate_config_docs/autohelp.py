@@ -67,9 +67,8 @@ def main():
             print(str(e))
             print("Failed to import: %s (%s)" % (package_name, e))
 
-    modules = common.import_modules(args.repo, package_name,
-                                    verbose=args.verbose)
-    options = common.OptionsCache(modules, verbose=args.verbose)
+    common.import_modules(args.repo, package_name, verbose=args.verbose)
+    options = common.OptionsCache(verbose=args.verbose)
     options.load_extension_options('oslo.messaging')
 
     if args.verbose > 0:

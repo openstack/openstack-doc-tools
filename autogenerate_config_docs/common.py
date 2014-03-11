@@ -57,7 +57,6 @@ def import_modules(repo_location, package_name, verbose=0):
     Loops through the repository, importing module by module to
     populate the configuration object (cfg.CONF) created from Oslo.
     """
-    modules = {}
     pkg_location = os.path.join(repo_location, package_name)
     for root, dirs, files in os.walk(pkg_location):
         skipdir = False
@@ -80,7 +79,6 @@ def import_modules(repo_location, package_name, verbose=0):
                     modname = modname[:modname.rfind(".")]
                 try:
                     module = importlib.import_module(modname)
-                    modules[modname] = module
                     if verbose >= 1:
                         print("imported %s" % modname)
                 except ImportError as e:
@@ -101,7 +99,6 @@ def import_modules(repo_location, package_name, verbose=0):
                         print(e)
                     continue
                 _register_runtime_opts(module, abs_path, verbose)
-    return modules
 
 
 def _register_runtime_opts(module, abs_path, verbose):
@@ -150,7 +147,7 @@ def _register_runtime_opts(module, abs_path, verbose):
 
 
 class OptionsCache(object):
-    def __init__(self, modules, verbose=0):
+    def __init__(self, verbose=0):
         self._verbose = verbose
         self._opts_by_name = {}
         self._opt_names = []
