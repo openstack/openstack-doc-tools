@@ -20,6 +20,7 @@ import re
 import sys
 
 import git
+import stevedore
 import xml.sax.saxutils
 
 import openstack.common.config.generator as generator
@@ -99,47 +100,45 @@ def import_modules(repo_location, package_name, verbose=0):
 
 class OptionsCache(object):
     def __init__(self, modules, verbose=0):
-        self._opts_by_module = {}
+        self._verbose = verbose
         self._opts_by_name = {}
         self._opt_names = []
 
-        for modname in modules.keys():
-            modopts = generator._list_opts(modules[modname])
-            if len(modopts) == 0:
-                continue
-            self._opts_by_module[modname] = []
-            for group, opts in modopts:
-                for opt in opts:
-                    self._opts_by_module[modname].append((group, opt))
-                    if group == 'DEFAULT':
-                        optname = opt.name
-                    else:
-                        optname = group + '/' + opt.name
-                    if optname in self._opts_by_name:
-                        oldmod = self._opts_by_name[optname][0]
-                        if oldmod.startswith(modname + '.'):
-                            if verbose >= 2:
-                                print(("Duplicate option name %s" +
-                                       " from %s and %s. Using %s.") %
-                                      (optname, modname, oldmod, oldmod))
-                        elif modname.startswith(oldmod + '.'):
-                            self._opts_by_name[optname] = (modname, group, opt)
-                            if verbose >= 2:
-                                print (("Duplicate option name %s"
-                                        " from %s and %s. Using %s.") %
-                                       (optname, modname, oldmod, modname))
-                        elif verbose >= 2:
-                            print (("Duplicate option name %s"
-                                    " from %s and %s. Taking one at random.") %
-                                   (optname, modname, oldmod))
-                    else:
-                        self._opts_by_name[optname] = (modname, group, opt)
-                        self._opt_names.append(optname)
+        for optname in cfg.CONF._opts:
+            self._add_opt(optname, 'DEFAULT', cfg.CONF._opts[optname]['opt'])
+
+        for group in cfg.CONF._groups:
+            for optname in cfg.CONF._groups[group]._opts:
+                self._add_opt(group + '/' + optname, group,
+                              cfg.CONF._groups[group]._opts[optname]['opt'])
 
         self._opt_names.sort(OptionsCache._cmpopts)
 
+    def _add_opt(self, optname, group, opt):
+        if optname in self._opts_by_name:
+            if self._verbose >= 2:
+                print ("Duplicate option name %s" % optname)
+        else:
+            self._opts_by_name[optname] = (group, opt)
+            self._opt_names.append(optname)
+
     def __len__(self):
         return len(self._opt_names)
+
+    def load_extension_options(self, module):
+        # Note that options loaded this way aren't added to _opts_by_module
+        loader = stevedore.named.NamedExtensionManager(
+            'oslo.config.opts',
+            names=(module,),
+            invoke_on_load=False
+        )
+        for ext in loader:
+            for group, opts in ext.plugin():
+                for opt in opts:
+                    if group is None:
+                        self._add_opt(opt.name, 'DEFAULT', opt)
+                    else:
+                        self._add_opt(group + '/' + opt.name, group, opt)
 
     def get_option_names(self):
         return self._opt_names
@@ -210,7 +209,7 @@ def write_docbook(package_name, options, verbose=0, target='./'):
           <tbody>\n''' % {'pkg': package_name, 'cat': cat})
         curgroup = None
         for optname in options_by_cat[cat]:
-            modname, group, option = options.get_option(optname)
+            group, option = options.get_option(optname)
             if group != curgroup:
                 curgroup = group
                 groups_file.write('''              <tr>

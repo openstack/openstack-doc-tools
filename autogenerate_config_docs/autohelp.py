@@ -70,6 +70,7 @@ def main():
     modules = common.import_modules(args.repo, package_name,
                                     verbose=args.verbose)
     options = common.OptionsCache(modules, verbose=args.verbose)
+    options.load_extension_options('oslo.messaging')
 
     if args.verbose > 0:
         print("%s options imported from package %s." % (len(options),
