@@ -32,6 +32,10 @@ import __builtin__
 __builtin__.__dict__['_'] = lambda x: x
 
 
+register_re = re.compile(r'''^ +.*\.register_opts\((?P<opts>[^,)]+)'''
+                         r'''(, (group=)?["'](?P<group>.*)["'])?\)''')
+
+
 def git_check(repo_path):
     """Check a passed directory to verify it is a valid git repository."""
 
@@ -67,7 +71,8 @@ def import_modules(repo_location, package_name, verbose=0):
             continue
         for pyfile in files:
             if pyfile.endswith('.py'):
-                modfile = os.path.join(root, pyfile).split(repo_location, 1)[1]
+                abs_path = os.path.join(root, pyfile)
+                modfile = abs_path.split(repo_location, 1)[1]
                 modname = os.path.splitext(modfile)[0].split(os.path.sep)
                 modname = [m for m in modname if m != '']
                 modname = '.'.join(modname)
@@ -95,7 +100,53 @@ def import_modules(repo_location, package_name, verbose=0):
                     if verbose >= 2:
                         print(e)
                     continue
+                _register_runtime_opts(module, abs_path, verbose)
     return modules
+
+
+def _register_runtime_opts(module, abs_path, verbose):
+    """Handle options not registered on module import.
+
+    This function parses the .py files to discover calls to register_opts in
+    functions and methods. It then explicitly call cfg.register_opt on each
+    option to register (most of) them.
+    """
+
+    with open(abs_path) as fd:
+        lines = fd.readlines()
+        for line in lines:
+            m = register_re.search(line)
+            if not m:
+                continue
+
+            opts_var = m.group('opts')
+            opts_group = m.group('group')
+
+            # Get the object (an options list) from the opts_var string.
+            # This requires parsing the string which can be of the form
+            # 'foo.bar'. We treat each element as an attribute of the previous.
+            register = True
+            obj = module
+            for item in opts_var.split('.'):
+                try:
+                    obj = getattr(obj, item)
+                except AttributeError:
+                    # FIXME(gpocentek): AttributeError is raised when a part of
+                    # the opts_var string is not an actual attribute. This will
+                    # need more parsing tricks.
+                    register = False
+                    if verbose >= 2:
+                        print("Ignoring %(obj)s in %(module)s" %
+                              {'obj': opts_var, 'module': module})
+                    break
+
+            if register:
+                for opt in obj:
+                    try:
+                        cfg.CONF.register_opt(opt, opts_group)
+                    except cfg.DuplicateOptError:
+                        # ignore options that have already been registered
+                        pass
 
 
 class OptionsCache(object):
