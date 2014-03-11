@@ -191,6 +191,8 @@ class OptionsCache(object):
                     else:
                         self._add_opt(group + '/' + opt.name, group, opt)
 
+        self._opt_names.sort(OptionsCache._cmpopts)
+
     def get_option_names(self):
         return self._opt_names
 
@@ -201,7 +203,7 @@ class OptionsCache(object):
     def _cmpopts(x, y):
         if '/' in x and '/' in y:
             prex = x[:x.find('/')]
-            prey = y[:x.find('/')]
+            prey = y[:y.find('/')]
             if prex != prey:
                 return cmp(prex, prey)
             return cmp(x, y)
