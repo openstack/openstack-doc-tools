@@ -461,6 +461,18 @@ def document_single_project(os_command):
         blacklist = ["create", "delete", "describe", "event",
                      "gettemplate", "list", "resource",
                      "update", "validate"]
+    elif os_command == 'ironic':
+        api_name = "Bare metal"
+        title = "Bare metal command-line client"
+        # Does not know about bash-completion yet, need to specify
+        # subcommands manually
+        subcommands = ['chassis-create', 'chassis-delete', 'chassis-list',
+                       'chassis-node-list', 'chassis-show', 'chassis-update',
+                       'driver-list', 'node-create', 'node-delete',
+                       'node-list', 'node-port-list', 'node-set-power-state',
+                       'node-show', 'node-update', 'node-validate',
+                       'port-create', 'port-delete', 'port-list',
+                       'port-show', 'port-update']
     elif os_command == 'keystone':
         api_name = "OpenStack Identity API"
         title = "Identity Service command-line client"
@@ -471,6 +483,9 @@ def document_single_project(os_command):
         api_name = "OpenStack Compute API"
         title = "Compute command-line client"
         blacklist = ["add-floating-ip", "remove-floating-ip"]
+    elif os_command == 'sahara':
+        api_name = "Data processing"
+        title = "Data processing command-line client"
     elif os_command == 'swift':
         api_name = "OpenStack Object Storage API"
         title = "Object Storage command-line client"
@@ -501,10 +516,10 @@ def main():
           % os_doc_tools.__version__)
 
     parser = argparse.ArgumentParser(description="Generate DocBook XML files "
-                                     "to document python-PROJECTclients")
+                                     "to document python-PROJECTclients.")
     parser.add_argument('client', nargs='?',
                         help="OpenStack command to document.")
-    parser.add_argument("--all", help="Document all clients",
+    parser.add_argument("--all", help="Document all clients.",
                         action="store_true")
     prog_args = parser.parse_args()
 
