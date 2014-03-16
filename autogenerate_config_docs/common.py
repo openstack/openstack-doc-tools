@@ -336,15 +336,6 @@ def update_flagmappings(package_name, options, verbose=0):
             updated_flags.append((opt, original_flags[opt][0]))
             continue
 
-        if '/' in opt:
-            # Compaitibility hack for old-style flagmappings, where grouped
-            # options didn't have their group names prefixed. If there's only
-            # one category, we assume there wasn't a conflict, and use it.
-            barename = opt[opt.find('/') + 1:]
-            if len(original_flags.get(barename, [])) == 1:
-                updated_flags.append((opt, original_flags[barename][0]))
-                continue
-
         updated_flags.append((opt, 'Unknown'))
 
     with open(package_name + '.flagmappings.new', 'w') as f:
