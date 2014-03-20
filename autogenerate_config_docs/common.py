@@ -268,7 +268,7 @@ def write_docbook(package_name, options, verbose=0, target='./'):
             if not option.help:
                 option.help = "No help text available for this option."
             if ((type(option).__name__ == "ListOpt") and (
-                    option.default is not None)):
+                    type(option.default) == list)):
                 option.default = ", ".join(option.default)
             groups_file.write('              <tr>\n')
             default = generator._sanitize_default(option.name,
