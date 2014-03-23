@@ -140,13 +140,13 @@ start. This can be done by sourcing the `venv/bin/activate` file.
 Now, download and install the projects. Installation is necessary to satisfy
 dependencies between projects. This will also install required dependencies.
 
-    $ PROJECTS="ceilometer cinder glance neutron nova"
+    $ PROJECTS="ceilometer cinder glance heat neutron nova trove"
     $ for p in $PROJECTS; do git clone git://git.openstack.org/openstack/$p.git; done
     $ for p in $PROJECTS; do cd $p && python setup.py install && cd ..; done
 
 Install some missing requirements:
 
-    $ pip install fixtures swift hp3parclient ryu
+    $ pip install fixtures swift hp3parclient ryu pymongo bson
 
 Note that some dependencies will still be missing. They can't be installed using
 pip, they should be installed manually. Not installing those dependencies will
