@@ -100,11 +100,11 @@ Release notes
 0.10
 ----
 
-* Fix `openstack-doc-test` to handle changes in `api-site` repository:
+* Fix ``openstack-doc-test`` to handle changes in ``api-site`` repository:
   Do not publish wadls directory, *.fo files and add api-ref-guides
   PDF files to index file for docs-draft.
 * Many improvements for generation of option tables.
-* Improvements for `openstack-auto-commands`: handle ironic, sahara;
+* Improvements for ``openstack-auto-commands``: handle ironic, sahara;
   improve generated output.
 
 0.9
