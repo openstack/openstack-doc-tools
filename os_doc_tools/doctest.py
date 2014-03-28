@@ -671,8 +671,16 @@ def publish_www():
     shutil.copytree(source, www_path)
 
 
-def ignore_most_xml(path, names):
-    f = [n for n in names if n.endswith('.xml') and n != 'atom.xml']
+def ignore_for_publishing(path, names):
+    """Return list of files that should be ignored for publishing."""
+
+    # Ignore:
+    # - all files ending with .xml with the exception of atom.xml
+    # - all files ending with .fo
+    # The directory named wadls
+
+    f = [n for n in names if ((n.endswith('.xml') and n != 'atom.xml')
+                              or (n.endswith('.fo') or n == 'wadls'))]
     return f
 
 
@@ -719,7 +727,7 @@ def publish_book(publish_path, book):
     shutil.rmtree(book_path, ignore_errors=True)
 
     shutil.copytree(source, book_path,
-                    ignore=ignore_most_xml)
+                    ignore=ignore_for_publishing)
 
 
 def ensure_exists(program):
@@ -1036,6 +1044,15 @@ def generate_index_file():
             index_file.write('<a href="%s/api-ref.html">%s</a>\n' %
                              (path, path))
             index_file.write('<br/>\n')
+
+        # List PDF files for api-site that have from "bk-api-ref*.pdf"
+        # as well since they have no corresponding html file.
+        for f in files:
+            if f.startswith('bk-api-ref') and f.endswith('.pdf'):
+                path = os.path.relpath(root, publish_path)
+                index_file.write('<a href="%s/%s">%s</a>\n' %
+                                 (path, f, f))
+                index_file.write('<br/>\n')
 
     index_file.write('</body>\n'
                      '</html>\n')
