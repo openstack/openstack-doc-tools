@@ -475,7 +475,7 @@ def document_single_project(os_command):
                        'port-show', 'port-update']
     elif os_command == 'keystone':
         api_name = "OpenStack Identity API"
-        title = "Identity Service command-line client"
+        title = "Identity service command-line client"
     elif os_command == 'neutron':
         api_name = "OpenStack Networking API"
         title = "Networking command-line client"
@@ -495,7 +495,7 @@ def document_single_project(os_command):
                        "stat", "upload"]
     elif os_command == 'trove':
         api_name = "Database API"
-        title = "Database command-line client"
+        title = "Database Service command-line client"
     else:
         print("Not yet handled command")
         sys.exit(-1)
