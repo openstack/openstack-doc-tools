@@ -86,6 +86,9 @@ def main():
     if args.subcommand == 'docbook':
         common.write_docbook(package_name, options, verbose=args.verbose,
                              target=args.target)
+        common.write_docbook_rootwrap(package_name, args.repo,
+                                      verbose=args.verbose,
+                                      target=args.target)
         return
 
 
