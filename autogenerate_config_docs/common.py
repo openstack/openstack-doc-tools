@@ -23,6 +23,7 @@ import git
 import stevedore
 import xml.sax.saxutils
 
+from hooks import HOOKS
 import openstack.common.config.generator as generator
 from oslo.config import cfg
 
@@ -99,6 +100,14 @@ def import_modules(repo_location, package_name, verbose=0):
                         print(e)
                     continue
                 _register_runtime_opts(module, abs_path, verbose)
+                _run_hook(modname)
+
+
+def _run_hook(modname):
+    try:
+        HOOKS[modname]()
+    except KeyError:
+        pass
 
 
 def _register_runtime_opts(module, abs_path, verbose):
