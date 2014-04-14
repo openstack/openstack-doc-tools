@@ -299,7 +299,7 @@ def write_docbook(package_name, options, verbose=0, target='./'):
                 default = default.replace(target_abspath,
                                           '/usr/lib/python/site-packages')
             groups_file.write('                       <td>%s = %s</td>\n' %
-                              (option.name, default))
+                              (option.dest, default))
             groups_file.write('                       <td>(%s) %s</td>\n' %
                               (type(option).__name__,
                                xml.sax.saxutils.escape(option.help)))
