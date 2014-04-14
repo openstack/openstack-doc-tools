@@ -2,10 +2,10 @@
 # to document the latest run of openstack-auto-commands
 # for creation of files in openstack-manuals.
 
-python-ceilometerclient >= 1.0.9
+python-ceilometerclient >= 1.0.10
 python-cinderclient >= 1.0.8
 python-glanceclient >= 0.12.0
-python-heatclient >= 0.2.8
+python-heatclient >= 0.2.9
 # python-ironicclient >= 0.1.2
 python-keystoneclient >= 0.7.1
 python-neutronclient >= 2.3.4
