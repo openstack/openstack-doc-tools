@@ -77,6 +77,10 @@ OPTIONS
   **--parallel**
       Build books in parallel (default).
 
+  **--publish**
+      Setup content in publish-docs directory for publishing to
+      external website.
+
   **--verbose**
        Verbose execution.
 

@@ -1204,6 +1204,9 @@ cli_OPTS = [
                 help="Do not exit on failures."),
     cfg.BoolOpt("parallel", default=True,
                 help="Build books in parallel (default)."),
+    cfg.BoolOpt("publish", default=False,
+                help="Setup content in publish-docs directory for "
+                "publishing to external website."),
     cfg.BoolOpt('verbose', default=False, short='v',
                 help="Verbose execution."),
     cfg.MultiStrOpt("build-file-exception",
@@ -1290,6 +1293,9 @@ def handle_options():
         CONF.check_build = True
         CONF.check_niceness = True
 
+    if CONF.publish:
+        CONF.create_index = False
+
     if CONF.check_build and CONF.book and CONF.target_dir:
         if len(CONF.book) != len(CONF.target_dir):
             print("ERROR: book and target_dir options need to have a 1:1 "
@@ -1329,10 +1335,13 @@ def main():
     elif not CONF.api_site:
         doc_path = os.path.join(doc_path, 'doc')
 
-    if CONF.check_build and www_touched(False):
+    # Do not publish www directory if we build for external
+    # publishing
+    if (CONF.check_build and
+        (www_touched(False) and not CONF.publish)):
         publish_www()
 
-    if not CONF.force and www_touched(True):
+    if not CONF.publish and not CONF.force and www_touched(True):
         print("Only files in www directory changed, nothing to do.\n")
         return
 
