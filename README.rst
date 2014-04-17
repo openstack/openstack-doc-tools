@@ -97,6 +97,13 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.11
+----
+
+* Add ``--publish`` option to ``openstack-doc-test`` that does not
+  publish the www directory to the wrong location.
+* Improvements for generation of option tables.
+
 0.10
 ----
 
