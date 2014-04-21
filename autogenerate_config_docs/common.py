@@ -101,6 +101,11 @@ def import_modules(repo_location, package_name, verbose=0):
                 _register_runtime_opts(module, abs_path, verbose)
                 _run_hook(modname)
 
+    # All the components provide keystone token authentication, usually using a
+    # pipeline. Since the auth_token options can only be discovered at runtime
+    # in this configuration, we force their discovery by importing the module.
+    import keystoneclient.middleware.auth_token  # noqa
+
 
 def _run_hook(modname):
     try:
