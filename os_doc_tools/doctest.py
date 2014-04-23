@@ -366,11 +366,12 @@ def get_modified_files(rootdir, filtering=None):
 def filter_dirs(dirs):
     """Return list of directories to descend into."""
 
-    # Don't descend into 'target' and 'publish-docs' subdirectories and
-    # filter out any dot directories
+    # Don't descend into 'locale', 'target', and 'publish-docs'
+    # subdirectories and filter out any dot directories
 
     return [d for d in dirs if (d != 'target' and
                                 d != 'publish-docs' and
+                                d != 'locale' and
                                 not d.startswith('.'))]
 
 
@@ -872,7 +873,7 @@ def is_book_master(filename):
     the top-level files and thus have to use a heuristic.
     """
 
-    return ((filename.startswith(('bk-', 'bk_', 'st-'))
+    return ((filename.startswith(('bk-', 'bk_', 'st-', 'api-'))
              and filename.endswith('.xml')) or
             filename == 'openstack-glossary.xml')
 
@@ -960,6 +961,54 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
                         included_by[href_abs].add(f_abs)
                     else:
                         included_by[href_abs] = set([f_abs])
+
+                ns = {"wadl": "http://wadl.dev.java.net/2009/02"}
+                for node in doc.xpath('//wadl:resource', namespaces=ns):
+                    href = node.get('href')
+                    hash_sign = href.rfind('#')
+                    if hash_sign != -1:
+                        href = href[:hash_sign]
+                    href_abs = os.path.abspath(os.path.join(root, href))
+                    if href_abs in included_by:
+                        included_by[href_abs].add(f_abs)
+                    else:
+                        included_by[href_abs] = set([f_abs])
+                for node in doc.xpath('//wadl:resources', namespaces=ns):
+                    href = node.get('href')
+                    # wadl:resources either have a href directly or a child
+                    # wadl:resource that has a href. So, check that we have
+                    # a href.
+                    if href:
+                        hash_sign = href.rfind('#')
+                        if hash_sign != -1:
+                            href = href[:hash_sign]
+                        href_abs = os.path.abspath(os.path.join(root, href))
+                        if href_abs in included_by:
+                            included_by[href_abs].add(f_abs)
+                        else:
+                            included_by[href_abs] = set([f_abs])
+
+    # Print list of files that are not included anywhere
+    if cfg.CONF.print_unused_files:
+        print("Checking for files that are not included anywhere...")
+        print(" Note: This only looks at files included by an .xml file "
+              "but not for files included by other files like .wadl.")
+        for root, dirs, files in os.walk(rootdir):
+            dirs[:] = filter_dirs(dirs)
+
+            # Filter out directories to be ignored
+            if ignore_dirs:
+                dirs[:] = [d for d in dirs if not d in ignore_dirs]
+
+            for f in files:
+                f_base = os.path.basename(f)
+                f_abs = os.path.abspath(os.path.join(root, f))
+
+                if (f_abs not in included_by and f_base != "pom.xml"
+                    and not is_book_master(f_base)):
+                    f_rel = os.path.relpath(f_abs, rootdir)
+                    print ("  %s " % f_rel)
+        print("\n")
 
     if not build_all_books:
         # Generate list of modified_files
@@ -1204,6 +1253,9 @@ cli_OPTS = [
                 help="Do not exit on failures."),
     cfg.BoolOpt("parallel", default=True,
                 help="Build books in parallel (default)."),
+    cfg.BoolOpt("print-unused-files", default=False,
+                help="Print list of files that are not included anywhere as "
+                "part of check-build."),
     cfg.BoolOpt("publish", default=False,
                 help="Setup content in publish-docs directory for "
                 "publishing to external website."),

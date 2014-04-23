@@ -97,6 +97,13 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.12
+----
+
+* ``openstack-doc-test``: Handle changes in api-site project, new
+  option --print-unused-files.
+* ``openstack-autohelp``: Handle keystone_authtoken options.
+
 0.11
 ----
 

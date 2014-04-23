@@ -77,6 +77,10 @@ OPTIONS
   **--parallel**
       Build books in parallel (default).
 
+  **--print-unused-files**
+      Print list of files that are not included anywhere as part of
+      check-build.
+
   **--publish**
       Setup content in publish-docs directory for publishing to
       external website.
