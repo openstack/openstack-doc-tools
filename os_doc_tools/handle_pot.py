@@ -50,14 +50,13 @@ options = {
 
 IGNORE_FOLDER = []
 IGNORE_FILE = []
-root = "./doc"
 
 
-def mergeback(folder, language):
+def mergeback(folder, language, root):
     if folder is None:
         path = root
     else:
-        outputFiles = mergeSingleDocument(folder, language)
+        outputFiles = mergeSingleDocument(folder, language, root)
         if (outputFiles is not None) and (len(outputFiles) > 0):
             for outXML in outputFiles:
                 changeXMLLangSetting(outXML, language)
@@ -69,13 +68,13 @@ def mergeback(folder, language):
     files = os.listdir(path)
     for aFile in files:
         if not (aFile in IGNORE_FOLDER):
-            outputFiles = mergeSingleDocument(aFile, language)
+            outputFiles = mergeSingleDocument(aFile, language, root)
             if (outputFiles is not None) and (len(outputFiles) > 0):
                 for outXML in outputFiles:
                     changeXMLLangSetting(outXML, language)
 
 
-def mergeSingleDocument(folder, language):
+def mergeSingleDocument(folder, language, root):
     xmlfiles = []
     outputfiles = []
     abspath = os.path.join(root, folder)
@@ -144,7 +143,7 @@ def get_xml_list(sms, dr, flst):
             sms.append(os.path.join(dr, f))
 
 
-def get_default_book():
+def get_default_book(root):
     return os.listdir(root)[0]
 
 
@@ -166,19 +165,28 @@ def generatedocbook():
         "-l", "--language", dest="language", help=("specified language")
     )
     parser.add_option(
-        "-b", "--book", dest="book", default=get_default_book(),
+        "-b", "--book", dest="book",
         help=("specified docbook")
+    )
+    parser.add_option(
+        "-r", "--root", dest="root", default="./doc",
+        help=("root directory")
     )
     (options, args) = parser.parse_args()
     if options.language is None:
         print("must specify language")
         return
 
+    root = options.root
+    if options.book is None:
+        options.book = get_default_book(root)
+
     #change working directory
 
     #copy folders
     folder = options.book
     language = options.language
+    root = options.root
     sourcepath = os.path.join(root, folder)
     destpath = os.path.join(os.path.curdir, "generated", language)
     if not os.path.exists(destpath):
@@ -189,14 +197,14 @@ def generatedocbook():
         shutil.rmtree(destfolder)
 
     os.system("cp -r %s %s" % (sourcepath, destpath))
-    mergeback(folder, language)
+    mergeback(folder, language, root)
 
 
-def generatePoT(folder):
+def generatePoT(folder, root):
     if folder is None:
         path = root
     else:
-        generateSinglePoT(folder)
+        generateSinglePoT(folder, root)
         return
 
     if not os.path.isdir(path):
@@ -205,10 +213,10 @@ def generatePoT(folder):
     files = os.listdir(path)
     for aFile in files:
         if not (aFile in IGNORE_FOLDER):
-            generateSinglePoT(aFile)
+            generateSinglePoT(aFile, root)
 
 
-def generateSinglePoT(folder):
+def generateSinglePoT(folder, root):
     xmlfiles = []
     abspath = os.path.join(root, folder)
     if os.path.isdir(abspath):
@@ -241,4 +249,8 @@ def generatepot():
         folder = sys.argv[1]
     except Exception:
         folder = None
-    generatePoT(folder)
+    try:
+        root = sys.argv[2]
+    except Exception:
+        root = "./doc"
+    generatePoT(folder, root)
