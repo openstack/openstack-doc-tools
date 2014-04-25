@@ -60,9 +60,10 @@ def get_existing_options(optfiles):
         trlist = tbody.getElementsByTagName('tr')
         for tr in trlist:
             try:
-                optentry = tr.childNodes[1].childNodes[0]
-                option, default = optentry.nodeValue.split('=', 1)
-                helptext = tr.childNodes[2].childNodes[0].nodeValue
+                tdlist = tr.getElementsByTagName('td')
+                optentry = tdlist[0].childNodes[0].nodeValue
+                option = optentry.split('=', 1)[0].strip()
+                helptext = tdlist[1].childNodes[0].nodeValue
             except IndexError:
                 continue
             if option not in options or 'No help text' in options[option]:

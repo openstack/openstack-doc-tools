@@ -97,6 +97,11 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.14
+----
+
+* ``extract_swift_flags``: Correctly parses existing tables
+
 0.13
 ----
 
