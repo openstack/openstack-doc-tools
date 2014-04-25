@@ -119,24 +119,24 @@ def new_section_file(sample, current_section):
                         + '.xml')
     section_file = open(section_filename, 'w')
     section_file.write('<?xml version="1.0" encoding="UTF-8"?>\n\
-     <!-- The tool that generated this table lives in the\n\
-          tools directory of this repository. As it was a one-time\n\
-          generation, you can edit this file. -->\n\
-     <para xmlns="http://docbook.org/ns/docbook" version="5.0">\n\
-     <table rules="all">\n\
-     <caption>Description of configuration options for <literal>'
+    <!-- The tool that generated this table lives in the\n\
+         openstack-doc-tools repository. The editions made in\n\
+         this file will *not* be lost if you run the script again. -->\n\
+    <para xmlns="http://docbook.org/ns/docbook" version="5.0">\n\
+    <table rules="all">\n\
+    <caption>Description of configuration options for <literal>'
                        + current_section + '</literal> in <literal>'
                        + os.path.basename(sample) +
                        '</literal></caption>\n\
-                       <col width="50%"/>\n\
-     <col width="50%"/>\n\
-     <thead>\n\
+    <col width="50%"/>\n\
+    <col width="50%"/>\n\
+    <thead>\n\
         <tr>\n\
-             <td>Configuration option=Default value</td>\n\
-             <td>Description</td>\n\
+            <th>Configuration option = Default value</th>\n\
+            <th>Description</th>\n\
         </tr>\n\
-     </thead>\n\
-     <tbody>')
+    </thead>\n\
+    <tbody>')
     return section_file
 
 
@@ -167,9 +167,9 @@ def create_new_tables(repo, verbose):
                 """
                 if current_section != line.strip('#').strip():
                     if section_file is not None:
-                        section_file.write('\n             </tbody>\n\
-                        </table>\n\
-                        </para>')
+                        section_file.write('\n    </tbody>\n\
+    </table>\n\
+    </para>')
                         section_file.close()
                     current_section = line.strip('#').strip()
                     section_file = new_section_file(sample, current_section)
@@ -193,17 +193,17 @@ def create_new_tables(repo, verbose):
                         option_desc = 'No help text available for this option.'
                         if verbose > 0:
                             print(parsed_line[0] + "has no help text")
-                    section_file.write('\n                    <tr>\n'
-                                       '                        <td>' +
-                                       parsed_line[0] + '=' +
+                    section_file.write('\n        <tr>\n'
+                                       '            <td>' +
+                                       parsed_line[0] + ' = ' +
                                        xml.sax.saxutils.escape(
                                            str(parsed_line[1])) +
                                        '</td><td>' + option_desc + '</td>\n' +
-                                       '              </tr>')
+                                       '        </tr>')
         if section_file is not None:
-            section_file.write('\n             </tbody>\n\
-                        </table>\n\
-                        </para>')
+            section_file.write('\n    </tbody>\n\
+    </table>\n\
+    </para>')
             section_file.close()
 
 

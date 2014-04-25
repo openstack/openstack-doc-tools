@@ -101,6 +101,7 @@ Release notes
 ----
 
 * ``extract_swift_flags``: Correctly parses existing tables
+* ``extract_swift_flags``: Improve the output to ease the tables edition
 
 0.13
 ----
