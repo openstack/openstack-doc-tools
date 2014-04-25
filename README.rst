@@ -97,6 +97,14 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.13
+----
+
+* ``openstack-generate-docbook`` handles now the api-site project:
+  Parameter --root gives root directory to use.
+* Remove obsoleted commands ``generatedocbook`` and
+  ``generatepot``. They have been obsoleted in 0.7.
+
 0.12
 ----
 
