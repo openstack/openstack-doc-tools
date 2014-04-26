@@ -97,15 +97,11 @@ sufficient for many of the books.
 Release notes
 =============
 
-0.14
-----
-
-* ``extract_swift_flags``: Correctly parses existing tables
-* ``extract_swift_flags``: Improve the output to ease the tables edition
-
 0.13
 ----
 
+* ``extract_swift_flags``: Correctly parses existing tables and
+  improve the output to ease the tables edition.
 * ``openstack-generate-docbook`` handles now the api-site project:
   Parameter --root gives root directory to use.
 * Remove obsoleted commands ``generatedocbook`` and
