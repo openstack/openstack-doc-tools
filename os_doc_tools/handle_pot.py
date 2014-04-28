@@ -27,8 +27,8 @@ import sys
 import tempfile
 import xml.dom.minidom
 
-from xml2po import Main
-from xml2po.modes.docbook import docbookXmlMode
+from xml2po import Main    # noqa
+from xml2po.modes.docbook import docbookXmlMode    # noqa
 
 
 class myDocbookXmlMode(docbookXmlMode):

@@ -13,6 +13,7 @@
 # under the License.
 
 import argparse
+import os
 import subprocess
 import sys
 
@@ -247,6 +248,7 @@ def generate_command(os_command, os_file):
 
     ignore_next_lines = False
     next_line_screen = True
+    next_line_screen = True
     line_index = -1
     in_screen = False
     for line in help_lines:
@@ -312,11 +314,11 @@ def generate_command(os_command, os_file):
                 continue
         if not ignore_next_lines:
             if next_line_screen:
-                os_file.write("        <screen><computeroutput>%s\n" % xline)
+                os_file.write("        <screen><computeroutput>%s" % xline)
                 next_line_screen = False
                 in_screen = True
             elif len(line) > 0:
-                os_file.write("%s\n" % (xline))
+                os_file.write("\n%s" % (xline))
 
     if in_screen:
         os_file.write("</computeroutput></screen>\n")
@@ -344,7 +346,13 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     os_file.write("        <title>%s %s command</title>\n"
                   % (os_command, os_subcommand))
 
-    next_line_screen = True
+    if os_command == "swift":
+        next_line_screen = False
+        os_file.write("\n        <para>")
+        in_para = True
+    else:
+        next_line_screen = True
+        in_para = False
     line_index = -1
     # Content is:
     # usage...
@@ -353,7 +361,6 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     #
     # Arguments
 
-    in_para = False
     skip_lines = False
     for line in help_lines:
         line_index += 1
@@ -362,7 +369,7 @@ def generate_subcommand(os_command, os_subcommand, os_file):
                             'optional arguments')):
             if in_para:
                 in_para = False
-                os_file.write("        </para>")
+                os_file.write("\n        </para>")
             if line.startswith(('Positional arguments',
                                 'positional arguments')):
                 format_table('Positional arguments',
@@ -381,19 +388,19 @@ def generate_subcommand(os_command, os_subcommand, os_file):
             continue
         if len(line) == 0:
             if not in_para:
-                os_file.write("        </computeroutput></screen>\n")
-                os_file.write("        <para>\n")
+                os_file.write("</computeroutput></screen>")
+                os_file.write("\n        <para>")
             in_para = True
             continue
         xline = quote_xml(line)
         if next_line_screen:
-            os_file.write("        <screen><computeroutput>%s\n" % xline)
+            os_file.write("        <screen><computeroutput>%s" % xline)
             next_line_screen = False
         else:
-            os_file.write("%s\n" % (xline))
+            os_file.write("\n%s" % (xline))
 
     if in_para:
-        os_file.write("        </para>")
+        os_file.write("\n        </para>\n")
     os_file.write("    </section>\n")
 
 
@@ -433,7 +440,7 @@ def generate_end(os_file):
     os_file.write("</chapter>\n")
 
 
-def document_single_project(os_command):
+def document_single_project(os_command, output_dir):
     """Create documenation for os_command."""
 
     print ("Documenting '%s'" % os_command)
@@ -500,8 +507,8 @@ def document_single_project(os_command):
         print("Not yet handled command")
         sys.exit(-1)
 
-    os_file = open("ch_cli_" + os_command + "_commands.xml",
-                   'w')
+    out_file = "ch_cli_" + os_command + "_commands.xml"
+    os_file = open(os.path.join(output_dir, out_file), 'w')
     generate_heading(os_command, api_name, title, os_file)
     generate_command(os_command, os_file)
     generate_subcommands(os_command, os_file, blacklist,
@@ -520,24 +527,26 @@ def main():
     parser.add_argument('client', nargs='?',
                         help="OpenStack command to document.")
     parser.add_argument("--all", help="Document all clients.",
-                        action="store_true")
+                        action="store_true"),
+    parser.add_argument("--output-dir", default=".",
+                        help="Directory to write generated files to")
     prog_args = parser.parse_args()
 
     if prog_args.all:
-        document_single_project("ceilometer")
-        document_single_project("cinder")
-        document_single_project("glance")
-        document_single_project("heat")
-        document_single_project("keystone")
-        document_single_project("nova")
-        document_single_project("neutron")
-        document_single_project("swift")
-        document_single_project("trove")
+        document_single_project("ceilometer", prog_args.output_dir)
+        document_single_project("cinder", prog_args.output_dir)
+        document_single_project("glance", prog_args.output_dir)
+        document_single_project("heat", prog_args.output_dir)
+        document_single_project("keystone", prog_args.output_dir)
+        document_single_project("nova", prog_args.output_dir)
+        document_single_project("neutron", prog_args.output_dir)
+        document_single_project("swift", prog_args.output_dir)
+        document_single_project("trove", prog_args.output_dir)
     elif prog_args.client is None:
         print("Pass the name of the client to document as argument.")
         sys.exit(1)
     else:
-        document_single_project(prog_args.client)
+        document_single_project(prog_args.client, prog_args.output_dir)
 
 
 if __name__ == "__main__":
