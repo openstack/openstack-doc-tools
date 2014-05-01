@@ -102,6 +102,7 @@ Release notes
 
 * ``openstack-auto-commands``: Improved screen generation and swift
   subcommand xml output.
+* ``openstack-doc-tools``: Warn about non-breaking space.
 
 0.13
 ----
