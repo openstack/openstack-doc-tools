@@ -97,6 +97,12 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.14
+----
+
+* ``openstack-auto-commands``: Improved screen generation and swift
+  subcommand xml output.
+
 0.13
 ----
 
