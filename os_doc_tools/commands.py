@@ -348,6 +348,9 @@ def generate_subcommand(os_command, os_subcommand, os_file):
 
     if os_command == "swift":
         next_line_screen = False
+        os_file.write("\n        <screen><computeroutput>Usage: swift %s"
+                      "</computeroutput></screen>"
+                      % (os_subcommand))
         os_file.write("\n        <para>")
         in_para = True
     else:
@@ -364,6 +367,8 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     skip_lines = False
     for line in help_lines:
         line_index += 1
+        if line.startswith('Usage:') and os_command == "swift":
+            line = line[len("Usage: "):]
         if line.startswith(('Arguments:', 'Positional arguments:',
                             'positional arguments', 'Optional arguments',
                             'optional arguments')):
