@@ -8,6 +8,7 @@ Release notes
 * ``openstack-dn2osdbk``: Allow single files as source
 * Imported and improved ``doc-tools-check-languages`` (recently known
   as ``tools/test-languages.sh`` in the documentation repositories).
+* Added a virtual build and test environment based on Vagrant.
 
 0.17
 ----
