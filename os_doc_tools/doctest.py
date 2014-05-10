@@ -345,7 +345,7 @@ def check_modified_affects_all(rootdir, verbose):
     ]
     for f in modified_files:
         if f in special_files:
-            if verbose:
+            if cfg.CONF.verbose:
                 print("File %s modified, this affects all books." % f)
             return True
 
@@ -1209,7 +1209,8 @@ def read_properties():
     gerrit_file = os.path.join(get_gitroot(), 'gerrit-doc.properties')
 
     if os.path.isfile(gerrit_file):
-
+        if cfg.CONF.verbose:
+            print(" Reading gerrit-doc.properties")
         for line in open(gerrit_file, 'r'):
             content = line.strip().split('=')
             if len(content) > 1:
@@ -1379,6 +1380,11 @@ def handle_options():
                     print(" Publish dir for %s is %s" %
                           (CONF.book[i], BOOK_PUBLISH_MAPPINGS[CONF.book[i]]))
 
+    if CONF.check_build:
+        read_properties()
+        print(" Release path: %s" % cfg.CONF.release_path)
+        print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
+
 
 def main():
 
@@ -1429,7 +1435,6 @@ def main():
         # Some programs are called in subprocesses,  make sure that they
         # really exist.
         ensure_exists("mvn")
-        read_properties()
         build_affected_books(doc_path, BOOK_EXCEPTIONS,
                              BUILD_FILE_EXCEPTIONS,
                              CONF.verbose, CONF.force,
