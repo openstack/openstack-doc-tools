@@ -140,9 +140,11 @@ start. This can be done by sourcing the `venv/bin/activate` file.
 Now, download and install the projects. Installation is necessary to satisfy
 dependencies between projects. This will also install required dependencies.
 
+    $ mkdir -p sources && cd sources
     $ PROJECTS="ceilometer cinder glance heat neutron nova trove"
     $ for p in $PROJECTS; do git clone git://git.openstack.org/openstack/$p.git; done
     $ for p in $PROJECTS; do cd $p && python setup.py install && cd ..; done
+    $ cd ..
 
 Install some missing requirements:
 
@@ -156,7 +158,7 @@ discovered.
 Update the flag names:
 
     $ for p in $PROJECTS; do
-    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update $project -i $project
+    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update $project
     > done
 
 At this point, search through the `*.flagmappings.new` files for anything
@@ -165,7 +167,7 @@ files and run `autohelp.py` with the `docbook` subcommand:
 
     $ for p in $PROJECTS; do
     > mv $p.flagmappings.new $p.flagmappings
-    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook $project -i $project
+    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook $project
     > done
 
 to generate the XML files and move those into the appropriate part of

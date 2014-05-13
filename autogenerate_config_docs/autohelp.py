@@ -47,8 +47,8 @@ def git_check(repo_path):
         package_name = os.path.basename(repo.remotes.origin.url)
         package_name = package_name.replace('.git', '')
     except Exception:
-        print("\nThere is a problem verifying that the directory passed in")
-        print("is a valid git repository.  Please try again.\n")
+        print("\n%s doesn't seem to be a valid git repository." % repo_path)
+        print("Use the -i flag to specify the repository path.\n")
         sys.exit(1)
     return package_name
 
@@ -462,10 +462,10 @@ def main():
         description='Manage flag files, to aid in updating documentation.',
         usage='%(prog)s <cmd> <package> [options]')
     parser.add_argument('subcommand',
-                        help='action (create, update, verify) [REQUIRED]',
+                        help='Action (create, update, verify).',
                         choices=['create', 'update', 'docbook'])
     parser.add_argument('package',
-                        help='name of the top-level package')
+                        help='Name of the top-level package.')
     parser.add_argument('-v', '--verbose',
                         action='count',
                         default=0,
@@ -473,16 +473,19 @@ def main():
                         required=False,)
     parser.add_argument('-i', '--input',
                         dest='repo',
-                        help='path to valid git repository [REQUIRED]',
-                        required=True,
+                        help='Path to a valid git repository.',
+                        required=False,
                         type=str,)
     parser.add_argument('-o', '--output',
                         dest='target',
-                        help='directory in which xml files are generated',
+                        help='Directory in which xml files are generated.',
                         required=False,
-                        default='./',
+                        default='../../doc/common/tables/',
                         type=str,)
     args = parser.parse_args()
+
+    if args.repo is None:
+        args.repo = './sources/%s' % args.package
 
     package_name = git_check(args.repo)
 
@@ -504,19 +507,16 @@ def main():
 
     if args.subcommand == 'create':
         create_flagmappings(package_name, options, verbose=args.verbose)
-        return
 
-    if args.subcommand == 'update':
+    elif args.subcommand == 'update':
         update_flagmappings(package_name, options, verbose=args.verbose)
-        return
 
-    if args.subcommand == 'docbook':
+    elif args.subcommand == 'docbook':
         write_docbook(package_name, options, verbose=args.verbose,
                       target=args.target)
         write_docbook_rootwrap(package_name, args.repo,
                                verbose=args.verbose,
                                target=args.target)
-        return
 
 
 if __name__ == "__main__":

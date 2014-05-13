@@ -106,6 +106,10 @@ Release notes
   -v output.
 * New command ``openstack-jsoncheck`` to check for niceness of JSON
   files and reformat them.
+* ``openstack-autohelp``: Update the default parameters. The tables
+  are generated in the doc/common/tables/ dir by default, and the git
+  repository for the project being worked on is looked at in a sources/
+  dir by default.
 
 0.13
 ----
