@@ -103,9 +103,11 @@ Release notes
 * ``openstack-auto-commands``: Improved screen generation and swift
   subcommand xml output.
 * ``openstack-doc-tools``: Warn about non-breaking space, enhance
-  -v output.
+  -v output, special case building of localized high-availability
+  guide.
 * New command ``openstack-jsoncheck`` to check for niceness of JSON
   files and reformat them.
+
 
 0.13
 ----

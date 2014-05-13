@@ -23,12 +23,16 @@ import codecs
 import optparse
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import xml.dom.minidom
 
 from xml2po import Main    # noqa
 from xml2po.modes.docbook import docbookXmlMode    # noqa
+
+OS_DOC_TOOLS_DIR = os.path.dirname(__file__)
+SCRIPTS_DIR = os.path.join(OS_DOC_TOOLS_DIR, 'scripts')
 
 
 class myDocbookXmlMode(docbookXmlMode):
@@ -123,6 +127,7 @@ def changeXMLLangSetting(xmlFile, language):
     for node in nodelists:
         if node.hasAttribute("href"):
             node.setAttribute("xlink:href", node.getAttribute("href"))
+            node.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
         if node.hasAttribute("title"):
             node.setAttribute("xlink:title", node.getAttribute("title"))
 
@@ -145,6 +150,28 @@ def get_xml_list(sms, dr, flst):
 
 def get_default_book(root):
     return os.listdir(root)[0]
+
+
+# NOTE(berendt): check_output as provided in Python 2.7.5 to make script
+#                usable with Python < 2.7
+def check_output(*popenargs, **kwargs):
+    """Run command with arguments and return its output as a byte string.
+
+    If the exit code was non-zero it raises a CalledProcessError.  The
+    CalledProcessError object will have the return code in the returncode
+    attribute and output in the output attribute.
+    """
+    if 'stdout' in kwargs:
+        raise ValueError('stdout argument not allowed, it will be overridden.')
+    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        raise subprocess.CalledProcessError(retcode, cmd, output=output)
+    return output
 
 
 def generatedocbook():
@@ -196,8 +223,27 @@ def generatedocbook():
     if os.path.exists(destfolder):
         shutil.rmtree(destfolder)
 
+    # Build the XML original location first
+    if folder == 'high-availability-guide':
+        try:
+            curr = os.getcwd()
+            os.chdir(sourcepath)
+            subprocess.check_output(
+                ["bash", os.path.join(SCRIPTS_DIR, 'build-ha-guide.sh'), ],
+                stderr=subprocess.STDOUT
+            )
+            os.chdir(curr)
+        except subprocess.CalledProcessError as e:
+            print("build-ha-guide.sh failed: %s" % e)
+            sys.exit(1)
     os.system("cp -r %s %s" % (sourcepath, destpath))
     mergeback(folder, language, root)
+    # Somehow a lang="" is in the xml and breaks build, remove it
+    if folder == 'high-availability-guide':
+        bk_ha = os.path.join(destfolder, "bk-ha-guide.xml")
+        with open(bk_ha) as bk_ha_file:
+            newxml = bk_ha_file.read().replace('<book lang="" ', '<book ')
+        open(bk_ha, 'wb').write(newxml)
 
 
 def generatePoT(folder, root):
