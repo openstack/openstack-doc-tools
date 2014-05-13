@@ -22,8 +22,8 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    #'sphinx.ext.intersphinx',
-    #'oslo.sphinx'
+    # 'sphinx.ext.intersphinx',
+    # 'oslo.sphinx'
 ]
 
 # autodoc generation is a bit aggressive and a nuisance when doing heavy
@@ -72,7 +72,7 @@ latex_documents = [
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
-#intersphinx_mapping = {'http://docs.python.org/': None}
+# intersphinx_mapping = {'http://docs.python.org/': None}
 
 # -- Options for manual page output -------------------------------------------
 
@@ -82,8 +82,7 @@ man_pages = [
     ('man/openstack-doc-test', 'openstack-doc-test',
      u'OpenStack documentation tools',
      [u'OpenStack'], 1)
-		    ]
+]
 
 # If true, show URL addresses after external links.
-#man_show_urls = False
-
+# man_show_urls = False
