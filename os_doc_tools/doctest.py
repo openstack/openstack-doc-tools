@@ -819,10 +819,14 @@ def build_book(book, publish_path, log_path):
             # Success
             base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
         elif base_book == "high-availability-guide":
-            output = subprocess.check_output(
-                ["bash", os.path.join(SCRIPTS_DIR, 'build-ha-guide.sh'), ],
-                stderr=subprocess.STDOUT
-            )
+            # generatedocbook already calls build-ha-guide.sh, do not
+            # call it again here for translated languages.
+            if not cfg.CONF.language:
+                output = subprocess.check_output(
+                    ["bash", os.path.join(SCRIPTS_DIR,
+                                          'build-ha-guide.sh'), ],
+                    stderr=subprocess.STDOUT
+                )
             output = subprocess.check_output(
                 ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
