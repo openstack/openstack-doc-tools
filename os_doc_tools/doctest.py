@@ -1386,8 +1386,9 @@ def handle_options():
 
     if CONF.check_build:
         read_properties()
-        print(" Release path: %s" % cfg.CONF.release_path)
-        print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
+        if CONF.verbose:
+            print(" Release path: %s" % cfg.CONF.release_path)
+            print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
 
 
 def main():
