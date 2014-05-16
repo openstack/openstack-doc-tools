@@ -1413,7 +1413,7 @@ def main():
         (www_touched(False) and not CONF.publish)):
         publish_www()
 
-    if not CONF.publish and not CONF.force and www_touched(True):
+    if not CONF.force and www_touched(True):
         print("Only files in www directory changed, nothing to do.\n")
         return
 
