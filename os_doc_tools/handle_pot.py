@@ -89,13 +89,13 @@ def mergeSingleDocument(folder, language, root):
 
     if len(xmlfiles) > 0:
         popath = os.path.join(abspath, "locale", language + ".po")
-        #generate MO file
+        # generate MO file
         mofile_handler, mofile_tmppath = tempfile.mkstemp()
         os.close(mofile_handler)
         os.system("msgfmt -o %s %s" % (mofile_tmppath, popath))
 
         for aXML in xmlfiles:
-            #(filename, ext) = os.path.splitext(os.path.basename(aXML))
+            # (filename, ext) = os.path.splitext(os.path.basename(aXML))
             relpath = os.path.relpath(aXML, root)
             outputpath = os.path.join(os.path.curdir, "generated", language,
                                       relpath)
@@ -122,7 +122,7 @@ def changeXMLLangSetting(xmlFile, language):
     root.setAttribute("xml:lang", language[:2])
     fileObj = codecs.open(xmlFile, "wb", encoding="utf-8")
 
-    #add namespace to link
+    # add namespace to link
     nodelists = root.getElementsByTagName("link")
     for node in nodelists:
         if node.hasAttribute("href"):
@@ -144,7 +144,7 @@ def get_xml_list(sms, dr, flst):
 
     for f in flst:
         if (f.endswith(".xml") and (f != "pom.xml") and
-            not (f in IGNORE_FILE)):
+           not (f in IGNORE_FILE)):
             sms.append(os.path.join(dr, f))
 
 
@@ -208,9 +208,9 @@ def generatedocbook():
     if options.book is None:
         options.book = get_default_book(root)
 
-    #change working directory
+    # change working directory
 
-    #copy folders
+    # copy folders
     folder = options.book
     language = options.language
     root = options.root
@@ -281,8 +281,8 @@ def generateSinglePoT(folder, root):
         except IOError:
             print("Error: cannot open aFile %s for writing." % (output))
             sys.exit(5)
-        #print(xmlfiles)
-        #print(">>>outout: %s ", output)
+        # print(xmlfiles)
+        # print(">>>outout: %s ", output)
         xml2po_main.to_pot(xmlfiles)
 
 

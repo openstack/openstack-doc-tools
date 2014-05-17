@@ -19,7 +19,7 @@ import sys
 from xml.dom import minidom
 import xml.sax.saxutils
 
-#Swift configuration example files live in
+# Swift configuration example files live in
 # swift/etc/*.conf-sample
 # and contain sections enclosed in [], with
 # options one per line containing =
@@ -67,7 +67,7 @@ def get_existing_options(optfiles):
             except IndexError:
                 continue
             if option not in options or 'No help text' in options[option]:
-                #options[option.split('=',1)[0]] = helptext
+                # options[option.split('=',1)[0]] = helptext
                 options[option] = helptext
     return options
 
@@ -151,7 +151,7 @@ def create_new_tables(repo, verbose):
 
     existing_tables = glob.glob('../../doc/common/tables/swift*xml')
     options = {}
-    #use the existing tables to get a list of option names
+    # use the existing tables to get a list of option names
     options = get_existing_options(existing_tables)
     option_descs = extract_descriptions_from_devref(repo, options)
     conf_samples = glob.glob(repo + '/etc/*conf-sample')

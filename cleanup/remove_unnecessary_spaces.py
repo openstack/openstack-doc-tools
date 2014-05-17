@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-## copyright: B1 Systems GmbH   <info@b1-systems.de>,    2013.
-##    author: Christian Berendt <berendt@b1-systems.de>, 2013.
+# copyright: B1 Systems GmbH   <info@b1-systems.de>,    2013.
+#    author: Christian Berendt <berendt@b1-systems.de>, 2013.
 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain

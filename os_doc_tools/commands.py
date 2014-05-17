@@ -157,7 +157,7 @@ def extract_options(line):
                 break
             if last_was_option:
                 if (words[1].startswith(("-", '<', '{', '[')) or
-                    is_option(words[1])):
+                   is_option(words[1])):
                     words[0] = words[0] + ' ' + words[1]
                     del words[1]
                 else:

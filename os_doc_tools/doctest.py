@@ -132,9 +132,9 @@ def get_wadl_schema():
     # NOTE(jaegerandi): We could use the RelaxNG instead
     # like follows but this gives quite some errors at the
     # moment, so only validate using the XMLSchema
-    #url = WADL_RNG
-    #relaxng_doc = etree.parse(url, base_url=BASE_RNG)
-    #return etree.RelaxNG(relaxng_doc)
+    # url = WADL_RNG
+    # relaxng_doc = etree.parse(url, base_url=BASE_RNG)
+    # return etree.RelaxNG(relaxng_doc)
     url = WADL_XSD
     schema = etree.parse(url, base_url=BASE_RNG)
     return etree.XMLSchema(schema)
@@ -569,7 +569,7 @@ def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
             # Files ending with ".xml" in subdirectories of
             # wadls and samples files are not docbook files.
             if (f.endswith('.xml') and
-                ("wadls" in f or "samples" in f)):
+               ("wadls" in f or "samples" in f)):
                 validate_schema = False
             # Right now we can only validate docbook .xml
             # and .wadl files with a schema
@@ -636,7 +636,7 @@ def validate_all_files(rootdir, exceptions, verbose,
         for f in files:
             # Ignore maven files, which are called pom.xml
             if (is_xml_like(f) and
-                f not in exceptions):
+               f not in exceptions):
                 path = os.path.abspath(os.path.join(root, f))
                 files_to_check.append(path)
 
@@ -919,7 +919,7 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
 
         # Filter out directories to be ignored
         if ignore_dirs:
-            dirs[:] = [d for d in dirs if not d in ignore_dirs]
+            dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         if os.path.basename(root) in book_exceptions:
             break
@@ -1011,14 +1011,14 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
 
             # Filter out directories to be ignored
             if ignore_dirs:
-                dirs[:] = [d for d in dirs if not d in ignore_dirs]
+                dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
             for f in files:
                 f_base = os.path.basename(f)
                 f_abs = os.path.abspath(os.path.join(root, f))
 
                 if (f_abs not in included_by and f_base != "pom.xml"
-                    and not is_book_master(f_base)):
+                   and not is_book_master(f_base)):
                     f_rel = os.path.relpath(f_abs, rootdir)
                     print ("  %s " % f_rel)
         print("\n")
@@ -1089,7 +1089,7 @@ def generate_index_file():
 
     for root, dirs, files in os.walk(publish_path):
 
-        dirs[:] = [d for d in dirs if not d in ['common', 'webapp', 'content']]
+        dirs[:] = [d for d in dirs if d not in ['common', 'webapp', 'content']]
 
         # Ignore top-level index.html files
         if root == publish_path:
@@ -1350,7 +1350,7 @@ def handle_options():
         add_build_exceptions(CONF.build_file_exception, CONF.verbose)
 
     if (not CONF.check_build and not CONF.check_deletions and
-        not CONF.check_niceness and not CONF.check_syntax):
+       not CONF.check_niceness and not CONF.check_syntax):
         CONF.check_all = True
 
     if CONF.check_all:
@@ -1368,7 +1368,7 @@ def handle_options():
                   "relationship.")
             sys.exit(1)
         if (CONF.publish_dir and
-            len(CONF.publish_dir) != len(CONF.target_dir)):
+           len(CONF.publish_dir) != len(CONF.target_dir)):
             print("ERROR: publish_dir and target_dir need to have a 1:1 "
                   "relationship if publish_dir is specified.")
             sys.exit(1)
@@ -1410,7 +1410,7 @@ def main():
     # Do not publish www directory if we build for external
     # publishing
     if (CONF.check_build and
-        (www_touched(False) and not CONF.publish)):
+       (www_touched(False) and not CONF.publish)):
         publish_www()
 
     if not CONF.force and www_touched(True):

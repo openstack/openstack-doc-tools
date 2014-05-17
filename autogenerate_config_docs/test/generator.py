@@ -35,13 +35,13 @@ import textwrap
 
 from oslo.config import cfg
 
-#from openstack.common import gettextutils
+# from openstack.common import gettextutils
 from openstack.common import importutils
 
 # sld
 # ...not sure about these being needed, so they are commented for now.
-#gettextutils.install('nova')
-#gettextutils.install('ceilometer')
+# gettextutils.install('nova')
+# gettextutils.install('ceilometer')
 
 STROPT = "StrOpt"
 BOOLOPT = "BoolOpt"
