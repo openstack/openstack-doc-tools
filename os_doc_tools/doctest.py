@@ -319,11 +319,14 @@ def check_modified_affects_all(rootdir):
         sys.exit(1)
 
     special_files = [
-        "tools/test.py",
+        # Top-Level pom.xml
+        "pom.xml",
+        # doc/pom.xml in openstack-manuals
         "doc/pom.xml"
     ]
+
     for f in modified_files:
-        if f in special_files:
+        if f in special_files or f.endswith('.ent'):
             if cfg.CONF.verbose:
                 print("File %s modified, this affects all books." % f)
             return True
