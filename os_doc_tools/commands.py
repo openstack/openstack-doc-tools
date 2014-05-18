@@ -99,14 +99,14 @@ def generate_heading(os_command, api_name, title, os_file):
     os_file.write(header.format(os_command, api_name, title, version))
 
 
-def is_option(str):
+def is_option(string):
     """Returns True if string specifies an argument."""
 
-    for x in str:
+    for x in string:
         if not (x.isupper() or x == '_' or x == ','):
             return False
 
-    if str.startswith('DEPRECATED'):
+    if string.startswith('DEPRECATED'):
         return False
     return True
 
@@ -532,7 +532,7 @@ def main():
     parser.add_argument('client', nargs='?',
                         help="OpenStack command to document.")
     parser.add_argument("--all", help="Document all clients.",
-                        action="store_true"),
+                        action="store_true")
     parser.add_argument("--output-dir", default=".",
                         help="Directory to write generated files to")
     prog_args = parser.parse_args()

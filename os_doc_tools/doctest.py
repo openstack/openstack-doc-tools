@@ -229,7 +229,7 @@ def verify_nice_usage_of_whitespaces(docfile):
 
     for element in elements:
         checks.append(re.compile(".*<%s>\s+[\w\-().:!?{}\[\]]+.*\n"
-                                 % element)),
+                                 % element))
         checks.append(re.compile(".*[\w\-().:!?{}\[\]]+\s+<\/%s>.*\n"
                                  % element))
 
@@ -323,7 +323,7 @@ def ha_guide_touched():
     return ha_changed
 
 
-def check_modified_affects_all(rootdir, verbose):
+def check_modified_affects_all(rootdir):
     """Check whether special files were modified.
 
     There are some special files where we should rebuild all books
@@ -400,7 +400,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
         for f in deleted_files:
             print ("   %s" % f)
 
-    deleted_files = map(lambda x: os.path.abspath(x), deleted_files)
+    deleted_files = [os.path.abspath(x) for x in deleted_files]
     no_checked_files = 0
 
     # Figure out whether files were included anywhere
@@ -614,8 +614,7 @@ def validate_modified_files(rootdir, exceptions, verbose,
     # Do not select deleted files, just Added, Copied, Modified, Renamed,
     # or Type changed
     modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
-
-    modified_files = filter(is_xml_like, modified_files)
+    modified_files = [f for f in modified_files if is_xml_like(f)]
 
     validate_individual_files(modified_files, rootdir, exceptions,
                               verbose,
@@ -892,7 +891,7 @@ def is_book_master(filename):
 
 
 def find_affected_books(rootdir, book_exceptions, file_exceptions,
-                        verbose, force, ignore_dirs):
+                        force, ignore_dirs):
     """Check which books are affected by modified files.
 
     Returns a set with books.
@@ -902,7 +901,7 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     books = []
     affected_books = set()
 
-    build_all_books = (force or check_modified_affects_all(rootdir, verbose) or
+    build_all_books = (force or check_modified_affects_all(rootdir) or
                        cfg.CONF.only_book)
 
     # Dictionary that contains a set of files.
@@ -1028,7 +1027,7 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
         # Do not select deleted files, just Added, Copied, Modified, Renamed,
         # or Type changed
         modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
-        modified_files = map(lambda x: os.path.abspath(x), modified_files)
+        modified_files = [os.path.abspath(f) for f in modified_files]
 
         # 2. Find all modified files and where they are included
 
@@ -1122,8 +1121,8 @@ def generate_index_file():
 
 
 def build_affected_books(rootdir, book_exceptions, file_exceptions,
-                         verbose, force=False, ignore_errors=False,
-                         ignore_dirs=[]):
+                         force=False, ignore_errors=False,
+                         ignore_dirs=None):
     """Build all the books which are affected by modified files.
 
     Looks for all directories with "pom.xml" and checks if a
@@ -1134,9 +1133,11 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
     This will throw an exception if a book fails to build
     """
 
+    if ignore_dirs is None:
+        ignore_dirs = []
+
     books = find_affected_books(rootdir, book_exceptions,
-                                file_exceptions, verbose,
-                                force, ignore_dirs)
+                                file_exceptions, force, ignore_dirs)
 
     # Remove cache content which can cause build failures
     shutil.rmtree(os.path.expanduser("~/.fop"),
@@ -1391,7 +1392,8 @@ def handle_options():
             print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
 
 
-def main():
+def doctest():
+    """Central entrypoint, parses arguments and runs tests."""
 
     CONF = cfg.CONF
     print ("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
@@ -1442,10 +1444,10 @@ def main():
         ensure_exists("mvn")
         build_affected_books(doc_path, BOOK_EXCEPTIONS,
                              BUILD_FILE_EXCEPTIONS,
-                             CONF.verbose, CONF.force,
+                             CONF.force,
                              CONF.ignore_errors,
                              CONF.ignore_dir)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(doctest())

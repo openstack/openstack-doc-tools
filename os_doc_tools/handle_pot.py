@@ -46,7 +46,7 @@ class myDocbookXmlMode(docbookXmlMode):
 
 default_mode = 'docbook'
 operation = 'merge'
-options = {
+xml_options = {
     'mark_untranslated': False,
     'expand_entities': True,
     'expand_all_entities': False,
@@ -57,6 +57,8 @@ IGNORE_FILE = []
 
 
 def mergeback(folder, language, root):
+    """Generate translated files for language in directory folder."""
+
     if folder is None:
         path = root
     else:
@@ -101,7 +103,7 @@ def mergeSingleDocument(folder, language, root):
                                       relpath)
             try:
                 xml2po_main = Main(default_mode, "merge", outputpath,
-                                   options)
+                                   xml_options)
                 xml2po_main.current_mode = myDocbookXmlMode()
                 xml2po_main.merge(mofile_tmppath, aXML)
                 outputfiles.append(outputpath)
@@ -117,6 +119,8 @@ def mergeSingleDocument(folder, language, root):
 
 
 def changeXMLLangSetting(xmlFile, language):
+    """Update XML settings for file."""
+
     dom = xml.dom.minidom.parse(xmlFile)
     root = dom.documentElement
     root.setAttribute("xml:lang", language[:2])
@@ -276,7 +280,7 @@ def generateSinglePoT(folder, root):
             os.mkdir(output)
         output = os.path.join(output, folder + ".pot")
         try:
-            xml2po_main = Main(default_mode, "pot", output, options)
+            xml2po_main = Main(default_mode, "pot", output, xml_options)
             xml2po_main.current_mode = myDocbookXmlMode()
         except IOError:
             print("Error: cannot open aFile %s for writing." % (output))
