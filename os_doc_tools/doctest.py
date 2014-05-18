@@ -45,6 +45,7 @@ import sys
 from lxml import etree
 
 import os_doc_tools
+from os_doc_tools.common import check_output   # noqa
 from oslo.config import cfg
 
 
@@ -93,28 +94,6 @@ WADL_RNG = os.path.join(BASE_RNG, 'wadl.rng')
 WADL_XSD = os.path.join(BASE_RNG, 'wadl.xsd')
 
 SCRIPTS_DIR = os.path.join(OS_DOC_TOOLS_DIR, 'scripts')
-
-
-# NOTE(berendt): check_output as provided in Python 2.7.5 to make script
-#                usable with Python < 2.7
-def check_output(*popenargs, **kwargs):
-    """Run command with arguments and return its output as a byte string.
-
-    If the exit code was non-zero it raises a CalledProcessError.  The
-    CalledProcessError object will have the return code in the returncode
-    attribute and output in the output attribute.
-    """
-    if 'stdout' in kwargs:
-        raise ValueError('stdout argument not allowed, it will be overridden.')
-    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-    output, unused_err = process.communicate()
-    retcode = process.poll()
-    if retcode:
-        cmd = kwargs.get("args")
-        if cmd is None:
-            cmd = popenargs[0]
-        raise subprocess.CalledProcessError(retcode, cmd, output=output)
-    return output
 
 
 def get_schema(is_api_site=False):
@@ -207,7 +186,7 @@ def verify_profiling(doc):
     verify_attribute_profiling(doc, "audience", KNOWN_AUDIENCE_VALUES)
 
 
-def verify_nice_usage_of_whitespaces(docfile):
+def verify_whitespace_niceness(docfile):
     """Check that no unnecessary whitespaces are used."""
     checks = [
         re.compile(".*\s+\n$"),
@@ -473,7 +452,7 @@ def validate_one_json_file(rootdir, path, verbose, check_syntax,
               (os.path.relpath(path, rootdir), e))
     try:
         if check_niceness:
-            verify_nice_usage_of_whitespaces(path)
+            verify_whitespace_niceness(path)
     except ValueError as e:
         any_failures = True
         print("  %s: %s" % (os.path.relpath(path, rootdir), e))
@@ -499,7 +478,7 @@ def validate_one_file(schema, rootdir, path, verbose,
                 verify_section_tags_have_xmid(doc)
                 verify_profiling(doc)
         if check_niceness:
-            verify_nice_usage_of_whitespaces(path)
+            verify_whitespace_niceness(path)
     except etree.XMLSyntaxError as e:
         any_failures = True
         print("  %s: %s" % (os.path.relpath(path, rootdir), e))
@@ -680,7 +659,7 @@ def publish_www():
     shutil.copytree(source, www_path)
 
 
-def ignore_for_publishing(path, names):
+def ignore_for_publishing(_, names):
     """Return list of files that should be ignored for publishing."""
 
     # Ignore:

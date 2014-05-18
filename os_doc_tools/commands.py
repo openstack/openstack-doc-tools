@@ -18,28 +18,7 @@ import subprocess
 import sys
 
 import os_doc_tools
-
-
-# NOTE(berendt): check_output as provided in Python 2.7.5 to make script
-#                usable with Python < 2.7
-def check_output(*popenargs, **kwargs):
-    """Run command with arguments and return its output as a byte string.
-
-    If the exit code was non-zero it raises a CalledProcessError.  The
-    CalledProcessError object will have the return code in the returncode
-    attribute and output in the output attribute.
-    """
-    if 'stdout' in kwargs:
-        raise ValueError('stdout argument not allowed, it will be overridden.')
-    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-    output, unused_err = process.communicate()
-    retcode = process.poll()
-    if retcode:
-        cmd = kwargs.get("args")
-        if cmd is None:
-            cmd = popenargs[0]
-        raise subprocess.CalledProcessError(retcode, cmd, output=output)
-    return output
+from os_doc_tools.common import check_output   # noqa
 
 
 def quote_xml(line):
