@@ -21,6 +21,6 @@ asciidoc -b docbook -d book -o - ha-guide.txt |  \
 xsltproc -o - $DB_UPGRADE - | \
 xmllint  --format - | \
 sed -e 's,<book,<book xml:id="bk-ha-guide",' | \
-sed -e 's,<!-- Converted by db4-upgrade version 1.0 -->,' |\
+sed -e 's,<!-- Converted by db4-upgrade version 1.0 -->,,' |\
 sed -e 's,<info,<?rax pdf.url="../openstack-ha-guide-trunk.pdf"?><info,' \
     > bk-ha-guide.xml
