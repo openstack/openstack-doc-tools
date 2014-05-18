@@ -1204,25 +1204,8 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
         print("Building of books finished successfully.\n")
 
     if len(RESULTS_OF_BUILDS) != len(books):
-        print("ERROR: %d queued for building but only %d built!" %
+        print("ERROR: %d queued for building but only %d build!" %
               (len(books), len(RESULTS_OF_BUILDS)))
-
-
-def read_properties():
-    """Read gerrit-doc.properties."""
-
-    gerrit_file = os.path.join(get_gitroot(), 'gerrit-doc.properties')
-
-    if os.path.isfile(gerrit_file):
-        if cfg.CONF.verbose:
-            print(" Reading gerrit-doc.properties")
-        for line in open(gerrit_file, 'r'):
-            content = line.strip().split('=')
-            if len(content) > 1:
-                if content[0] == "DOC_RELEASE_PATH":
-                    cfg.CONF.release_path = content[1]
-                elif content[0] == "DOC_COMMENTS_ENABLED":
-                    cfg.CONF.comments_enabled = content[1]
 
 
 def add_exceptions(file_exception, verbose):
@@ -1386,7 +1369,6 @@ def handle_options():
                           (CONF.book[i], BOOK_PUBLISH_MAPPINGS[CONF.book[i]]))
 
     if CONF.check_build:
-        read_properties()
         if CONF.verbose:
             print(" Release path: %s" % cfg.CONF.release_path)
             print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
