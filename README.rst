@@ -97,6 +97,11 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.15
+----
+
+* ``openstack-doc-tools``: Output information about tested patch.
+
 0.14
 ----
 

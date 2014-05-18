@@ -642,6 +642,25 @@ def get_gitroot():
     return gitroot
 
 
+def print_gitinfo():
+    """Print information about repository and change."""
+
+    try:
+        git_cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+        gitbranch = check_output(git_cmd).rstrip()
+        git_cmd = ["git", "show", "--format=%s", "-s"]
+        gitsubject = check_output(git_cmd).rstrip()
+        git_cmd = ["git", "show", "--format=%an", "-s"]
+        gitauthor = check_output(git_cmd).rstrip()
+    except (subprocess.CalledProcessError, OSError) as e:
+        print("git failed: %s" % e)
+        sys.exit(1)
+    print("Testing patch:")
+    print("  Title: %s" % gitsubject)
+    print("  Author: %s" % gitauthor)
+    print("  Branch: %s" % gitbranch)
+
+
 def get_publish_path():
     """Return path to use of publishing books."""
 
@@ -1378,6 +1397,7 @@ def doctest():
     print ("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
            % os_doc_tools.__version__)
 
+    print_gitinfo()
     handle_options()
 
     doc_path = get_gitroot()
