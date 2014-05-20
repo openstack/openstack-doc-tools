@@ -104,7 +104,7 @@ Release notes
   subcommand xml output.
 * ``openstack-doc-tools``: Warn about non-breaking space, enhance
   -v output, special case building of localized high-availability
-  guide.
+  guide, fix for building changed identity-api repository.
 * New command ``openstack-jsoncheck`` to check for niceness of JSON
   files and reformat them.
 * ``openstack-autohelp``: Update the default parameters. The tables

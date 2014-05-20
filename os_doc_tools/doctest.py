@@ -810,8 +810,8 @@ def build_book(book, publish_path, log_path):
                 stderr=subprocess.STDOUT
             )
         # Repository: identity-api
-        # Let's not check for "v3" but for the full name instead
-        elif book.endswith("openstack-identity-api/v3"):
+        elif (cfg.CONF.repo_name == "identity-api"
+              and book.endswith("v3")):
             output = subprocess.check_output(
                 ["bash", os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
                  "identity-api-v3"],
