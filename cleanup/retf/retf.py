@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """This script applies a set of regular expressions onto a set of files
 to automatically identify and fix typographical errors.

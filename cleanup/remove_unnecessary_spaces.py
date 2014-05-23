@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # copyright: B1 Systems GmbH   <info@b1-systems.de>,    2013.
 #    author: Christian Berendt <berendt@b1-systems.de>, 2013.
