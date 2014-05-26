@@ -100,14 +100,15 @@ Release notes
 0.15
 ----
 
-* ``openstack-doc-tools``: Output information about tested patch.
+* ``openstack-doc-test``: Output information about tested patch,
+  special case entity files for book building.
 
 0.14
 ----
 
 * ``openstack-auto-commands``: Improved screen generation and swift
   subcommand xml output.
-* ``openstack-doc-tools``: Warn about non-breaking space, enhance
+* ``openstack-doc-test``: Warn about non-breaking space, enhance
   -v output, special case building of localized high-availability
   guide, fix for building changed identity-api repository.
 * New command ``openstack-jsoncheck`` to check for niceness of JSON
