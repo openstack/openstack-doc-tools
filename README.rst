@@ -102,6 +102,7 @@ Release notes
 
 * ``openstack-doc-test``: Output information about tested patch,
   special case entity files for book building.
+* New script in cleanup/retf for spell checking using the RETF rules.
 
 0.14
 ----
