@@ -394,38 +394,41 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
         os.chdir(root)
 
         for f in files:
-            if (f.endswith('.xml') and
-                    f != 'pom.xml' and
-                    f not in file_exceptions):
-                path = os.path.abspath(os.path.join(root, f))
-                try:
-                    doc = etree.parse(path)
-                except etree.XMLSyntaxError as e:
-                    print(" Warning: file %s is invalid XML: %s" % (path, e))
-                    continue
+            if (not f.endswith('.xml') or
+                    f == 'pom.xml' or
+                    f in file_exceptions):
+                continue
 
-                no_checked_files = no_checked_files + 1
+            path = os.path.abspath(os.path.join(root, f))
+            try:
+                doc = etree.parse(path)
+            except etree.XMLSyntaxError as e:
+                print(" Warning: file %s is invalid XML: %s" % (path, e))
+                continue
 
-                # Check for inclusion of files as part of imagedata
-                for node in doc.findall(
-                        '//{http://docbook.org/ns/docbook}imagedata'):
-                    href = node.get('fileref')
-                    if (f not in file_exceptions and
-                            os.path.abspath(href) in deleted_files):
-                        print("  File %s has imagedata href for deleted "
-                              "file %s" % (f, href))
-                        missing_reference = True
+            no_checked_files = no_checked_files + 1
 
-                        break
+            # Check for inclusion of files as part of imagedata
+            for node in doc.findall(
+                    '//{http://docbook.org/ns/docbook}imagedata'):
+                href = node.get('fileref')
+                if (f not in file_exceptions and
+                        os.path.abspath(href) in deleted_files):
+                    print("  File %s has imagedata href for deleted "
+                          "file %s" % (f, href))
+                    missing_reference = True
 
-                # Check for inclusion of files as part of xi:include
-                ns = {"xi": "http://www.w3.org/2001/XInclude"}
-                for node in doc.xpath('//xi:include', namespaces=ns):
-                    href = node.get('href')
-                    if (os.path.abspath(href) in deleted_files):
-                        print("  File %s has an xi:include on deleted file %s"
-                              % (f, href))
-                        missing_reference = True
+                    break
+
+            # Check for inclusion of files as part of xi:include
+            ns = {"xi": "http://www.w3.org/2001/XInclude"}
+            for node in doc.xpath('//xi:include', namespaces=ns):
+                href = node.get('href')
+                if (os.path.abspath(href) in deleted_files):
+                    print("  File %s has an xi:include on deleted file %s"
+                          % (f, href))
+                    missing_reference = True
+
     if missing_reference:
         print("Failed removed file check, %d files were removed, "
               "%d files checked.\n"
@@ -949,35 +952,51 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
             f_abs = os.path.abspath(os.path.join(root, f))
             if is_book_master(f_base):
                 book_bk[f_abs] = book_root
-            if (f.endswith('.xml') and
-                    f != "pom.xml" and
-                    f not in file_exceptions):
-                try:
-                    doc = etree.parse(f_abs)
-                except etree.XMLSyntaxError as e:
-                    print("  Warning: file %s is invalid XML: %s" % (f_abs, e))
-                    continue
-                for node in doc.findall(
-                        '//{http://docbook.org/ns/docbook}imagedata'):
-                    href = node.get('fileref')
-                    href_abs = os.path.abspath(os.path.join(root, href))
-                    if href_abs in included_by:
-                        included_by[href_abs].add(f_abs)
-                    else:
-                        included_by[href_abs] = set([f_abs])
+            if (not f.endswith('.xml') or
+                    f == "pom.xml" or
+                    f in file_exceptions):
+                continue
 
-                ns = {"xi": "http://www.w3.org/2001/XInclude"}
-                for node in doc.xpath('//xi:include', namespaces=ns):
-                    href = node.get('href')
-                    href_abs = os.path.abspath(os.path.join(root, href))
-                    if href_abs in included_by:
-                        included_by[href_abs].add(f_abs)
-                    else:
-                        included_by[href_abs] = set([f_abs])
+            try:
+                doc = etree.parse(f_abs)
+            except etree.XMLSyntaxError as e:
+                print("  Warning: file %s is invalid XML: %s" % (f_abs, e))
+                continue
+            for node in doc.findall(
+                    '//{http://docbook.org/ns/docbook}imagedata'):
+                href = node.get('fileref')
+                href_abs = os.path.abspath(os.path.join(root, href))
+                if href_abs in included_by:
+                    included_by[href_abs].add(f_abs)
+                else:
+                    included_by[href_abs] = set([f_abs])
 
-                ns = {"wadl": "http://wadl.dev.java.net/2009/02"}
-                for node in doc.xpath('//wadl:resource', namespaces=ns):
-                    href = node.get('href')
+            ns = {"xi": "http://www.w3.org/2001/XInclude"}
+            for node in doc.xpath('//xi:include', namespaces=ns):
+                href = node.get('href')
+                href_abs = os.path.abspath(os.path.join(root, href))
+                if href_abs in included_by:
+                    included_by[href_abs].add(f_abs)
+                else:
+                    included_by[href_abs] = set([f_abs])
+
+            ns = {"wadl": "http://wadl.dev.java.net/2009/02"}
+            for node in doc.xpath('//wadl:resource', namespaces=ns):
+                href = node.get('href')
+                hash_sign = href.rfind('#')
+                if hash_sign != -1:
+                    href = href[:hash_sign]
+                href_abs = os.path.abspath(os.path.join(root, href))
+                if href_abs in included_by:
+                    included_by[href_abs].add(f_abs)
+                else:
+                    included_by[href_abs] = set([f_abs])
+            for node in doc.xpath('//wadl:resources', namespaces=ns):
+                href = node.get('href')
+                # wadl:resources either have a href directly or a child
+                # wadl:resource that has a href. So, check that we have
+                # a href.
+                if href:
                     hash_sign = href.rfind('#')
                     if hash_sign != -1:
                         href = href[:hash_sign]
@@ -986,20 +1005,6 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
                         included_by[href_abs].add(f_abs)
                     else:
                         included_by[href_abs] = set([f_abs])
-                for node in doc.xpath('//wadl:resources', namespaces=ns):
-                    href = node.get('href')
-                    # wadl:resources either have a href directly or a child
-                    # wadl:resource that has a href. So, check that we have
-                    # a href.
-                    if href:
-                        hash_sign = href.rfind('#')
-                        if hash_sign != -1:
-                            href = href[:hash_sign]
-                        href_abs = os.path.abspath(os.path.join(root, href))
-                        if href_abs in included_by:
-                            included_by[href_abs].add(f_abs)
-                        else:
-                            included_by[href_abs] = set([f_abs])
 
     # Print list of files that are not included anywhere
     if cfg.CONF.print_unused_files:
