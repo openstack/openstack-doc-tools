@@ -284,24 +284,6 @@ def www_touched(check_only_www):
     return www_changed
 
 
-def ha_guide_touched():
-    """Check whether files in high-availability-guide directory are touched."""
-
-    try:
-        git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = check_output(git_args).strip().split()
-    except (subprocess.CalledProcessError, OSError) as e:
-        print("git failed: %s" % e)
-        sys.exit(1)
-
-    ha_changed = False
-    for f in modified_files:
-        if f.startswith("doc/high-availability-guide/"):
-            ha_changed = True
-
-    return ha_changed
-
-
 def check_modified_affects_all(rootdir):
     """Check whether special files were modified.
 
@@ -821,19 +803,6 @@ def build_book(book, publish_path, log_path):
             )
             # Success
             base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
-        elif base_book == "high-availability-guide":
-            # generatedocbook already calls build-ha-guide.sh, do not
-            # call it again here for translated languages.
-            if not cfg.CONF.language:
-                output = subprocess.check_output(
-                    ["bash", os.path.join(SCRIPTS_DIR,
-                                          'build-ha-guide.sh'), ],
-                    stderr=subprocess.STDOUT
-                )
-            output = subprocess.check_output(
-                ["mvn", "generate-sources", comments, release, "-B"],
-                stderr=subprocess.STDOUT
-            )
         # Repository: identity-api
         elif (cfg.CONF.repo_name == "identity-api"
               and book.endswith("v3")):
@@ -940,12 +909,6 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
         # collect list of books
         if build_all_books:
             continue
-
-        # ha-guide uses asciidoc which we do not track.
-        # Just check whether any file is touched in that directory
-        if root.endswith('doc/high-availability-guide'):
-            if ha_guide_touched():
-                affected_books.add(book_root)
 
         for f in files:
             f_base = os.path.basename(f)

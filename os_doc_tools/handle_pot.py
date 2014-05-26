@@ -23,16 +23,12 @@ import codecs
 import optparse
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 import xml.dom.minidom
 
 from xml2po import Main    # noqa
 from xml2po.modes.docbook import docbookXmlMode    # noqa
-
-OS_DOC_TOOLS_DIR = os.path.dirname(__file__)
-SCRIPTS_DIR = os.path.join(OS_DOC_TOOLS_DIR, 'scripts')
 
 
 class myDocbookXmlMode(docbookXmlMode):
@@ -205,27 +201,8 @@ def generatedocbook():
     if os.path.exists(destfolder):
         shutil.rmtree(destfolder)
 
-    # Build the XML original location first
-    if folder == 'high-availability-guide':
-        try:
-            curr = os.getcwd()
-            os.chdir(sourcepath)
-            subprocess.check_output(
-                ["bash", os.path.join(SCRIPTS_DIR, 'build-ha-guide.sh'), ],
-                stderr=subprocess.STDOUT
-            )
-            os.chdir(curr)
-        except subprocess.CalledProcessError as e:
-            print("build-ha-guide.sh failed: %s" % e)
-            sys.exit(1)
     os.system("cp -r %s %s" % (sourcepath, destpath))
     mergeback(folder, language, root)
-    # Somehow a lang="" is in the xml and breaks build, remove it
-    if folder == 'high-availability-guide':
-        bk_ha = os.path.join(destfolder, "bk-ha-guide.xml")
-        with open(bk_ha) as bk_ha_file:
-            newxml = bk_ha_file.read().replace('<book lang="" ', '<book ')
-        open(bk_ha, 'wb').write(newxml)
 
 
 def generatePoT(folder, root):
