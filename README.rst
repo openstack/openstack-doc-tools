@@ -105,6 +105,7 @@ Release notes
   for high-availability-guide, it is not using asciidoc anymore.
 * New script in cleanup/retf for spell checking using the RETF rules.
   patch.
+* Fix entity handling in ``openstack-generate-docbook``.
 
 
 0.14

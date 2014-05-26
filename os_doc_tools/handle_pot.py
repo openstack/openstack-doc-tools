@@ -117,7 +117,21 @@ def mergeSingleDocument(folder, language, root):
 def changeXMLLangSetting(xmlFile, language):
     """Update XML settings for file."""
 
-    dom = xml.dom.minidom.parse(xmlFile)
+    # The mergeback breaks the ENTITIY title which should look like:
+    # <!DOCTYPE chapter [
+    # <!ENTITY % openstack SYSTEM "../common/entities/openstack.ent">
+    # %openstack;
+    # ]>
+    # The "%openstack;" gets removed, let's readd it first.
+
+    # NOTE(jaegerandi): This just handles the openstack ENTITY, if
+    # others are used, this needs to be generalized.
+    with open(xmlFile) as xml_file:
+        newxml = xml_file.read().replace(
+            'common/entities/openstack.ent">',
+            'common/entities/openstack.ent"> %openstack;')
+
+    dom = xml.dom.minidom.parseString(newxml)
     root = dom.documentElement
     root.setAttribute("xml:lang", language[:2])
     fileObj = codecs.open(xmlFile, "wb", encoding="utf-8")
@@ -130,7 +144,6 @@ def changeXMLLangSetting(xmlFile, language):
             node.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
         if node.hasAttribute("title"):
             node.setAttribute("xlink:title", node.getAttribute("title"))
-
     dom.writexml(fileObj)
 
 
