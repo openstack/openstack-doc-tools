@@ -102,11 +102,11 @@ Release notes
 
 * ``openstack-doc-test``: Output information about tested patch,
   special case entity files for book building. Remove special handling
-  for high-availability-guide, it is not using asciidoc anymore.
+  for high-availability-guide, it is not using asciidoc anymore. Fix
+  handling of ignore-dir parameter.
 * New script in cleanup/retf for spell checking using the RETF rules.
   patch.
 * Fix entity handling in ``openstack-generate-docbook``.
-
 
 0.14
 ----

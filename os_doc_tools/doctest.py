@@ -884,6 +884,8 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     # Dictionary with books and their bk*.xml files
     book_bk = {}
 
+    # List of absolute paths of ignored directories
+    abs_ignore_dirs = []
     # 1. Iterate over whole tree and analyze include files.
     # This updates included_by, book_bk and books.
     for root, dirs, files in os.walk(rootdir):
@@ -891,6 +893,10 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
 
         # Filter out directories to be ignored
         if ignore_dirs:
+            for d in dirs:
+                if d in ignore_dirs:
+                    abs_ignore_dirs.append(
+                        os.path.join(os.path.join(root, d)))
             dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         if os.path.basename(root) in book_exceptions:
@@ -997,6 +1003,13 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
         # or Type changed
         modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
         modified_files = [os.path.abspath(f) for f in modified_files]
+        if ignore_dirs:
+            for idir in abs_ignore_dirs:
+                non_ignored_files = []
+                for f in modified_files:
+                    if not f.startswith(idir):
+                        non_ignored_files.append(f)
+                modified_files = non_ignored_files
 
         # 2. Find all modified files and where they are included
 
@@ -1339,6 +1352,9 @@ def handle_options():
 
     if CONF.check_build:
         if CONF.verbose:
+            if cfg.CONF.ignore_dir:
+                for d in cfg.CONF.ignore_dir:
+                    print(" Ignore directory: %s" % d)
             print(" Release path: %s" % cfg.CONF.release_path)
             print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
 
