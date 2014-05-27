@@ -97,6 +97,11 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.16
+----
+
+* Fix entity handling in ``openstack-generate-docbook``.
+
 0.15
 ----
 
@@ -106,7 +111,6 @@ Release notes
   handling of ignore-dir parameter.
 * New script in cleanup/retf for spell checking using the RETF rules.
   patch.
-* Fix entity handling in ``openstack-generate-docbook``.
 
 0.14
 ----
