@@ -100,17 +100,17 @@ Release notes
 0.16
 ----
 
-* Fix entity handling in ``openstack-generate-docbook``.
+* ``openstack-doc-test``: Fix handling of ignore-dir parameter.
 
 0.15
 ----
 
 * ``openstack-doc-test``: Output information about tested patch,
   special case entity files for book building. Remove special handling
-  for high-availability-guide, it is not using asciidoc anymore. Fix
-  handling of ignore-dir parameter.
+  for high-availability-guide, it is not using asciidoc anymore.
 * New script in cleanup/retf for spell checking using the RETF rules.
   patch.
+* Fix entity handling in ``openstack-generate-docbook``.
 
 0.14
 ----
