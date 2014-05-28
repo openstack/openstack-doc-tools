@@ -232,7 +232,7 @@ def check_file(src, rules, disabled):
         if rule.get('description') in disabled:
             continue
 
-        logger.debug("%s: checking rule '%s'.", file,
+        logger.debug("%s: checking rule '%s'.", src,
                      rule.get('description'))
         logger.debug(rule.get('find'))
         newcontent, count = rule.get('regex').subn(
@@ -240,7 +240,7 @@ def check_file(src, rules, disabled):
         )
 
         if count > 0:
-            logger.warning("%d match(s) in file %s : %s.", count, file,
+            logger.warning("%d match(s) in file %s : %s.", count, src,
                            rule.get('description'))
             findings += count
         content = newcontent
@@ -281,6 +281,8 @@ def main():
 
         all_findings = 0
         for check in files:
+            if not os.path.isfile(check):
+                continue
 
             (findings, content) = check_file(check, rules, disabled)
 
