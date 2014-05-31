@@ -101,6 +101,11 @@ Release notes
 ----
 
 * ``openstack-doc-test``: Fix handling of ignore-dir parameter.
+* ``autohelp-wrapper``: New tool to simplify the setup of an autohelp.py
+  environment
+* ``diff_branches.py``: Generates a listing of the configuration options
+  changes that occured between 2 openstack releases.
+* ``autohelp.py``: add the 'dump' subcommand
 
 0.15
 ----

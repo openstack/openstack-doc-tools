@@ -35,6 +35,7 @@ usage() {
     echo "Options:"
     echo "  -b BRANCH: Work on this branch (defaults to master)"
     echo "  -c:        Recreate the virtual environment"
+    echo "  -e PATH:   Create the virtualenv in PATH"
 }
 
 setup_venv() {
@@ -59,7 +60,7 @@ setup_tools() {
     get_project openstack-manuals
 
     (cd $SOURCESDIR/oslo-incubator && python setup.py install)
-    pip install GitPython>=0.3.2.RC1
+    pip install "GitPython>=0.3.2.RC1"
 
     # For some reason the ceilometer installation fails without these 2
     # packages pre-installed
@@ -86,11 +87,11 @@ setup_tools() {
     # late in the icehouse release cycle to let the doc team handle the changes
     # properly in the documentation.
     if echo $BRANCH | grep -q stable/; then
-        pip install python-keystoneclient==0.7
+        pip install "python-keystoneclient==0.7"
     fi
 }
 
-while getopts :b:m:c opt; do
+while getopts :b:e:c opt; do
     case $opt in
     b)
         BRANCH=$OPTARG
@@ -99,6 +100,10 @@ while getopts :b:m:c opt; do
     c)
         rm -rf $VENVDIR
         shift
+        ;;
+    e)
+        VENVDIR=$OPTARG
+        shift 2
         ;;
     \?)
         usage
@@ -145,7 +150,16 @@ for project in $PROJECTS; do
         python setup.py install
     )
 
-    cd $MANUALSREPO/tools/autogenerate-config-flagmappings
+    if [ "$ACTION" = "setup" ]; then
+        continue
+    fi
+
+    if [ -d $MANUALSREPO/tools/autogenerate-config-flagmappings ]; then
+        cd $MANUALSREPO/tools/autogenerate-config-flagmappings
+    else
+        # for havana
+        $MANUALSREPO/tools/autogenerate-config-docs
+    fi
 
     case $ACTION in
     update)
@@ -154,9 +168,6 @@ for project in $PROJECTS; do
         ;;
     docbook)
         $AUTOHELP docbook $project -i $SOURCESDIR/$project
-        ;;
-    setup)
-        # The work is already done
         ;;
     esac
 done
