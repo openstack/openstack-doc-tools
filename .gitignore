@@ -26,3 +26,6 @@ ChangeLog
 # Autohelp
 autogenerate_config_docs/venv
 autogenerate_config_docs/sources
+
+# sitemap
+sitemap/sitemap_docs.openstack.org.xml
