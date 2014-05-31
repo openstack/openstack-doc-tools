@@ -23,3 +23,6 @@ ChangeLog
 .*.swp
 .bak
 
+# Autohelp
+autogenerate_config_docs/venv
+autogenerate_config_docs/sources

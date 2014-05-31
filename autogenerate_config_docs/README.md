@@ -4,8 +4,25 @@ autogenerate_config_docs
 Automatically generate configuration tables to document OpenStack.
 
 
-Dependencies: python-git (at least version 0.3.2 RC1), oslo-incubator,
-openstack-doc-tools
+Dependencies: python-git (at least version 0.3.2 RC1), oslo-incubator.
+
+Using the wrapper
+-----------------
+
+The autohelp-wrapper script installs a virtual environment and all the needed
+dependencies, clones or update the projects and manuals repositories, then runs
+the autohelp.py script.
+
+The workflow is:
+
+    $ ./autohelp-wrapper update
+    $ vim sources/openstack-manuals/tools/autogenerate-config-flagmappings/*.flagmappings
+    $ ./autohelp-wrapper docbook
+    # check the results
+    $ git commit -a
+
+For details about the autohelp.py script and its manual setup, see the next
+sections.
 
 Setting up your environment
 ---------------------------

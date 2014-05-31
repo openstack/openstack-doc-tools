@@ -1,0 +1,162 @@
+#!/bin/sh
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+set -e
+
+HERE=$(pwd)
+VENVDIR=$HERE/venv
+SOURCESDIR=$HERE/sources
+MANUALSREPO=$SOURCESDIR/openstack-manuals
+AUTOHELP="python $HERE/autohelp.py"
+GITBASE=git://git.openstack.org/openstack
+PROJECTS="ceilometer cinder glance heat keystone neutron nova trove"
+BRANCH=master
+
+usage() {
+    echo "Wrapper for autohelp.py"
+    echo "Usage:"
+    echo "  $(basename $0) [ OPTIONS ] update|docbook|setup [ project1 ... ]"
+    echo
+    echo "Subcommands:"
+    echo "  update:    Update the flagmapping files"
+    echo "  docbook:   Generate the options tables"
+    echo "  setup:     Install the environment only"
+    echo
+    echo "Options:"
+    echo "  -b BRANCH: Work on this branch (defaults to master)"
+    echo "  -c:        Recreate the virtual environment"
+}
+
+setup_venv() {
+    if [ ! -e $VENVDIR ]; then
+        virtualenv $VENVDIR
+    fi
+    . $VENVDIR/bin/activate
+}
+
+get_project() {
+    project=$1
+
+    if [ ! -e $SOURCESDIR/$project ]; then
+        git clone $GITBASE/$project $SOURCESDIR/$project
+    else
+        (cd $SOURCESDIR/$project && git pull)
+    fi
+}
+
+setup_tools() {
+    get_project oslo-incubator
+    get_project openstack-manuals
+
+    (cd $SOURCESDIR/oslo-incubator && python setup.py install)
+    pip install GitPython>=0.3.2.RC1
+
+    # For some reason the ceilometer installation fails without these 2
+    # packages pre-installed
+    pip install setuptools pbr
+
+    # Some projects don't have explicit dependencies on some less used packages.
+    # Without these packages installed some modules can't be imported and
+    # configuration options are not discovered. We install these packages to
+    # make sure that we get the options.
+
+    # Ceilometer
+    pip install swift
+
+    # Cinder
+    # hp3parclient is needed for icehouse, but not for juno
+    pip install hp3parclient
+
+    # Neutron
+    pip install ryu
+
+    # This is a workaround to avoid pulling in new configuration options brought
+    # by python-keystoneclient >= 0.8. This version also deprecates some options
+    # still expected by the projects. The release of version 0.8 happened too
+    # late in the icehouse release cycle to let the doc team handle the changes
+    # properly in the documentation.
+    if echo $BRANCH | grep -q stable/; then
+        pip install python-keystoneclient==0.7
+    fi
+}
+
+while getopts :b:m:c opt; do
+    case $opt in
+    b)
+        BRANCH=$OPTARG
+        shift 2
+        ;;
+    c)
+        rm -rf $VENVDIR
+        shift
+        ;;
+    \?)
+        usage
+        exit 1
+        ;;
+    esac
+done
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+ACTION=$1
+shift
+
+case $ACTION in
+    update|docbook|setup) ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+
+if [ ! -e autohelp.py ]; then
+    echo "Execute this script in the autogenerate_config_docs directory."
+    exit 1
+fi
+
+[ $# != 0 ] && PROJECTS="$*"
+
+setup_venv
+setup_tools
+
+cd $MANUALSREPO
+git checkout $BRANCH
+
+for project in $PROJECTS; do
+    get_project $project
+
+    (
+        cd $SOURCESDIR/$project
+        git checkout $BRANCH
+        python setup.py install
+    )
+
+    cd $MANUALSREPO/tools/autogenerate-config-flagmappings
+
+    case $ACTION in
+    update)
+        $AUTOHELP update $project -i $SOURCESDIR/$project
+        mv $project.flagmappings.new $project.flagmappings
+        ;;
+    docbook)
+        $AUTOHELP docbook $project -i $SOURCESDIR/$project
+        ;;
+    setup)
+        # The work is already done
+        ;;
+    esac
+done
