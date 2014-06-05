@@ -906,10 +906,9 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
         # Do not process files in doc itself or top-level directory
         elif root.endswith('doc') or root == rootdir:
             continue
-        elif "pom.xml" in files:
-            if (not cfg.CONF.only_book or
-                (cfg.CONF.only_book and
-                 os.path.basename(root) in cfg.CONF.only_book)):
+        elif ("pom.xml" in files and (not cfg.CONF.only_book or
+                                      os.path.basename(root) in
+                                      cfg.CONF.only_book)):
                 books.append(root)
                 book_root = root
 
