@@ -376,7 +376,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
         os.chdir(root)
 
         for f in files:
-            if not is_testable_xml_file(f) or f in file_exceptions:
+            if not is_testable_xml_file(f, file_exceptions):
                 continue
 
             path = os.path.abspath(os.path.join(root, f))
@@ -475,14 +475,15 @@ def validate_one_file(schema, rootdir, path, verbose,
     return any_failures
 
 
-def is_testable_xml_file(path):
+def is_testable_xml_file(path, exceptions):
     """Returns true if file ends with .xml and is not a pom.xml file."""
 
     filename = os.path.basename(path)
-    return filename.endswith('.xml') and not filename == 'pom.xml'
+    return (filename.endswith('.xml') and not filename == 'pom.xml' and
+            not filename in exceptions)
 
 
-def is_testable_file(path):
+def is_testable_file(path, exceptions):
     """Returns true if file is in some XML format we handle
 
     Skips pom.xml files as well since those are not handled.
@@ -491,7 +492,7 @@ def is_testable_file(path):
     filename = os.path.basename(path)
     return (filename.endswith(('.xml', '.xsd', '.xsl', '.wadl',
                                '.xjb', '.json')) and
-            not filename == 'pom.xml')
+            not filename == 'pom.xml' and not filename in exceptions)
 
 
 def is_wadl(filename):
@@ -506,7 +507,7 @@ def is_json(filename):
     return filename.endswith('.json')
 
 
-def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
+def validate_individual_files(files_to_check, rootdir, verbose,
                               check_syntax=False, check_niceness=False,
                               ignore_errors=False, is_api_site=False):
     """Validate list of files."""
@@ -527,10 +528,6 @@ def validate_individual_files(files_to_check, rootdir, exceptions, verbose,
         print("Checking niceness of XML files...")
 
     for f in files_to_check:
-        base_f = os.path.basename(f)
-        if (base_f == "pom.xml" or
-                base_f in exceptions):
-            continue
         validate_schema = True
         if is_api_site:
             # Files ending with ".xml" in subdirectories of
@@ -581,9 +578,10 @@ def validate_modified_files(rootdir, exceptions, verbose,
     # Do not select deleted files, just Added, Copied, Modified, Renamed,
     # or Type changed
     modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
-    modified_files = [f for f in modified_files if is_testable_file(f)]
+    modified_files = [f for f in modified_files if
+                      is_testable_file(f, exceptions)]
 
-    validate_individual_files(modified_files, rootdir, exceptions,
+    validate_individual_files(modified_files, rootdir,
                               verbose,
                               check_syntax, check_niceness,
                               ignore_errors, is_api_site)
@@ -601,11 +599,11 @@ def validate_all_files(rootdir, exceptions, verbose,
 
         for f in files:
             # Ignore maven files, which are called pom.xml
-            if is_testable_file(f) and f not in exceptions:
+            if is_testable_file(f, exceptions):
                 path = os.path.abspath(os.path.join(root, f))
                 files_to_check.append(path)
 
-    validate_individual_files(files_to_check, rootdir, exceptions,
+    validate_individual_files(files_to_check, rootdir,
                               verbose,
                               check_syntax, check_niceness,
                               ignore_errors, is_api_site)
@@ -919,7 +917,7 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
             f_abs = os.path.abspath(os.path.join(root, f))
             if is_book_master(f_base):
                 book_bk[f_abs] = book_root
-            if not is_testable_xml_file(f) or f in file_exceptions:
+            if not is_testable_xml_file(f, file_exceptions):
                 continue
 
             try:
