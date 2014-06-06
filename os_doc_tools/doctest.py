@@ -477,21 +477,23 @@ def validate_one_file(schema, rootdir, path, verbose,
     return any_failures
 
 
-def is_xml(filename):
+def is_xml(path):
     """Returns true if file ends with .xml and is not a pom.xml file."""
 
-    return filename.endswith('.xml') and not filename.endswith('/pom.xml')
+    filename = os.path.basename(path)
+    return filename.endswith('.xml') and not filename == 'pom.xml'
 
 
-def is_xml_like(filename):
+def is_xml_like(path):
     """Returns true if file is in some XML format we handle
 
     Skips pom.xml files as well since those are not handled.
     """
 
+    filename = os.path.basename(path)
     return (filename.endswith(('.xml', '.xsd', '.xsl', '.wadl',
                                '.xjb', '.json')) and
-            not filename.endswith('pom.xml'))
+            not filename == 'pom.xml')
 
 
 def is_wadl(filename):
