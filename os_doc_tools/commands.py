@@ -44,8 +44,14 @@ def generate_heading(os_command, api_name, title, os_file):
     :param api_name:   string description of the API of os_command
     :param os_file:    open filehandle for output of DocBook file
     """
-    version = check_output([os_command, "--version"],
-                           stderr=subprocess.STDOUT)
+
+    try:
+        version = check_output([os_command, "--version"],
+                               stderr=subprocess.STDOUT)
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            print("Command %s not found, aborting." % os_command)
+            sys.exit(1)
     # Extract version from "swift 0.3"
     version = version.strip().rpartition(' ')[2]
 
