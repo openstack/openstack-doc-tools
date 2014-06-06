@@ -83,8 +83,11 @@ def format_parsed_json(parsed):
                       indent=4)
 
 
-def process_file(path, format):
-    """Check syntax/formatting and fix formatting of a JSON file."""
+def process_file(path, formatting=None):
+    """Check syntax/formatting and fix formatting of a JSON file.
+
+    :param formatting: one of 'check' or 'fix'
+    """
     with open(path, 'r') as infile:
         raw = infile.read()
         try:
@@ -92,27 +95,31 @@ def process_file(path, format):
         except ParserException as err:
             print("%s\n%s" % (path, err))
         else:
-            formatted = format_parsed_json(parsed)
-            if formatted != raw:
-                if format:
-                    with open(path, 'w') as outfile:
-                        outfile.write(formatted)
-                    errstr = indent_note("Reformatted")
-                else:
-                    errstr = indent_note("Reformatting needed")
-                print("%s\n%s" % (path, errstr))
+            if formatting in ('check', 'fix'):
+                formatted = format_parsed_json(parsed)
+                if formatted != raw:
+                    if formatting == "fix":
+                        with open(path, 'w') as outfile:
+                            outfile.write(formatted)
+                        errstr = indent_note("Reformatted")
+                    else:
+                        errstr = indent_note("Reformatting needed")
+                    print("%s\n%s" % (path, errstr))
+            else:
+                # for the benefit of external callers
+                return ValueError("formatting arg must be 'check' or 'fix'")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Validate and reformat JSON"
                                      "files.")
     parser.add_argument('files', metavar='FILES', nargs='+')
-    parser.add_argument('-f', '--format', action='store_true',
-                        help='reformat valid JSON files')
+    parser.add_argument('-f', '--formatting', choices=['check', 'fix'],
+                        help='check or fix formatting of JSON files')
     args = parser.parse_args()
 
     for path in args.files:
-        process_file(path, args.format)
+        process_file(path, args.formatting)
 
 if __name__ == "__main__":
     sys.exit(main())
