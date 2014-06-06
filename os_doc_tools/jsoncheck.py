@@ -77,22 +77,10 @@ def parse_json(raw):
         return parsed
 
 
-class FormattingException(Exception):
-    pass
-
-
-def check_format(parsed, raw, path=None):
-    """Check formatting; pretty-print JSON file while retaining key order."""
-    formatted = json.dumps(parsed, sort_keys=False, separators=(',', ': '),
-                           indent=4)
-    if formatted != raw:
-        if path:
-            with open(path, 'w') as outfile:
-                outfile.write(formatted)
-            errstr = indent_note("Reformatted")
-        else:
-            errstr = indent_note("Reformatting needed")
-        raise FormattingException(errstr)
+def format_parsed_json(parsed):
+    """Pretty-print JSON file while retaining key order."""
+    return json.dumps(parsed, sort_keys=False, separators=(',', ': '),
+                      indent=4)
 
 
 def process_file(path, format):
@@ -104,10 +92,15 @@ def process_file(path, format):
         except ParserException as err:
             print("%s\n%s" % (path, err))
         else:
-            try:
-                check_format(parsed, raw, path if format else None)
-            except FormattingException as err:
-                print("%s\n%s" % (path, err))
+            formatted = format_parsed_json(parsed)
+            if formatted != raw:
+                if format:
+                    with open(path, 'w') as outfile:
+                        outfile.write(formatted)
+                    errstr = indent_note("Reformatted")
+                else:
+                    errstr = indent_note("Reformatting needed")
+                print("%s\n%s" % (path, errstr))
 
 
 def main():
