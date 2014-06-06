@@ -515,7 +515,9 @@ def main():
     parser = argparse.ArgumentParser(description="Generate DocBook XML files "
                                      "to document python-PROJECTclients.")
     parser.add_argument('client', nargs='?',
-                        help="OpenStack command to document.")
+                        help="OpenStack command to document. One of: "
+                        "ceilometer, cinder, glance, heat, keystone, nova, "
+                        "neutron, swift, trove.")
     parser.add_argument("--all", help="Document all clients.",
                         action="store_true")
     parser.add_argument("--output-dir", default=".",
@@ -533,7 +535,7 @@ def main():
         document_single_project("swift", prog_args.output_dir)
         document_single_project("trove", prog_args.output_dir)
     elif prog_args.client is None:
-        print("Pass the name of the client to document as argument.")
+        parser.print_help()
         sys.exit(1)
     else:
         document_single_project(prog_args.client, prog_args.output_dir)
