@@ -376,9 +376,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
         os.chdir(root)
 
         for f in files:
-            if (not f.endswith('.xml') or
-                    f == 'pom.xml' or
-                    f in file_exceptions):
+            if not is_xml(f) or f in file_exceptions:
                 continue
 
             path = os.path.abspath(os.path.join(root, f))
@@ -922,9 +920,7 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
             f_abs = os.path.abspath(os.path.join(root, f))
             if is_book_master(f_base):
                 book_bk[f_abs] = book_root
-            if (not f.endswith('.xml') or
-                    f == "pom.xml" or
-                    f in file_exceptions):
+            if not is_xml(f) or f in file_exceptions:
                 continue
 
             try:
