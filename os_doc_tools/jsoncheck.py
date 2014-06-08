@@ -95,6 +95,21 @@ def check_format(parsed, raw, path=None):
         raise FormattingException(errstr)
 
 
+def process_file(path, format):
+    """Check syntax/formatting and fix formatting of a JSON file."""
+    with open(path, 'r') as infile:
+        raw = infile.read()
+        try:
+            parsed = parse_json(raw)
+        except ParserException as err:
+            print("%s\n%s" % (path, err))
+        else:
+            try:
+                check_format(parsed, raw, path if format else None)
+            except FormattingException as err:
+                print("%s\n%s" % (path, err))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Validate and reformat JSON"
                                      "files.")
@@ -104,19 +119,7 @@ def main():
     args = parser.parse_args()
 
     for path in args.files:
-        with open(path, 'r') as infile:
-            raw = infile.read()
-            infile.close()
-            try:
-                parsed = parse_json(raw)
-            except ParserException as err:
-                print("%s\n%s" % (path, err))
-            else:
-                try:
-                    check_format(parsed, raw, path if args.format else None)
-                except FormattingException as err:
-                    print("%s\n%s" % (path, err))
-
+        process_file(path, args.format)
 
 if __name__ == "__main__":
     sys.exit(main())
