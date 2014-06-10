@@ -14,10 +14,9 @@ import posixpath
 import time
 import urlparse
 
+from generator import items
 from scrapy.contrib.linkextractors import sgml
 from scrapy.contrib import spiders
-
-from generator import items
 
 
 class SitemapSpider(spiders.CrawlSpider):

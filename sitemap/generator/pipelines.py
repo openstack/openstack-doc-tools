@@ -49,8 +49,9 @@ class IgnoreDuplicateUrls(object):
 
 
 class ExportSitemap(object):
-    '''Write found URLs to a sitemap file, based on
-    http://doc.scrapy.org/en/latest/topics/exporters.html.
+    '''Write found URLs to a sitemap file.
+
+    Based on http://doc.scrapy.org/en/latest/topics/exporters.html.
     '''
 
     def __init__(self):

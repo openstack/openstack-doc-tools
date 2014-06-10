@@ -26,13 +26,12 @@ import os
 import pickle
 import re
 import sys
-
-import git
-import stevedore
 import xml.sax.saxutils
 
+import git
 from hooks import HOOKS
 import openstack.common.config.generator as generator
+import stevedore
 
 
 TABLE_HEADER = '''<?xml version="1.0" encoding="UTF-8"?>

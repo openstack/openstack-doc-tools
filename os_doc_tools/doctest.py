@@ -13,7 +13,6 @@
 # under the License.
 
 '''
-
 Usage:
     test.py [path]
 
@@ -29,7 +28,6 @@ Requires:
     - Python 2.7 or greater
     - lxml Python library
     - Maven
-
 '''
 
 import gzip
@@ -43,10 +41,10 @@ import subprocess
 import sys
 
 from lxml import etree
+from oslo.config import cfg
 
 import os_doc_tools
 from os_doc_tools.common import check_output   # noqa
-from oslo.config import cfg
 
 
 # These are files that are known to not pass syntax or niceness checks
@@ -120,19 +118,19 @@ def get_wadl_schema():
 
 
 def validation_failed(schema, doc):
-    """Return True if the parsed doc fails against the schema
+    """Return True if the parsed doc fails against the schema.
 
     This will ignore validation failures of the type: IDREF attribute linkend
     references an unknown ID. This is because we are validating individual
     files that are being imported, and sometimes the reference isn't present
     in the current file.
     """
-    return not schema.validate(doc) and \
-        any(log.type_name != "DTD_UNKNOWN_ID" for log in schema.error_log)
+    return (not schema.validate(doc) and
+            any(log.type_name != "DTD_UNKNOWN_ID" for log in schema.error_log))
 
 
 def verify_section_tags_have_xmid(doc):
-    """Check that all section tags have an xml:id attribute
+    """Check that all section tags have an xml:id attribute.
 
     Will throw an exception if there's at least one missing.
     """
@@ -144,11 +142,13 @@ def verify_section_tags_have_xmid(doc):
 
 
 def verify_attribute_profiling(doc, attribute, known_values):
-    """Check for elements with attribute profiling set that conflicts with
-       the attribute profiling of nodes below them in the DOM
-       tree. This picks up cases where content is accidentally
-       omitted via conflicting profiling. Checks known_values also for
-       supported profiling values.
+    """Check for conflicts in attribute profiling.
+
+    Check for elements with attribute profiling set that conflicts with
+    the attribute profiling of nodes below them in the DOM
+    tree. This picks up cases where content is accidentally
+    omitted via conflicting profiling. Checks known_values also for
+    supported profiling values.
     """
 
     ns = {"docbook": "http://docbook.org/ns/docbook"}
@@ -234,8 +234,8 @@ def verify_whitespace_niceness(docfile):
     if affected_lines:
         if (msg):
             msg += "\n    "
-        msg += "trailing or unnecessary whitespaces found in lines: %s"\
-               % (", ".join(affected_lines))
+        msg += ("trailing or unnecessary whitespaces found in lines: %s"
+                % (", ".join(affected_lines)))
     if tab_lines:
         if (msg):
             msg += "\n    "
@@ -349,9 +349,7 @@ def filter_dirs(dirs):
 
 
 def check_deleted_files(rootdir, file_exceptions, verbose):
-    """Check whether files got deleted and verify that no other file
-    references them.
-    """
+    """Checking that no removed files are referenced."""
 
     print("Checking that no removed files are referenced...")
     deleted_files = get_modified_files(rootdir, "--diff-filter=D")
@@ -480,7 +478,7 @@ def is_testable_xml_file(path, exceptions):
 
     filename = os.path.basename(path)
     return (filename.endswith('.xml') and not filename == 'pom.xml' and
-            not filename in exceptions)
+            filename not in exceptions)
 
 
 def is_testable_file(path, exceptions):
@@ -492,7 +490,7 @@ def is_testable_file(path, exceptions):
     filename = os.path.basename(path)
     return (filename.endswith(('.xml', '.xsd', '.xsl', '.wadl',
                                '.xjb', '.json')) and
-            not filename == 'pom.xml' and not filename in exceptions)
+            not filename == 'pom.xml' and filename not in exceptions)
 
 
 def is_wadl(filename):
@@ -848,11 +846,14 @@ def build_book(book, publish_path, log_path):
 
 
 def is_book_master(filename):
-    """Returns True if filename is one of the special filenames used for the
+    """Check if a file is a book master file.
+
+    Returns True if filename is one of the special filenames used for the
     book master files.
 
     We do not parse pom.xml for the includes directive to determine
     the top-level files and thus have to use a heuristic.
+
     """
 
     return ((filename.startswith(('bk-', 'bk_', 'st-', 'api-'))

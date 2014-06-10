@@ -31,9 +31,7 @@ PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'keystone', 'neutron',
 
 
 def setup_venv(branch, novenvupdate):
-    """Uses the autohelp-wrapper script to generate a virtualenv for a given
-    branch.
-    """
+    """Setup a virtual environment for `branch`."""
     dirname = os.path.join('venv', branch.replace('/', '_'))
     if novenvupdate and os.path.exists(dirname):
         return
@@ -46,9 +44,7 @@ def setup_venv(branch, novenvupdate):
 
 
 def get_options(project, branch, args):
-    """Calls the autohelp script in a venv to get the list of known
-    options.
-    """
+    """Get the list of known options for a project."""
     print("Working on %(project)s (%(branch)s)" % {'project': project,
                                                    'branch': branch})
     # Checkout the required branch
@@ -136,9 +132,7 @@ def dbk_append_header(parent, cells):
 
 
 def diff(old_list, new_list):
-    """Compare the old and new lists of options to generate lists of modified
-    options.
-    """
+    """Compare the old and new lists of options."""
     new_opts = []
     changed_default = []
     deprecated_opts = []

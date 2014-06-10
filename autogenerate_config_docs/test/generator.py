@@ -170,17 +170,17 @@ def _list_opts(obj):
 
 def print_group_opts(group, opts_by_module):
     print("[%s]" % group)
-    print
+    print('')
     global OPTION_COUNT
     for mod, opts in opts_by_module:
         OPTION_COUNT += len(opts)
         print('#')
         print('# Options defined in %s' % mod)
         print('#')
-        print
+        print('')
         for opt in opts:
             _print_opt(opt)
-        print
+        print('')
 
 
 def _get_my_ip():
@@ -246,7 +246,7 @@ def _print_opt(opt):
                 opt_default = ['']
             for default in opt_default:
                 print('#%s=%s' % (opt_name, default))
-        print
+        print('')
     except Exception:
         sys.stderr.write('Error in option "%s"\n' % opt_name)
         sys.exit(1)
