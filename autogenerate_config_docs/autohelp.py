@@ -23,6 +23,7 @@ from oslo.config import cfg
 import argparse
 import importlib
 import os
+import pickle
 import re
 import sys
 
@@ -123,6 +124,13 @@ def import_modules(repo_location, package_name, verbose=0):
                     if verbose >= 2:
                         print(e)
                     continue
+                except cfg.NoSuchGroupError as e:
+                    """
+                    If a group doesn't exist, we ignore the import.
+                    """
+                    if verbose >= 2:
+                        print(e)
+                    continue
                 _register_runtime_opts(module, abs_path, verbose)
                 _run_hook(modname)
 
@@ -205,6 +213,11 @@ class OptionsCache(object):
             if self._verbose >= 2:
                 print ("Duplicate option name %s" % optname)
         else:
+            if opt.name == 'bindir':
+                venv = os.environ.get('VIRTUAL_ENV')
+                if venv is not None and opt.default.startswith(venv):
+                    opt.default = opt.default.replace(venv, '/usr/local')
+
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
 
@@ -250,7 +263,8 @@ class OptionsCache(object):
             return cmp(x, y)
 
 
-def write_docbook(package_name, options, verbose=0, target='./'):
+def write_docbook(package_name, options, verbose=0,
+                  target='../../doc/common/tables/'):
     """Write DocBook tables.
 
     Prints a docbook-formatted table for every group of options.
@@ -323,13 +337,13 @@ def write_docbook(package_name, options, verbose=0, target='./'):
         groups_file.close()
 
 
-def write_docbook_rootwrap(package_name, repo, verbose=0, target='./'):
+def write_docbook_rootwrap(package_name, repo, verbose=0,
+                           target='../../doc/common/tables/'):
     """Write a DocBook table for rootwrap options.
 
     Prints a docbook-formatted table for options in a project's
     rootwrap.conf configuration file.
     """
-
     # The sample rootwrap.conf path is not the same in all projects. It is
     # either in etc/ or in etc/<project>/, so we check both locations.
     conffile = os.path.join(repo, 'etc', package_name, 'rootwrap.conf')
@@ -445,13 +459,21 @@ def update_flagmappings(package_name, options, verbose=0):
             print(line)
 
 
+def dump_options(options):
+    """Dumps the list of options with their attributes.
+
+    This output is consumed by the diff_branches script.
+    """
+    print(pickle.dumps(options._opts_by_name))
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Manage flag files, to aid in updating documentation.',
         usage='%(prog)s <cmd> <package> [options]')
     parser.add_argument('subcommand',
-                        help='Action (create, update, verify).',
-                        choices=['create', 'update', 'docbook'])
+                        help='Action (create, update, verify, dump).',
+                        choices=['create', 'update', 'docbook', 'dump'])
     parser.add_argument('package',
                         help='Name of the top-level package.')
     parser.add_argument('-v', '--verbose',
@@ -466,9 +488,11 @@ def main():
                         type=str,)
     parser.add_argument('-o', '--output',
                         dest='target',
-                        help='Directory in which xml files are generated.',
+                        help='Directory or file in which data will be saved.\n'
+                             'Defaults to ../../doc/common/tables/ '
+                             'for "docbook".\n'
+                             'Defaults to stdout for "dump"',
                         required=False,
-                        default='../../doc/common/tables/',
                         type=str,)
     args = parser.parse_args()
 
@@ -505,6 +529,8 @@ def main():
         write_docbook_rootwrap(package_name, args.repo,
                                verbose=args.verbose,
                                target=args.target)
+    elif args.subcommand == 'dump':
+        dump_options(options)
 
 
 if __name__ == "__main__":
