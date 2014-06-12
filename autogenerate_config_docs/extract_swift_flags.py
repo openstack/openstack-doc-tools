@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import argparse
 import glob
 import os
 import sys
@@ -72,7 +73,7 @@ def get_existing_options(optfiles):
     return options
 
 
-def extract_descriptions_from_devref(repo, options):
+def extract_descriptions_from_devref(swift_repo, options):
     """Extract descriptions from devref RST files.
 
     Loop through the devref RST files, looking for lines formatted
@@ -81,7 +82,7 @@ def extract_descriptions_from_devref(repo, options):
     """
 
     option_descs = {}
-    rsts = glob.glob(repo + '/doc/source/*.rst')
+    rsts = glob.glob(swift_repo + '/doc/source/*.rst')
     for rst in rsts:
         rst_file = open(rst, 'r')
         in_option_block = False
@@ -110,8 +111,9 @@ def extract_descriptions_from_devref(repo, options):
     return option_descs
 
 
-def new_section_file(sample, current_section):
-    section_filename = ('swift-' +
+def new_section_file(manuals_repo, sample, current_section):
+    section_filename = (manuals_repo + '/doc/common/tables/' +
+                        'swift-' +
                         os.path.basename(sample).split('.conf')[0]
                         + '-'
                         + current_section.replace('[', '').
@@ -140,7 +142,7 @@ def new_section_file(sample, current_section):
     return section_file
 
 
-def create_new_tables(repo, verbose):
+def create_new_tables(swift_repo, manuals_repo, verbose):
     """Create new DocBook tables.
 
     Writes a set of DocBook-formatted tables, one per section in swift
@@ -149,12 +151,12 @@ def create_new_tables(repo, verbose):
     sample config files.
     """
 
-    existing_tables = glob.glob('../../doc/common/tables/swift*xml')
+    existing_tables = glob.glob(manuals_repo + '/doc/common/tables/swift*xml')
     options = {}
     # use the existing tables to get a list of option names
     options = get_existing_options(existing_tables)
-    option_descs = extract_descriptions_from_devref(repo, options)
-    conf_samples = glob.glob(repo + '/etc/*conf-sample')
+    option_descs = extract_descriptions_from_devref(swift_repo, options)
+    conf_samples = glob.glob(swift_repo + '/etc/*conf-sample')
     for sample in conf_samples:
         current_section = None
         section_file = None
@@ -172,7 +174,8 @@ def create_new_tables(repo, verbose):
     </para>')
                         section_file.close()
                     current_section = line.strip('#').strip()
-                    section_file = new_section_file(sample, current_section)
+                    section_file = new_section_file(manuals_repo, sample,
+                                                    current_section)
             elif section_file is not None:
                 """
                 it's a config option line in the conf file, find out the
@@ -207,14 +210,36 @@ def create_new_tables(repo, verbose):
             section_file.close()
 
 
-def main(repo, verbose=0):
+def main():
     """Write DocBook formatted files.
 
     Writes a set of DocBook-formatted files, based on configuration sections
     in swift sample configuration files.
     """
 
-    create_new_tables(repo, verbose)
+    parser = argparse.ArgumentParser(
+        description="Update the swift options tables.",
+        usage="%(prog)s [-v] [-s swift_repo] [-m manuals_repo]")
+    parser.add_argument('-s', '--swift-repo',
+                        dest='swift_repo',
+                        help="Location of the swift git repository.",
+                        required=False,
+                        default="./sources/swift")
+    parser.add_argument('-m', '--manuals-repo',
+                        dest='manuals_repo',
+                        help="Location of the manuals git repository.",
+                        required=False,
+                        default="./sources/openstack-manuals")
+    parser.add_argument('-v', '--verbose',
+                        action='count',
+                        default=0,
+                        dest='verbose',
+                        required=False)
+    args = parser.parse_args()
+
+    create_new_tables(args.swift_repo, args.manuals_repo, args.verbose)
+
+    return 0
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    sys.exit(main())
