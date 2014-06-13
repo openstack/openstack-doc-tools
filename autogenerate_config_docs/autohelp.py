@@ -263,12 +263,12 @@ class OptionsCache(object):
             return cmp(x, y)
 
 
-def write_docbook(package_name, options, verbose=0,
-                  target='../../doc/common/tables/'):
+def write_docbook(package_name, options, target, verbose=0):
     """Write DocBook tables.
 
     Prints a docbook-formatted table for every group of options.
     """
+    target = target or '../../doc/common/tables/'
     options_by_cat = {}
 
     # Compute the absolute path of the git repository (the relative path is
@@ -337,13 +337,14 @@ def write_docbook(package_name, options, verbose=0,
         groups_file.close()
 
 
-def write_docbook_rootwrap(package_name, repo, verbose=0,
-                           target='../../doc/common/tables/'):
+def write_docbook_rootwrap(package_name, repo, target, verbose=0):
     """Write a DocBook table for rootwrap options.
 
     Prints a docbook-formatted table for options in a project's
     rootwrap.conf configuration file.
     """
+    target = target or '../../doc/common/tables/'
+
     # The sample rootwrap.conf path is not the same in all projects. It is
     # either in etc/ or in etc/<project>/, so we check both locations.
     conffile = os.path.join(repo, 'etc', package_name, 'rootwrap.conf')
@@ -524,11 +525,9 @@ def main():
         update_flagmappings(package_name, options, verbose=args.verbose)
 
     elif args.subcommand == 'docbook':
-        write_docbook(package_name, options, verbose=args.verbose,
-                      target=args.target)
-        write_docbook_rootwrap(package_name, args.repo,
-                               verbose=args.verbose,
-                               target=args.target)
+        write_docbook(package_name, options, args.target, verbose=args.verbose)
+        write_docbook_rootwrap(package_name, args.repo, args.target,
+                               verbose=args.verbose)
     elif args.subcommand == 'dump':
         dump_options(options)
 
