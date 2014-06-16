@@ -18,8 +18,9 @@ VENVDIR=$HERE/venv
 SOURCESDIR=$HERE/sources
 MANUALSREPO=$SOURCESDIR/openstack-manuals
 AUTOHELP="python $HERE/autohelp.py"
+EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
-PROJECTS="ceilometer cinder glance heat keystone neutron nova trove"
+PROJECTS="ceilometer cinder glance heat keystone neutron nova swift trove"
 BRANCH=master
 
 usage() {
@@ -163,11 +164,16 @@ for project in $PROJECTS; do
 
     case $ACTION in
     update)
+        [ "$project" = "swift" ] && continue
         $AUTOHELP update $project -i $SOURCESDIR/$project
         mv $project.flagmappings.new $project.flagmappings
         ;;
     docbook)
-        $AUTOHELP docbook $project -i $SOURCESDIR/$project
+        if [ "$project" = "swift" ]; then
+            $EXTRACT_SWIFT -m $MANUALSREPO -s $SOURCESDIR/swift
+        else
+            $AUTOHELP docbook $project -i $SOURCESDIR/$project
+        fi
         ;;
     esac
 done
