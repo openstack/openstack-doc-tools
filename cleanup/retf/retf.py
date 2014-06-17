@@ -36,8 +36,11 @@ import yaml
 
 
 class DownloadRetfListingFailed(Exception):
-    """Exception will be raised when the download of the RETF
+    """Exception for failed downloads of the RETF listing.
+
+    Exception will be raised when the download of the RETF
     listing failed or the destination file could not be written.
+
     """
 
     pass

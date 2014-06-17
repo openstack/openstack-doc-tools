@@ -16,7 +16,6 @@ import argparse
 import glob
 import os
 import sys
-
 from xml.dom import minidom
 import xml.sax.saxutils
 
@@ -120,25 +119,27 @@ def new_section_file(manuals_repo, sample, current_section):
                         replace(']', '').replace(':', '-')
                         + '.xml')
     section_file = open(section_filename, 'w')
-    section_file.write('<?xml version="1.0" encoding="UTF-8"?>\n\
-    <!-- The tool that generated this table lives in the\n\
-         openstack-doc-tools repository. The editions made in\n\
-         this file will *not* be lost if you run the script again. -->\n\
-    <para xmlns="http://docbook.org/ns/docbook" version="5.0">\n\
-    <table rules="all">\n\
-    <caption>Description of configuration options for <literal>'
-                       + current_section + '</literal> in <literal>'
-                       + os.path.basename(sample) +
-                       '</literal></caption>\n\
-    <col width="50%"/>\n\
-    <col width="50%"/>\n\
-    <thead>\n\
-        <tr>\n\
-            <th>Configuration option = Default value</th>\n\
-            <th>Description</th>\n\
-        </tr>\n\
-    </thead>\n\
-    <tbody>')
+    section_file.write(
+        ('<?xml version="1.0" encoding="UTF-8"?>\n'
+         '    <!-- The tool that generated this table lives in the\n'
+         '         openstack-doc-tools repository. The editions made in\n'
+         '         this file will *not* be lost if you run the script '
+         'again. -->\n'
+         '    <para xmlns="http://docbook.org/ns/docbook" version="5.0">\n'
+         '    <table rules="all">\n'
+         '    <caption>Description of configuration options for <literal>'
+         + current_section + '</literal> in <literal>'
+         + os.path.basename(sample) +
+         '</literal></caption>\n'
+         '    <col width="50%"/>\n'
+         '    <col width="50%"/>\n'
+         '    <thead>\n'
+         '        <tr>\n'
+         '            <th>Configuration option = Default value</th>\n'
+         '            <th>Description</th>\n'
+         '        </tr>\n'
+         '    </thead>\n'
+         '    <tbody>'))
     return section_file
 
 
@@ -169,9 +170,9 @@ def create_new_tables(swift_repo, manuals_repo, verbose):
                 """
                 if current_section != line.strip('#').strip():
                     if section_file is not None:
-                        section_file.write('\n    </tbody>\n\
-    </table>\n\
-    </para>')
+                        section_file.write(('\n    </tbody>\n'
+                                            '    </table>\n'
+                                            '    </para>'))
                         section_file.close()
                     current_section = line.strip('#').strip()
                     section_file = new_section_file(manuals_repo, sample,
@@ -204,9 +205,9 @@ def create_new_tables(swift_repo, manuals_repo, verbose):
                                        '</td><td>' + option_desc + '</td>\n' +
                                        '        </tr>')
         if section_file is not None:
-            section_file.write('\n    </tbody>\n\
-    </table>\n\
-    </para>')
+            section_file.write(('\n    </tbody>\n'
+                                '    </table>\n'
+                                '</para>'))
             section_file.close()
 
 
