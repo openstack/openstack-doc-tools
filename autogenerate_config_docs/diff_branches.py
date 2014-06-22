@@ -204,37 +204,43 @@ def generate_docbook(project, new_branch, old_list, new_list):
     section.append(title)
 
     # New options
-    table = dbk_append_table(section, "New options", 2)
-    dbk_append_header(table, ["Option = default value", "(Type) Help string"])
-    for name in sorted(new_opts, _cmpopts):
-        opt = new_list[name][1]
-        type = opt.__class__.__name__.split('.')[-1]
-        name = format_option_name(name)
-        cells = ["%(name)s = %(default)s" % {'name': name,
-                                             'default': opt.default},
-                 "(%(type)s) %(help)s" % {'type': type, 'help': opt.help}]
-        dbk_append_row(table, cells)
+    if new_opts:
+        table = dbk_append_table(section, "New options", 2)
+        dbk_append_header(table, ["Option = default value",
+                                  "(Type) Help string"])
+        for name in sorted(new_opts, _cmpopts):
+            opt = new_list[name][1]
+            type = opt.__class__.__name__.split('.')[-1]
+            name = format_option_name(name)
+            cells = ["%(name)s = %(default)s" % {'name': name,
+                                                 'default': opt.default},
+                     "(%(type)s) %(help)s" % {'type': type, 'help': opt.help}]
+            dbk_append_row(table, cells)
 
-    table = dbk_append_table(section, "New default values", 3)
-    dbk_append_header(table, ["Option", "Previous default value",
-                              "New default value"])
-    for name in sorted(changed_default, _cmpopts):
-        old_default = old_list[name][1].default
-        new_default = new_list[name][1].default
-        if isinstance(old_default, list):
-            old_default = ", ".join(old_default)
-        if isinstance(new_default, list):
-            new_default = ", ".join(new_default)
-        name = format_option_name(name)
-        cells = [name, old_default, new_default]
-        dbk_append_row(table, cells)
+    # Updated default
+    if changed_default:
+        table = dbk_append_table(section, "New default values", 3)
+        dbk_append_header(table, ["Option", "Previous default value",
+                                  "New default value"])
+        for name in sorted(changed_default, _cmpopts):
+            old_default = old_list[name][1].default
+            new_default = new_list[name][1].default
+            if isinstance(old_default, list):
+                old_default = ", ".join(old_default)
+            if isinstance(new_default, list):
+                new_default = ", ".join(new_default)
+            name = format_option_name(name)
+            cells = [name, old_default, new_default]
+            dbk_append_row(table, cells)
 
-    table = dbk_append_table(section, "Deprecated options", 2)
-    dbk_append_header(table, ["Deprecated option", "New Option"])
-    for deprecated, new in deprecated_opts:
-        deprecated = format_option_name(deprecated)
-        new = format_option_name(new)
-        dbk_append_row(table, [deprecated, new])
+    # Deprecated options
+    if deprecated_opts:
+        table = dbk_append_table(section, "Deprecated options", 2)
+        dbk_append_header(table, ["Deprecated option", "New Option"])
+        for deprecated, new in deprecated_opts:
+            deprecated = format_option_name(deprecated)
+            new = format_option_name(new)
+            dbk_append_row(table, [deprecated, new])
 
     return etree.tostring(section, pretty_print=True, xml_declaration=True,
                           encoding="UTF-8")
