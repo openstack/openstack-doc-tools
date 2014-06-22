@@ -165,6 +165,24 @@ def diff(old_list, new_list):
     return new_opts, changed_default, deprecated_opts
 
 
+def format_option_name(name):
+    """Return a formatted string for the option path."""
+    try:
+        section, name = name.split('/')
+    except ValueError:
+        # name without a section ('log_dir')
+        return "[DEFAULT]/%s" % name
+
+    try:
+        # If we're dealing with swift, we'll have a filename to extract
+        # ('proxy-server|filter:tempurl/use')
+        filename, section = section.split('|')
+        return "%s.conf: [%s]/%s" % (filename, section, name)
+    except ValueError:
+        # section but no filename ('database/connection')
+        return "[%s]/%s" % (section, name)
+
+
 def generate_docbook(project, new_branch, old_list, new_list):
     """Generate the diff between the 2 options lists for `project`."""
     new_opts, changed_default, deprecated_opts = diff(old_list, new_list)
@@ -191,6 +209,7 @@ def generate_docbook(project, new_branch, old_list, new_list):
     for name in sorted(new_opts, _cmpopts):
         opt = new_list[name][1]
         type = opt.__class__.__name__.split('.')[-1]
+        name = format_option_name(name)
         cells = ["%(name)s = %(default)s" % {'name': name,
                                              'default': opt.default},
                  "(%(type)s) %(help)s" % {'type': type, 'help': opt.help}]
@@ -206,12 +225,15 @@ def generate_docbook(project, new_branch, old_list, new_list):
             old_default = ", ".join(old_default)
         if isinstance(new_default, list):
             new_default = ", ".join(new_default)
+        name = format_option_name(name)
         cells = [name, old_default, new_default]
         dbk_append_row(table, cells)
 
     table = dbk_append_table(section, "Deprecated options", 2)
     dbk_append_header(table, ["Deprecated option", "New Option"])
     for deprecated, new in deprecated_opts:
+        deprecated = format_option_name(deprecated)
+        new = format_option_name(new)
         dbk_append_row(table, [deprecated, new])
 
     return etree.tostring(section, pretty_print=True, xml_declaration=True,
