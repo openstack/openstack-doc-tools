@@ -27,7 +27,7 @@ from lxml import etree
 
 
 PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'keystone', 'neutron',
-            'nova', 'trove']
+            'nova', 'swift', 'trove']
 
 
 def setup_venv(branch, novenvupdate):
@@ -55,8 +55,13 @@ def get_options(project, branch, args):
     # And run autohelp script to get a serialized dict of the discovered
     # options
     dirname = os.path.abspath(os.path.join('venv', branch.replace('/', '_')))
-    cmd = ("python autohelp.py dump %(project)s -i %(path)s" %
-           {'project': project, 'path': repo_path})
+    if project == 'swift':
+        cmd = ("python extract_swift_flags.py dump "
+               "-s %(sources)s/swift -m %(sources)s/openstack-manuals" %
+               {'sources': args.sources})
+    else:
+        cmd = ("python autohelp.py dump %(project)s -i %(path)s" %
+               {'project': project, 'path': repo_path})
     path = os.environ.get("PATH")
     bin_path = os.path.abspath(os.path.join(dirname, "bin"))
     path = "%s:%s" % (bin_path, path)
