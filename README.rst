@@ -102,11 +102,13 @@ Release notes
 
 * ``openstack-doc-test``: Fix handling of ignore-dir parameter.
 * ``autohelp-wrapper``: New tool to simplify the setup of an autohelp.py
-  environment
+  environment.
 * ``diff_branches.py``: Generates a listing of the configuration options
   changes that occured between 2 openstack releases.
-* ``autohelp.py``: add the 'dump' subcommand
-* ``jsoncheck.py``: add public API
+* ``autohelp.py``: Add the 'dump' subcommand, include swift.
+* ``jsoncheck.py``: Add public API.
+* Added tool to generate a sitemap.xml file.
+* Added script to prettify HTML and XML syntax.
 
 0.15
 ----
