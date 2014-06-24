@@ -106,6 +106,7 @@ Release notes
 * ``diff_branches.py``: Generates a listing of the configuration options
   changes that occured between 2 openstack releases.
 * ``autohelp.py``: add the 'dump' subcommand
+* ``jsoncheck.py``: add public API
 
 0.15
 ----
