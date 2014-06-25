@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:wadl="http://wadl.dev.java.net/2009/02" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:svg="http://www.w3.org/2000/svg" xmlns:s="http://www.ascc.net/xml/schematron" xmlns:rng="http://relaxng.org/ns/structure/1.0" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook" xmlns:ctrl="http://nwalsh.com/xmlns/schema-control/" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" ns="http://docbook.org/ns/docbook">
 
-  <include href="docbookxi.rng"/> 
-  <include href="extensions.rng"/>
+  <include href="classpath:///rng/docbookxi.rng"/> 
+  <include href="classpath:///rng/extensions.rng"/>
 
   <define name="db.para.blocks" combine="choice">
     <choice>
@@ -16,6 +16,32 @@
       <ref name="rax.extensions"/>
       <ref name="rax.extension"/>
     </choice>
+    </optional>
+  </define>
+
+  <define name="db.xi.include.attlist" combine="choice">
+    <optional>
+      <attribute name="db:prefix"/>
+    </optional>
+    <optional>
+      <attribute name="db:idfixup">
+        <choice>
+          <value>none</value>
+          <value>strip</value>
+          <value>prefix</value>
+          <value>auto</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="db:linkscope">
+        <choice>
+          <value>user</value>
+          <value>local</value>
+          <value>near</value>
+          <value>global</value>
+        </choice>
+      </attribute>
     </optional>
   </define>
 
@@ -173,6 +199,9 @@
       <attribute name="base">
         <data type="anyURI"/>
       </attribute>
+  </optional>
+  <optional>
+    <attribute name="xml:id"/>
   </optional>
   <optional>
       <attribute name="href">
