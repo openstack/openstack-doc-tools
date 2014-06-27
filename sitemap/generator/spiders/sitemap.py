@@ -31,6 +31,9 @@ class SitemapSpider(spiders.CrawlSpider):
                     r'.*\.xml',
                     r'.*\.txt',
                     r'.*/',
+                ],
+                deny=[
+                    r'/trunk/',
                 ]
             ),
             follow=True, callback='parse_item'
