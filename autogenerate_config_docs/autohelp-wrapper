@@ -170,7 +170,7 @@ for project in $PROJECTS; do
         ;;
     docbook)
         if [ "$project" = "swift" ]; then
-            $EXTRACT_SWIFT -m $MANUALSREPO -s $SOURCESDIR/swift
+            $EXTRACT_SWIFT docbook -m $MANUALSREPO -s $SOURCESDIR/swift
         else
             $AUTOHELP docbook $project -i $SOURCESDIR/$project
         fi
