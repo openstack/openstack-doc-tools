@@ -17,11 +17,11 @@ import glob
 import os
 import pickle
 import sys
-from xml.dom import minidom
-import xml.sax.saxutils
 
-from autohelp import OptionsCache
+from lxml import etree
 from oslo.config import cfg
+
+from autohelp import OptionsCache  # noqa
 
 # Swift configuration example files live in
 # swift/etc/*.conf-sample
@@ -29,6 +29,29 @@ from oslo.config import cfg
 # options one per line containing =
 # and generally only having a single entry
 # after the equals (the default value)
+
+DBK_NS = ".//{http://docbook.org/ns/docbook}"
+
+BASE_XML = '''<?xml version="1.0" encoding="UTF-8"?>
+<para xmlns="http://docbook.org/ns/docbook" version="5.0">
+<!-- The tool that generated this table lives in the
+     openstack-doc-tools repository. The editions made in
+     this file will *not* be lost if you run the script again. -->
+  <table rules="all">
+    <caption>Description of configuration options for
+        <literal>[%s]</literal> in <literal>%s.conf</literal>
+    </caption>
+    <col width="50%%"/>
+    <col width="50%%"/>
+    <thead>
+      <tr>
+        <th>Configuration option = Default value</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</para>'''
 
 
 def parse_line(line):
@@ -60,15 +83,15 @@ def get_existing_options(optfiles):
     for optfile in optfiles:
         if '/swift-conf-changes-' in optfile:
             continue
-        xmldoc = minidom.parse(optfile)
-        tbody = xmldoc.getElementsByTagName('tbody')[0]
-        trlist = tbody.getElementsByTagName('tr')
+        xml = etree.fromstring(open(optfile).read())
+        tbody = xml.find(DBK_NS + "tbody")
+        trlist = tbody.findall(DBK_NS + "tr")
         for tr in trlist:
             try:
-                tdlist = tr.getElementsByTagName('td')
-                optentry = tdlist[0].childNodes[0].nodeValue
+                col1, col2 = tr.findall(DBK_NS + "td")
+                optentry = col1.text
                 option = optentry.split('=', 1)[0].strip()
-                helptext = tdlist[1].childNodes[0].nodeValue
+                helptext = col2.text
             except IndexError:
                 continue
             if option not in options or 'No help text' in options[option]:
@@ -115,39 +138,26 @@ def extract_descriptions_from_devref(swift_repo, options):
     return option_descs
 
 
-def new_section_file(manuals_repo, section):
-    """Create a new section file.
+def write_xml(manuals_repo, section, xml):
+    """Write the XML to file."""
+    sample, section_name = section.split('|')
+    section_filename = (manuals_repo + '/doc/common/tables/' +
+                        'swift-' + sample + '-' + section_name + '.xml')
+    with open(section_filename, 'w') as fd:
+        fd.write(etree.tostring(xml, pretty_print=True,
+                                xml_declaration=True,
+                                encoding="UTF-8"))
 
-    It writes the DocBook header and the first table row.
-    Returns a file descriptor for this new file.
-    """
+
+def new_section_xml(manuals_repo, section):
+    """Create a new XML tree."""
 
     # The section holds 2 informations, the file in which the option was found,
     # and the section name in that file.
     sample, section_name = section.split('|')
-    section_filename = (manuals_repo + '/doc/common/tables/' +
-                        'swift-' + sample + '-' + section_name + '.xml')
-    section_fd = open(section_filename, 'w')
-    section_fd.write('''<?xml version="1.0" encoding="UTF-8"?>
-    <!-- The tool that generated this table lives in the
-         openstack-doc-tools repository. The editions made in
-         this file will *not* be lost if you run the script again. -->
-    <para xmlns="http://docbook.org/ns/docbook" version="5.0">
-    <table rules="all">
-    <caption>Description of configuration options for <literal>'''
-                     + '[' + section_name + ']' + '</literal> in <literal>'
-                     + sample + '.conf' +
-                     '''</literal></caption>
-    <col width="50%"/>
-    <col width="50%"/>
-    <thead>
-        <tr>
-            <th>Configuration option = Default value</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>''')
-    return section_fd
+    parser = etree.XMLParser(remove_blank_text=True)
+    xml = etree.XML(BASE_XML % (section_name, sample), parser)
+    return xml
 
 
 def write_docbook(options, manuals_repo):
@@ -156,33 +166,33 @@ def write_docbook(options, manuals_repo):
     Writes a set of DocBook-formatted tables, one per section in swift
     configuration files.
     """
-    def end_file(fd):
-        fd.write('''
-    </tbody>
-    </table>
-    </para>''')
-
     names = options.get_option_names()
     current_section = None
-    section_fd = None
+    xml = None
     for full_option in sorted(names, OptionsCache._cmpopts):
         section, optname = full_option.split('/')
 
         if current_section != section:
-            if section_fd is not None:
-                end_file(section_fd)
-                section_fd.close()
+            if xml is not None:
+                write_xml(manuals_repo, current_section, xml)
             current_section = section
-            section_fd = new_section_file(manuals_repo, section)
+            xml = new_section_xml(manuals_repo, section)
+            tbody = xml.find(DBK_NS + "tbody")
 
         oslo_opt = options.get_option(full_option)[1]
-        section_fd.write('\n        <tr>\n'
-                         '            <td>' +
-                         oslo_opt.name + ' = ' +
-                         oslo_opt.default +
-                         '</td><td>' + oslo_opt.help + '</td>\n' +
-                         '        </tr>')
-    end_file(section_fd)
+
+        tr = etree.Element('tr')
+        tbody.append(tr)
+
+        td = etree.Element('td')
+        td.text = "%s = %s" % (oslo_opt.name, oslo_opt.default)
+        tr.append(td)
+
+        td = etree.Element('td')
+        td.text = oslo_opt.help
+        tr.append(td)
+
+    write_xml(manuals_repo, section, xml)
 
 
 def read_options(swift_repo, manuals_repo, verbose):
@@ -239,7 +249,7 @@ def read_options(swift_repo, manuals_repo, verbose):
                 # \xa0 is a non-breacking space
                 name = parsed_line[0]
                 option_desc = option_desc.replace(u'\xa0', u' ')
-                default = xml.sax.saxutils.escape(str(parsed_line[1]))
+                default = parsed_line[1]
 
                 o = cfg.StrOpt(name=name, default=default, help=option_desc)
                 try:
