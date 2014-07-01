@@ -121,14 +121,21 @@ def changeXMLLangSetting(xmlFile, language):
     # <!ENTITY % openstack SYSTEM "../common/entities/openstack.ent">
     # %openstack;
     # ]>
-    # The "%openstack;" gets removed, let's readd it first.
+    # The "%openstack;" gets removed, let's add it back first.
 
     # NOTE(jaegerandi): This just handles the openstack ENTITY, if
     # others are used, this needs to be generalized.
     with open(xmlFile) as xml_file:
-        newxml = xml_file.read().replace(
-            'common/entities/openstack.ent">',
-            'common/entities/openstack.ent"> %openstack;')
+        newxml = xml_file.read()
+
+    # Used in openstack-manuals:
+    newxml = newxml.replace(
+        'common/entities/openstack.ent">',
+        'common/entities/openstack.ent"> %openstack;')
+
+    # As used in security-doc and operations-guide
+    newxml = newxml.replace('SYSTEM "openstack.ent">',
+                            'SYSTEM "openstack.ent"> %openstack;')
 
     dom = xml.dom.minidom.parseString(newxml)
     root = dom.documentElement
