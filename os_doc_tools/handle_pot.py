@@ -137,7 +137,13 @@ def changeXMLLangSetting(xmlFile, language):
     newxml = newxml.replace('SYSTEM "openstack.ent">',
                             'SYSTEM "openstack.ent"> %openstack;')
 
-    dom = xml.dom.minidom.parseString(newxml)
+    try:
+        dom = xml.dom.minidom.parseString(newxml)
+    except xml.parsers.expat.ExpatError as e:
+        print("Error: parsing of file '%s' for language '%s' "
+              "with Expat failed: %s." % (xmlFile, language, e))
+        sys.exit(5)
+
     root = dom.documentElement
     root.setAttribute("xml:lang", language[:2])
     fileObj = codecs.open(xmlFile, "wb", encoding="utf-8")
