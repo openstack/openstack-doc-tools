@@ -97,6 +97,11 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.16.1
+------
+
+* Fix includes of rackbook.rng to unbreak syntax checking.
+
 0.16
 ----
 
