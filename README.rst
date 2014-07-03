@@ -97,6 +97,9 @@ sufficient for many of the books.
 Release notes
 =============
 
+0.17
+----
+
 0.16.1
 ------
 
