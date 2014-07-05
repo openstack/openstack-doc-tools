@@ -148,12 +148,10 @@ def changeXMLLangSetting(xmlFile, language):
     root.setAttribute("xml:lang", language[:2])
     fileObj = codecs.open(xmlFile, "wb", encoding="utf-8")
 
-    # add namespace to link
     nodelists = root.getElementsByTagName("link")
     for node in nodelists:
         if node.hasAttribute("href"):
             node.setAttribute("xlink:href", node.getAttribute("href"))
-            node.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
         if node.hasAttribute("title"):
             node.setAttribute("xlink:title", node.getAttribute("title"))
     dom.writexml(fileObj)
