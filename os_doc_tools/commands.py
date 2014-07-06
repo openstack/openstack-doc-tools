@@ -21,6 +21,18 @@ import os_doc_tools
 from os_doc_tools.common import check_output   # noqa
 
 
+def use_help_flag(os_command):
+    """Use --help flag (instead of help keyword)
+
+    Returns true if the command requires a --help flag instead
+    of a help keyword.
+    """
+
+    if os_command == "swift" or "-manage" in os_command:
+        return True
+    return False
+
+
 def quote_xml(line):
     """Convert special characters for XML output."""
 
@@ -57,6 +69,10 @@ def generate_heading(os_command, api_name, title, os_file):
 
     print("Documenting '%s help (version %s)'" % (os_command, version))
 
+    if use_help_flag(os_command):
+        help_str = "<replaceable>COMMAND</replaceable> <option>--help</option>"
+    else:
+        help_str = "<option>help</option> <replaceable>COMMAND</replaceable>"
     header = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <chapter xmlns=\"http://docbook.org/ns/docbook\"
     xmlns:xi=\"http://www.w3.org/2001/XInclude\"
@@ -76,12 +92,13 @@ def generate_heading(os_command, api_name, title, os_file):
        command, enter:
     </para>
     <screen><prompt>$</prompt> <userinput><command>{0}</command> \
-<option>help</option> <replaceable>COMMAND</replaceable></userinput></screen>
+{4}</userinput></screen>
 
     <section xml:id=\"{0}client_command_usage\">
        <title>{0} usage</title>\n"""
 
-    os_file.write(header.format(os_command, api_name, title, version))
+    os_file.write(header.format(os_command, api_name, title, version,
+                                help_str))
 
 
 def is_option(string):
@@ -319,7 +336,7 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     :param os_file:    open filehandle for output of DocBook file
     """
 
-    if os_command == "swift":
+    if use_help_flag(os_command):
         help_lines = check_output([os_command, os_subcommand,
                                    "--help"]).split('\n')
     else:
@@ -463,13 +480,13 @@ def document_single_project(os_command, output_dir):
         title = "Bare metal command-line client"
         # Does not know about bash-completion yet, need to specify
         # subcommands manually
-        subcommands = ['chassis-create', 'chassis-delete', 'chassis-list',
-                       'chassis-node-list', 'chassis-show', 'chassis-update',
-                       'driver-list', 'node-create', 'node-delete',
-                       'node-list', 'node-port-list', 'node-set-power-state',
-                       'node-show', 'node-update', 'node-validate',
-                       'port-create', 'port-delete', 'port-list',
-                       'port-show', 'port-update']
+        subcommands = ["chassis-create", "chassis-delete", "chassis-list",
+                       "chassis-node-list", "chassis-show", "chassis-update",
+                       "driver-list", "node-create", "node-delete",
+                       "node-list", "node-port-list", "node-set-power-state",
+                       "node-show", "node-update", "node-validate",
+                       "port-create", "port-delete", "port-list", "port-show",
+                       "port-update"]
     elif os_command == 'keystone':
         api_name = "OpenStack Identity API"
         title = "Identity service command-line client"
@@ -493,18 +510,27 @@ def document_single_project(os_command, output_dir):
     elif os_command == 'trove':
         api_name = "Database API"
         title = "Database Service command-line client"
+        blacklist = ["resize-flavor"]
+    elif os_command == 'trove-manage':
+        api_name = "Database Management Utility"
+        title = "Database Service Management command-line client"
+        # Does not know about bash-completion yet, need to specify
+        # subcommands manually
+        subcommands = ["db_sync", "db_upgrade",
+                       "db_downgrade", "datastore_update",
+                       "datastore_version_update", "db_recreate"]
     else:
-        print("Not yet handled command")
+        print("'%s' command not yet handled" % os_command)
         sys.exit(-1)
 
-    out_file = "ch_cli_" + os_command + "_commands.xml"
-    os_file = open(os.path.join(output_dir, out_file), 'w')
-    generate_heading(os_command, api_name, title, os_file)
-    generate_command(os_command, os_file)
-    generate_subcommands(os_command, os_file, blacklist,
+    out_filename = "ch_cli_" + os_command + "_commands.xml"
+    out_file = open(os.path.join(output_dir, out_filename), 'w')
+    generate_heading(os_command, api_name, title, out_file)
+    generate_command(os_command, out_file)
+    generate_subcommands(os_command, out_file, blacklist,
                          subcommands)
-    generate_end(os_file)
-    os_file.close()
+    generate_end(out_file)
+    out_file.close()
 
 
 def main():
@@ -512,28 +538,36 @@ def main():
           "openstack-doc-tools version %s)\n"
           % os_doc_tools.__version__)
 
+    api_clients = ["ceilometer", "cinder", "glance", "heat", "keystone",
+                   "nova", "neutron", "swift", "trove"]
+    manage_clients = ["trove-manage"]
+    all_clients = api_clients + manage_clients
+
     parser = argparse.ArgumentParser(description="Generate DocBook XML files "
                                      "to document python-PROJECTclients.")
     parser.add_argument('client', nargs='?',
-                        help="OpenStack command to document. One of: "
-                        "ceilometer, cinder, glance, heat, keystone, nova, "
-                        "neutron, swift, trove.")
-    parser.add_argument("--all", help="Document all clients.",
+                        help="OpenStack command to document. One of: " +
+                        ", ".join(all_clients) + ".")
+    parser.add_argument("--all", help="Document all clients. "
+                        "Namely " + ", ".join(all_clients) + ".",
+                        action="store_true")
+    parser.add_argument("--all-api", help="Document all API clients. "
+                        "Namely " + ", ".join(api_clients) + ".",
+                        action="store_true")
+    parser.add_argument("--all-manage", help="Document all manage clients. "
+                        "Namely " + ", ".join(manage_clients) + ".",
                         action="store_true")
     parser.add_argument("--output-dir", default=".",
                         help="Directory to write generated files to")
     prog_args = parser.parse_args()
 
-    if prog_args.all:
-        document_single_project("ceilometer", prog_args.output_dir)
-        document_single_project("cinder", prog_args.output_dir)
-        document_single_project("glance", prog_args.output_dir)
-        document_single_project("heat", prog_args.output_dir)
-        document_single_project("keystone", prog_args.output_dir)
-        document_single_project("nova", prog_args.output_dir)
-        document_single_project("neutron", prog_args.output_dir)
-        document_single_project("swift", prog_args.output_dir)
-        document_single_project("trove", prog_args.output_dir)
+    if prog_args.all or prog_args.all_api or prog_args.all_manage:
+        if prog_args.all or prog_args.all_api:
+            for client in api_clients:
+                document_single_project(client, prog_args.output_dir)
+        if prog_args.all or prog_args.all_manage:
+            for client in manage_clients:
+                document_single_project(client, prog_args.output_dir)
     elif prog_args.client is None:
         parser.print_help()
         sys.exit(1)
