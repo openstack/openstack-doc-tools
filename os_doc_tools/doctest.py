@@ -833,7 +833,7 @@ def build_book(book, publish_path, log_path):
                 ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
             )
-    except subprocess.CalledProcessError as e:
+    except (subprocess.CalledProcessError, KeyboardInterrupt) as e:
         output = e.output
         returncode = e.returncode
         result = False
@@ -1138,23 +1138,29 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
     print("Building all queued %d books now..." % len(books))
 
     # And then queue - since we wait for the first book to finish.
-    for book in sorted(books):
-        if cfg.CONF.debug or not cfg.CONF.parallel:
-            (book, result, output, retcode) = build_book(book,
-                                                         publish_path,
-                                                         log_path)
-            logging_build_book([book, result, output, retcode])
-        else:
-            res = pool.apply_async(build_book, (book, publish_path, log_path),
-                                   callback=logging_build_book)
-            if first_book:
-                first_book = False
-                # The first invocation of maven might download loads of
-                # data locally, we cannot do this in parallel. So, wait here
-                # for the first job to finish before running further mvn jobs.
-                res.get()
-    pool.close()
-    pool.join()
+    try:
+        for book in sorted(books):
+            if cfg.CONF.debug or not cfg.CONF.parallel:
+                (book, result, output, retcode) = build_book(book,
+                                                             publish_path,
+                                                             log_path)
+                logging_build_book([book, result, output, retcode])
+            else:
+                res = pool.apply_async(build_book,
+                                       (book, publish_path, log_path),
+                                       callback=logging_build_book)
+                if first_book:
+                    first_book = False
+                    # The first invocation of maven might download loads of
+                    # data locally, we cannot do this in parallel. So, wait
+                    # here for the first job to finish before running further
+                    # mvn jobs.
+                    res.get()
+        pool.close()
+        pool.join()
+    except KeyboardInterrupt:
+        pool.terminate()
+        pool.join()
 
     any_failures = False
     for book, result, _, _ in sorted(RESULTS_OF_BUILDS,
