@@ -100,6 +100,9 @@ Release notes
 0.17
 ----
 
+* Added support for *-manage CLI doc generation.
+* Various smaller fixes and improvements.
+
 0.16.1
 ------
 
