@@ -175,7 +175,7 @@ discovered.
 Update the flag names:
 
     $ for p in $PROJECTS; do
-    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update $project
+    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv update $p
     > done
 
 At this point, search through the `*.flagmappings.new` files for anything
@@ -184,7 +184,7 @@ files and run `autohelp.py` with the `docbook` subcommand:
 
     $ for p in $PROJECTS; do
     > mv $p.flagmappings.new $p.flagmappings
-    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook $project
+    > ../../../openstack-doc-tools/autogenerate_config_docs/autohelp.py -vvv docbook $p
     > done
 
 to generate the XML files and move those into the appropriate part of
