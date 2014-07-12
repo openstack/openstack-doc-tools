@@ -28,9 +28,7 @@ def use_help_flag(os_command):
     of a help keyword.
     """
 
-    if os_command == "swift" or "-manage" in os_command:
-        return True
-    return False
+    return os_command == "swift" or "-manage" in os_command
 
 
 def quote_xml(line):
