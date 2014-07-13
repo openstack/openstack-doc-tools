@@ -29,7 +29,6 @@ import sys
 
 import git
 from lxml import etree
-import openstack.common.config.generator as generator
 import stevedore
 
 from hooks import HOOKS  # noqa
@@ -191,6 +190,27 @@ def _register_runtime_opts(module, abs_path, verbose):
                         pass
 
 
+def _sanitize_default(name, default):
+    if default == os.uname()[1]:
+        return 'localhost'
+
+    if name == 'bindir':
+        return '/usr/local/bin'
+
+    if name == 'my_ip':
+        return '10.0.0.1'
+
+    for pathelm in sys.path[1:]:
+        if pathelm == '':
+            continue
+        if pathelm.endswith('/'):
+            pathelm = pathelm[:-1]
+        if default.startswith(pathelm):
+            return default.replace(pathelm, '/usr/lib/python/site-packages')
+
+    return default
+
+
 class OptionsCache(object):
     def __init__(self, verbose=0):
         self._verbose = verbose
@@ -213,9 +233,7 @@ class OptionsCache(object):
                 print ("Duplicate option name %s" % optname)
         else:
             if opt.name == 'bindir':
-                venv = os.environ.get('VIRTUAL_ENV')
-                if venv is not None and opt.default.startswith(venv):
-                    opt.default = opt.default.replace(venv, '/usr/local')
+                opt.default = _sanitize_default(opt.name, str(opt.default))
 
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
@@ -281,13 +299,6 @@ def write_docbook(package_name, options, target, verbose=0):
     target = target or '../../doc/common/tables/'
     options_by_cat = {}
 
-    # Compute the absolute path of the git repository (the relative path is
-    # prepended to sys.path in autohelp.py)
-    target_abspath = os.path.abspath(sys.path[0])
-
-    # This regex will be used to sanitize file paths and uris
-    uri_re = re.compile(r'(^[^:]+://)?%s' % target_abspath)
-
     with open(package_name + '.flagmappings') as f:
         for line in f:
             opt, categories = line.split(' ', 1)
@@ -311,30 +322,17 @@ def write_docbook(package_name, options, target, verbose=0):
                 th.text = "[%s]" % group
                 tr.append(th)
                 tbody.append(tr)
+
             if not option.help:
                 option.help = "No help text available for this option."
             if ((type(option).__name__ == "ListOpt") and (
                     type(option.default) == list)):
                 option.default = ", ".join(option.default)
-            default = generator._sanitize_default(option.name,
-                                                  str(option.default))
-            # This should be moved to generator._sanitize_default
-            # NOTE(gpocentek): The first element in the path is the current
-            # project git repository path. It is not useful to test values
-            # against it, and it causes trouble if it is the same as the python
-            # module name. So we just drop it.
-            for pathelm in sys.path[1:]:
-                if pathelm == '':
-                    continue
-                if pathelm.endswith('/'):
-                    pathelm = pathelm[:-1]
-                if default.startswith(pathelm):
-                    default = default.replace(pathelm,
-                                              '/usr/lib/python/site-packages')
-                    break
-            if uri_re.search(default):
-                default = default.replace(target_abspath,
-                                          '/usr/lib/python/site-packages')
+            if (hasattr(option, 'sample_default') and
+               option.sample_default is not None):
+                default = str(option.sample_default)
+            else:
+                default = _sanitize_default(option.name, str(option.default))
 
             tr = etree.Element('tr')
             tbody.append(tr)
@@ -416,7 +414,6 @@ def write_docbook_rootwrap(package_name, repo, target, verbose=0):
             tbody.append(tr)
         if desc == '':
             desc = "No help text available for this option."
-        default = generator._sanitize_default(optname, str(default))
 
         tr = etree.Element('tr')
         tbody.append(tr)
