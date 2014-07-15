@@ -319,7 +319,7 @@ def generate_command(os_command, os_file):
                 next_line_screen = False
                 in_screen = True
             elif len(line) > 0:
-                os_file.write("\n%s" % (xline))
+                os_file.write("\n%s" % xline.rstrip())
 
     if in_screen:
         os_file.write("</computeroutput></screen>\n")
