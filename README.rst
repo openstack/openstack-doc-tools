@@ -102,6 +102,8 @@ Release notes
 
 * Added support for *-manage CLI doc generation.
 * Various smaller fixes and improvements.
+* ``openstack-dn2osdbk``: Converts Docutils Native XML to docbook.
+* ``openstack-doc-test``: Handle the upcoming HOT guide.
 
 0.16.1
 ------
