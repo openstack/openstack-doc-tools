@@ -497,7 +497,7 @@ def document_single_project(os_command, output_dir):
         title = "Compute command-line client"
         blacklist = ["add-floating-ip", "remove-floating-ip"]
     elif os_command == 'sahara':
-        api_name = "Data processing"
+        api_name = "Data processing API"
         title = "Data processing command-line client"
     elif os_command == 'swift':
         api_name = "OpenStack Object Storage API"
