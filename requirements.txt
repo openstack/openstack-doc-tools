@@ -1,5 +1,5 @@
 pbr>=0.6,!=0.7,<1.0
 argparse
 lxml>=2.3
-oslo.config>=1.4.0.0a2
+oslo.config>=1.2.1
 
