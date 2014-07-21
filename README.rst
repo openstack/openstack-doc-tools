@@ -20,6 +20,8 @@ On Fedora::
 
     yum install maven3
 
+You need to have Python 2.7 installed for using the tools.
+
 This package needs a few external dependencies including lxml. If you
 do not have lxml installed, you can either install python-lxml or have
 it installed automatically and build from sources. To build lxml from
