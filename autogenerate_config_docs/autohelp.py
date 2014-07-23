@@ -191,15 +191,19 @@ def _register_runtime_opts(module, abs_path, verbose):
                         pass
 
 
-def _sanitize_default(name, default):
+def _sanitize_default(opt):
+    default = str(opt.default)
     if default == os.uname()[1]:
         return 'localhost'
 
-    if name == 'bindir':
+    if opt.name == 'bindir':
         return '/usr/local/bin'
 
-    if name == 'my_ip':
+    if opt.name == 'my_ip':
         return '10.0.0.1'
+
+    if isinstance(opt, cfg.StrOpt) and default.strip() != default:
+        return '"%s"' % default
 
     for pathelm in sys.path[1:]:
         if pathelm == '':
@@ -207,7 +211,7 @@ def _sanitize_default(name, default):
         if pathelm.endswith('/'):
             pathelm = pathelm[:-1]
         if default.startswith(pathelm):
-            return default.replace(pathelm, '/usr/lib/python/site-packages')
+            default.replace(pathelm, '/usr/lib/python/site-packages')
 
     return default
 
@@ -234,7 +238,7 @@ class OptionsCache(object):
                 print ("Duplicate option name %s" % optname)
         else:
             if opt.name == 'bindir':
-                opt.default = _sanitize_default(opt.name, str(opt.default))
+                opt.default = _sanitize_default(opt)
 
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
@@ -333,7 +337,7 @@ def write_docbook(package_name, options, target, verbose=0):
                option.sample_default is not None):
                 default = str(option.sample_default)
             else:
-                default = _sanitize_default(option.name, str(option.default))
+                default = _sanitize_default(option)
 
             tr = etree.Element('tr')
             tbody.append(tr)
