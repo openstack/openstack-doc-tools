@@ -798,6 +798,28 @@ def build_book(book, publish_path, log_path):
             )
             # Success
             base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
+        # HOT template guide
+        elif base_book == 'hot-guide':
+            # Make sure that the build dir is clean
+            if os.path.isdir('build'):
+                shutil.rmtree('build')
+            # Generate the DN XML
+            output = subprocess.check_output(
+                ["make", "xml"],
+                stderr=subprocess.STDOUT
+            )
+            out_file.write(output)
+            # Generate the docbook book
+            output = subprocess.check_output(
+                ["openstack-dn2osdbk", "build/xml", "build/docbook",
+                 "--toplevel", "book"],
+                stderr=subprocess.STDOUT
+            )
+            out_file.write(output)
+            output = subprocess.check_output(
+                ["mvn", "generate-sources", comments, release, "-B"],
+                stderr=subprocess.STDOUT
+            )
         # Repository: identity-api
         elif (cfg.CONF.repo_name == "identity-api"
               and book.endswith("v3")):
@@ -918,6 +940,9 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
             f_abs = os.path.abspath(os.path.join(root, f))
             if is_book_master(f_base):
                 book_bk[f_abs] = book_root
+            if "doc/hot-guide/" in f_abs:
+                affected_books.add('hot-guide')
+                continue
             if not is_testable_xml_file(f, file_exceptions):
                 continue
 
