@@ -103,9 +103,12 @@ Release notes
 ----
 
 * Added support for *-manage CLI doc generation.
-* Various smaller fixes and improvements.
 * ``openstack-dn2osdbk``: Converts Docutils Native XML to docbook.
 * ``openstack-doc-test``: Handle the upcoming HOT guide.
+* ``autohelp.py``: Provide our own sanitizer.
+* ``autohelp.py``: Use the oslo sample_default if available.
+* ``openstack-doc-test``: Correctly handle SIGINT.
+* Various smaller fixes and improvements.
 
 0.16.1
 ------
