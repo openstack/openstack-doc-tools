@@ -1,7 +1,7 @@
 include README.rst
 include AUTHORS 
 include LICENSE
-include ChangeLog
+include RELEASE_NOTES.rst
 recursive-include bin *
 recursive-include doc *
 recursive-include tools *
