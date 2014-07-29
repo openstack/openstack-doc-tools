@@ -29,6 +29,7 @@ import sys
 
 import git
 from lxml import etree
+import oslo.i18n as i18n
 import stevedore
 
 from hooks import HOOKS  # noqa
@@ -82,6 +83,16 @@ def import_modules(repo_location, package_name, verbose=0):
     Loops through the repository, importing module by module to
     populate the configuration object (cfg.CONF) created from Oslo.
     """
+
+    # If the project uses oslo.i18n, make sure that it is initialized so that
+    # the builtins contain the _ function.
+    requirements = os.path.join(repo_location, 'requirements.txt')
+    with open(requirements) as fd:
+        for line in fd:
+            if line.startswith('oslo.i18n'):
+                i18n.enable_lazy()
+                i18n.install(package_name)
+
     pkg_location = os.path.join(repo_location, package_name)
     for root, dirs, files in os.walk(pkg_location):
         skipdir = False
