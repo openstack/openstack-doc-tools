@@ -20,7 +20,7 @@ MANUALSREPO=$SOURCESDIR/openstack-manuals
 AUTOHELP="python $HERE/autohelp.py"
 EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
-PROJECTS="ceilometer cinder glance heat keystone neutron nova swift trove"
+PROJECTS="ceilometer cinder glance heat keystone neutron nova sahara swift trove"
 BRANCH=master
 
 usage() {
