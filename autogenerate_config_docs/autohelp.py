@@ -155,8 +155,7 @@ def _register_runtime_opts(module, abs_path, verbose):
     """
 
     with open(abs_path) as fd:
-        lines = fd.readlines()
-        for line in lines:
+        for line in fd:
             m = register_re.search(line)
             if not m:
                 continue
@@ -269,10 +268,9 @@ class OptionsCache(object):
         for ext in EXTENSIONS:
             requirements = os.path.join(repo, 'requirements.txt')
             with open(requirements) as fd:
-                lines = fd.readlines()
-            for line in lines:
-                if line.startswith(ext):
-                    self.load_extension_options(ext)
+                for line in fd:
+                    if line.startswith(ext):
+                        self.load_extension_options(ext)
 
     def get_option_names(self):
         return self._opt_names
