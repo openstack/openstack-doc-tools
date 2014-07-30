@@ -28,12 +28,12 @@ DIR=$(resolve_symlink $0)
 
 # Find location of db4-upgrade-xsl:
 if [ -e /usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl ] ; then
-  DB_UPGRADE=/usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl
+    DB_UPGRADE=/usr/share/xml/docbook/stylesheet/docbook5/db4-upgrade.xsl
 elif [ -e  /usr/share/xml/docbook/stylesheet/upgrade/db4-upgrade.xsl ] ; then
-  DB_UPGRADE=/usr/share/xml/docbook/stylesheet/upgrade/db4-upgrade.xsl
+    DB_UPGRADE=/usr/share/xml/docbook/stylesheet/upgrade/db4-upgrade.xsl
 else
-  echo "db4-upgrade.xsl not found"
-  exit 1
+    echo "db4-upgrade.xsl not found"
+    exit 1
 fi
 
 # Need to get the file name to insert here so it can be reused for multiple projects
