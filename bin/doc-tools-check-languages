@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+function setup_directory {
+    language=$1
+    shift
+    for book in "$@" ; do
+        echo "   $book"
+        openstack-generate-docbook -l $language -b $book
+    done
+}
+
+
+function setup_language {
+    language=$1
+    shift
+    echo "Setting up files for $language"
+    echo "======================="
+    echo "  Directories:"
+    setup_directory $language 'common' 'glossary' "$@"
+    cp doc/pom.xml generated/$language/pom.xml
+}
+
+
+function test_language {
+    language=$1
+    shift
+
+    echo
+    echo "Building for language $language"
+    echo
+
+    setup_language $language $@
+
+    args=("-v")
+    if [[ $PURPOSE -eq "publish" ]]; then
+        args+=("--publish")
+    fi
+    args+=("--check-build" "-l $language")
+    for book in "$@"; do
+        args+=("--only-book $book")
+    done
+
+    openstack-doc-test ${args[@]}
+
+    if [[ $? -eq 0 ]] ; then
+        echo "... succeeded"
+    else
+        echo "... failed"
+        BUILD_FAIL=1
+    fi
+}
+
+
+function test_ja {
+    test_language 'ja' 'high-availability-guide' \
+        'image-guide' 'install-guide' 'user-guide' \
+        'user-guide-admin'
+}
+
+
+function test_fr {
+    test_language 'fr' 'user-guide'
+}
+
+
+function usage {
+    echo "usage: $0 PURPOSE LANGUAGE1 LANGUAGE2 ..."
+    echo
+    echo "PURPOSE is either 'test' or 'publish'."
+    echo "LANGUAGE is either 'fr', 'ja' or 'all'."
+}
+
+
+case "$1" in
+    test|publish)
+        PURPOSE=$1
+        shift
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+
+BUILD_FAIL=0
+for language in "$@" ; do
+    case "$language" in
+        all)
+            test_fr
+            test_ja
+            ;;
+        fr)
+            test_fr
+            ;;
+        ja)
+            test_ja
+            ;;
+        *)
+            BUILD_FAIL=1
+            echo "Language $language not handled"
+            ;;
+    esac
+done
+
+exit $BUILD_FAIL

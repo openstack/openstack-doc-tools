@@ -6,6 +6,8 @@ Release notes
 
 * ``openstack-doc-test``: Don't always build the HOT guide
 * ``openstack-dn2osdbk``: Allow single files as source
+* Imported and improved ``doc-tools-check-languages`` (recently known
+  as ``tools/test-languages.sh`` in the documentation repositories).
 
 0.17
 ----
