@@ -5,6 +5,7 @@ Release notes
 ----
 
 * ``openstack-doc-test``: Don't always build the HOT guide
+* ``openstack-dn2osdbk``: Allow single files as source
 
 0.17
 ----

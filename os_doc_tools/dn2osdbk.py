@@ -209,16 +209,23 @@ class ChapterTransformer(BaseFolderTransformer):
 def main():
     parser = argparse.ArgumentParser(description="Generate docbook from "
                                      "DocUtils Native XML format")
-    parser.add_argument('source', help='Source directory.')
-    parser.add_argument('output', help='Output file.')
+    parser.add_argument('source', help='Source file or directory.')
+    parser.add_argument('output', help='Output file or directory.')
     parser.add_argument('--toplevel', help='Toplevel flag.',
                         choices=['book', 'chapter'],
                         default='chapter')
     args = parser.parse_args()
 
-    cls = globals()[TRANSFORMERS[args.toplevel]]
-    transformer = cls(args.source, args.output)
-    sys.exit(transformer.transform())
+    if os.path.isdir(args.source):
+        cls = globals()[TRANSFORMERS[args.toplevel]]
+        transformer = cls(args.source, args.output)
+        sys.exit(transformer.transform())
+    else:
+        transformer = XMLFileTransformer(args.source, args.toplevel)
+        xml = transformer.transform()
+        with open(args.output, 'w') as fd:
+            fd.write(xml)
+        sys.exit(0)
 
 
 if __name__ == "__main__":
