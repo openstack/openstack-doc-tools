@@ -940,9 +940,6 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
             f_abs = os.path.abspath(os.path.join(root, f))
             if is_book_master(f_base):
                 book_bk[f_abs] = book_root
-            if "doc/hot-guide/" in f_abs:
-                affected_books.add('hot-guide')
-                continue
             if not is_testable_xml_file(f, file_exceptions):
                 continue
 
@@ -1047,6 +1044,9 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
             new_files_to_check = new_files
             new_files = []
             for f in new_files_to_check:
+                if "doc/hot-guide/" in f:
+                    affected_books.add('hot-guide')
+                    continue
                 # Skip bk*.xml files
                 if is_book_master(os.path.basename(f)):
                     book_modified = book_bk[f]

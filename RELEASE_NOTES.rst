@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.18
+----
+
+* ``openstack-doc-test``: Don't always build the HOT guide
+
 0.17
 ----
 
