@@ -129,7 +129,7 @@ def validation_failed(schema, doc):
             any(log.type_name != "DTD_UNKNOWN_ID" for log in schema.error_log))
 
 
-def verify_section_tags_have_xmid(doc):
+def verify_section_tags_have_xmlid(doc):
     """Check that all section tags have an xml:id attribute.
 
     Will throw an exception if there's at least one missing.
@@ -459,7 +459,7 @@ def validate_one_file(schema, rootdir, path, verbose,
                 if validation_failed(schema, doc):
                     any_failures = True
                     print(error_message(schema.error_log))
-                verify_section_tags_have_xmid(doc)
+                verify_section_tags_have_xmlid(doc)
                 verify_profiling(doc)
         if check_niceness:
             verify_whitespace_niceness(path)
