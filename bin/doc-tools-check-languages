@@ -75,6 +75,7 @@ function usage {
 
 
 CONF_FILE=$1
+shift
 
 if [[ -z $CONF_FILE ]]; then
     usage
@@ -94,9 +95,9 @@ if [[ -z $(declare -p BOOKS 2> /dev/null | grep 'declare -A BOOKS') || \
     exit 1
 fi
 
-case "$2" in
+case "$1" in
     test|publish)
-        PURPOSE=$2
+        PURPOSE=$1
         shift
         ;;
     *)
