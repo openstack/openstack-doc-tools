@@ -109,7 +109,7 @@ def _format_parsed_json(parsed):
 def _process_file(path, formatting=None):
     """Check syntax/formatting and fix formatting of a JSON file.
 
-    :param formatting: one of 'check' or 'fix'
+    :param formatting: one of 'check' or 'fix' (default: None)
     """
     with open(path, 'r') as infile:
         raw = infile.read()
@@ -118,7 +118,7 @@ def _process_file(path, formatting=None):
         except ParserException as err:
             print("%s\n%s" % (path, err))
         else:
-            if formatting in ('check', 'fix'):
+            if formatting in (None, 'check', 'fix'):
                 formatted = _format_parsed_json(parsed)
                 if formatted != raw:
                     if formatting == "fix":
@@ -130,7 +130,7 @@ def _process_file(path, formatting=None):
                     print("%s\n%s" % (path, errstr))
             else:
                 # for the benefit of external callers
-                return ValueError("formatting arg must be 'check' or 'fix'")
+                raise ValueError("Called with invalid formatting value.")
 
 
 def main():
