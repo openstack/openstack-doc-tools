@@ -93,12 +93,12 @@ def _parse_json(raw):
     try:
         parsed = json.loads(raw, object_pairs_hook=collections.OrderedDict)
     except ValueError as err:
-        note = _indent_note(str(err))
+        note = str(err)
         # if demjson is available, print its diagnostic string as well
         if demjson:
             demerr = _get_demjson_diagnostics(raw)
             if demerr:
-                note += "\n" + _indent_note(demerr)
+                note += "\n" + demerr
         raise ParserException(note)
     else:
         return parsed
@@ -120,7 +120,7 @@ def _process_file(path, formatting=None):
         try:
             parsed = _parse_json(raw)
         except ParserException as err:
-            print("%s\n%s" % (path, err))
+            print("%s\n%s" % (path, _indent_note(str(err))))
         else:
             if formatting in (None, 'check', 'fix'):
                 formatted = _format_parsed_json(parsed)
@@ -128,10 +128,10 @@ def _process_file(path, formatting=None):
                     if formatting == "fix":
                         with open(path, 'w') as outfile:
                             outfile.write(formatted)
-                        errstr = _indent_note("Reformatted")
+                        errstr = "Reformatted"
                     else:
-                        errstr = _indent_note("Reformatting needed")
-                    print("%s\n%s" % (path, errstr))
+                        errstr = "Reformatting needed"
+                    print("%s\n%s" % (path, _indent_note(errstr)))
             else:
                 # for the benefit of external callers
                 raise ValueError("Called with invalid formatting value.")
