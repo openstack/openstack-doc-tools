@@ -39,6 +39,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 
 from lxml import etree
 from oslo.config import cfg
@@ -1388,6 +1389,7 @@ def handle_options():
 def doctest():
     """Central entrypoint, parses arguments and runs tests."""
 
+    start_time = time.time()
     CONF = cfg.CONF
     print ("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
            % os_doc_tools.__version__)
@@ -1442,6 +1444,8 @@ def doctest():
                              CONF.ignore_errors,
                              CONF.ignore_dir)
 
+    elapsed_time = (time.time() - start_time)
+    print ("Run time was: %.2f seconds." % elapsed_time)
 
 if __name__ == "__main__":
     sys.exit(doctest())
