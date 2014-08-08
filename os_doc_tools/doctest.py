@@ -40,6 +40,7 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib2
 
 from lxml import etree
 from oslo.config import cfg
@@ -246,6 +247,40 @@ def verify_whitespace_niceness(docfile):
         raise ValueError(msg)
 
 
+def verify_valid_links(doc):
+    """Check that all linked URLs are reachable
+
+    Will throw an exception if there's at least one unreachable URL.
+    """
+    ns = {"docbook": "http://docbook.org/ns/docbook",
+          'xlink': 'http://www.w3.org/1999/xlink'}
+    msg = []
+    for node in doc.xpath('//docbook:link', namespaces=ns):
+        try:
+            url = node.attrib['{http://www.w3.org/1999/xlink}href']
+        except Exception:
+            continue
+
+        try:
+            urllib2.urlopen(url)
+        except urllib2.HTTPError as e:
+            # Ignore some error codes:
+            # 403 (Forbidden) since it often means that the user-agent
+            # is wrong.
+            # 503 (Service Temporarily Unavailable)
+            if e.code not in [403, 503]:
+                e_line = node.sourceline
+                msg.append("URL %s not reachable at line %d, error %s" % (
+                    url, e_line, e))
+        except urllib2.URLError as e:
+            e_line = node.sourceline
+            msg.append("URL %s invalid at line %d, error %s" % (
+                url, e_line, e))
+
+    if len(msg) > 0:
+        raise ValueError("\n    ".join(msg))
+
+
 def error_message(error_log):
     """Return a string that contains the error message.
 
@@ -446,7 +481,8 @@ def validate_one_json_file(rootdir, path, verbose, check_syntax,
 
 
 def validate_one_file(schema, rootdir, path, verbose,
-                      check_syntax, check_niceness, validate_schema):
+                      check_syntax, check_niceness, check_links,
+                      validate_schema):
     """Validate a single file."""
     # We pass schema in as a way of caching it, generating it is expensive
 
@@ -454,14 +490,17 @@ def validate_one_file(schema, rootdir, path, verbose,
     if verbose:
         print(" Validating %s" % os.path.relpath(path, rootdir))
     try:
-        if check_syntax:
+        if check_syntax or check_links:
             doc = etree.parse(path)
-            if validate_schema:
-                if validation_failed(schema, doc):
-                    any_failures = True
-                    print(error_message(schema.error_log))
-                verify_section_tags_have_xmlid(doc)
-                verify_profiling(doc)
+            if check_syntax:
+                if validate_schema:
+                    if validation_failed(schema, doc):
+                        any_failures = True
+                        print(error_message(schema.error_log))
+                    verify_section_tags_have_xmlid(doc)
+                    verify_profiling(doc)
+            if check_links:
+                    verify_valid_links(doc)
         if check_niceness:
             verify_whitespace_niceness(path)
     except etree.XMLSyntaxError as e:
@@ -508,6 +547,7 @@ def is_json(filename):
 
 def validate_individual_files(files_to_check, rootdir, verbose,
                               check_syntax=False, check_niceness=False,
+                              check_links=False,
                               ignore_errors=False, is_api_site=False):
     """Validate list of files."""
 
@@ -519,12 +559,14 @@ def validate_individual_files(files_to_check, rootdir, verbose,
     no_validated = 0
     no_failed = 0
 
-    if check_syntax and check_niceness:
-        print("Checking syntax and niceness of XML files...")
-    elif check_syntax:
-        print("Checking syntax of XML files...")
-    elif check_niceness:
-        print("Checking niceness of XML files...")
+    checks = []
+    if check_links:
+        checks.append("valid URL links")
+    if check_niceness:
+        checks.append("niceness")
+    if check_syntax:
+        checks.append("syntax")
+    print("Checking XML files for %s..." % (", ".join(checks)))
 
     for f in files_to_check:
         validate_schema = True
@@ -549,12 +591,14 @@ def validate_individual_files(files_to_check, rootdir, verbose,
                                              verbose,
                                              check_syntax,
                                              check_niceness,
+                                             check_links,
                                              validate_schema)
         else:
             any_failures = validate_one_file(schema, rootdir, f,
                                              verbose,
                                              check_syntax,
                                              check_niceness,
+                                             check_links,
                                              validate_schema)
         if any_failures:
             no_failed = no_failed + 1
@@ -571,7 +615,8 @@ def validate_individual_files(files_to_check, rootdir, verbose,
 
 def validate_modified_files(rootdir, exceptions, verbose,
                             check_syntax=False, check_niceness=False,
-                            ignore_errors=False, is_api_site=False):
+                            check_links=False, ignore_errors=False,
+                            is_api_site=False):
     """Validate list of modified files."""
 
     # Do not select deleted files, just Added, Copied, Modified, Renamed,
@@ -583,12 +628,14 @@ def validate_modified_files(rootdir, exceptions, verbose,
     validate_individual_files(modified_files, rootdir,
                               verbose,
                               check_syntax, check_niceness,
-                              ignore_errors, is_api_site)
+                              check_links, ignore_errors,
+                              is_api_site)
 
 
 def validate_all_files(rootdir, exceptions, verbose,
                        check_syntax, check_niceness=False,
-                       ignore_errors=False, is_api_site=False):
+                       check_links=False, ignore_errors=False,
+                       is_api_site=False):
     """Validate all xml files."""
 
     files_to_check = []
@@ -605,7 +652,7 @@ def validate_all_files(rootdir, exceptions, verbose,
     validate_individual_files(files_to_check, rootdir,
                               verbose,
                               check_syntax, check_niceness,
-                              ignore_errors, is_api_site)
+                              check_links, ignore_errors, is_api_site)
 
 
 def logging_build_book(result):
@@ -1244,6 +1291,8 @@ cli_OPTS = [
                 help="Check building of books using modified files."),
     cfg.BoolOpt("check-deletions", default=False,
                 help="Check that deleted files are not used."),
+    cfg.BoolOpt("check-links", default=False,
+                help="Check that linked URLs are valid and reachable."),
     cfg.BoolOpt("check-niceness", default=False,
                 help="Check the niceness of files, for example whitespace."),
     cfg.BoolOpt("check-syntax", default=False,
@@ -1343,14 +1392,16 @@ def handle_options():
         add_build_exceptions(CONF.build_file_exception, CONF.verbose)
 
     if (not CONF.check_build and not CONF.check_deletions and
-       not CONF.check_niceness and not CONF.check_syntax):
+       not CONF.check_niceness and not CONF.check_syntax and
+       not CONF.check_links):
         CONF.check_all = True
 
     if CONF.check_all:
         CONF.check_deletions = True
-        CONF.check_syntax = True
         CONF.check_build = True
+        CONF.check_links = True
         CONF.check_niceness = True
+        CONF.check_syntax = True
 
     if CONF.publish:
         CONF.create_index = False
@@ -1415,12 +1466,13 @@ def doctest():
         print("Only files in www directory changed, nothing to do.\n")
         return
 
-    if CONF.check_syntax or CONF.check_niceness:
+    if CONF.check_syntax or CONF.check_niceness or CONF.check_links:
         if CONF.force:
             validate_all_files(doc_path, FILE_EXCEPTIONS,
                                CONF.verbose,
                                CONF.check_syntax,
                                CONF.check_niceness,
+                               CONF.check_links,
                                CONF.ignore_errors,
                                CONF.api_site)
         else:
@@ -1428,6 +1480,7 @@ def doctest():
                                     CONF.verbose,
                                     CONF.check_syntax,
                                     CONF.check_niceness,
+                                    CONF.check_links,
                                     CONF.ignore_errors,
                                     CONF.api_site)
 

@@ -33,14 +33,17 @@ OPTIONS
   **--check-build**
         Try to build books using modified files.
 
-  **--check-syntax**
-        Check the syntax of modified files.
-
   **--check-deletions**
        Check that deleted files are not used.
 
+  **--check-links**
+       Check that linked URLs are valid and reachable.
+
   **--check-niceness**
        Check the niceness of files, for example whitespace.
+
+  **--check-syntax**
+        Check the syntax of modified files.
 
   **--check-all**
        Run all checks (default if no arguments are given).
