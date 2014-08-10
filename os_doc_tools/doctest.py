@@ -153,8 +153,8 @@ def verify_attribute_profiling(doc, attribute, known_values):
     supported profiling values.
     """
 
+    msg = []
     ns = {"docbook": "http://docbook.org/ns/docbook"}
-
     path = '//docbook:*[@%s]' % attribute
     for parent in doc.xpath(path, namespaces=ns):
         p_tag = parent.tag
@@ -163,7 +163,7 @@ def verify_attribute_profiling(doc, attribute, known_values):
 
         for att in p_att_list:
             if att not in known_values:
-                raise ValueError(
+                msg.append(
                     "'%s' is not a recognized %s profile on line %d." %
                     (att, attribute, p_line))
 
@@ -175,11 +175,13 @@ def verify_attribute_profiling(doc, attribute, known_values):
             for att in c_att_list:
                 if att not in p_att_list:
                     len_ns = len("{http://docbook.org/ns/docbook}")
-                    raise ValueError(
+                    msg.append(
                         "%s %s profiling (%s) conflicts with %s "
                         "profiling of %s on line %d." %
                         (p_tag[len_ns:], attribute, p_att_list,
                          attribute, c_tag[len_ns:], c_line))
+    if len(msg) > 0:
+        raise ValueError("\n     ".join(msg))
 
 
 def verify_profiling(doc):
@@ -391,7 +393,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
     deleted_files = get_modified_files(rootdir, "--diff-filter=D")
     if not deleted_files:
         print("No files were removed.\n")
-        return
+        return 0
 
     if verbose:
         print(" Removed files:")
@@ -444,14 +446,15 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
                     missing_reference = True
 
     if missing_reference:
-        print("Failed removed file check, %d files were removed, "
+        print("Check failed, %d files were removed, "
               "%d files checked.\n"
               % (len(deleted_files), no_checked_files))
-        sys.exit(1)
+        return 1
 
-    print("Passed removed file check, %d files were removed, "
+    print("Check passed, %d files were removed, "
           "%d files checked.\n"
           % (len(deleted_files), no_checked_files))
+    return 0
 
 
 def validate_one_json_file(rootdir, path, verbose, check_syntax,
@@ -547,8 +550,7 @@ def is_json(filename):
 
 def validate_individual_files(files_to_check, rootdir, verbose,
                               check_syntax=False, check_niceness=False,
-                              check_links=False,
-                              ignore_errors=False, is_api_site=False):
+                              check_links=False, is_api_site=False):
     """Validate list of files."""
 
     schema = get_schema(is_api_site)
@@ -607,16 +609,15 @@ def validate_individual_files(files_to_check, rootdir, verbose,
     if no_failed > 0:
         print("Check failed, validated %d XML files with %d failures.\n"
               % (no_validated, no_failed))
-        if not ignore_errors:
-            sys.exit(1)
+        return 1
     else:
         print("Check passed, validated %d XML files.\n" % no_validated)
+    return 0
 
 
 def validate_modified_files(rootdir, exceptions, verbose,
                             check_syntax=False, check_niceness=False,
-                            check_links=False, ignore_errors=False,
-                            is_api_site=False):
+                            check_links=False, is_api_site=False):
     """Validate list of modified files."""
 
     # Do not select deleted files, just Added, Copied, Modified, Renamed,
@@ -628,14 +629,12 @@ def validate_modified_files(rootdir, exceptions, verbose,
     validate_individual_files(modified_files, rootdir,
                               verbose,
                               check_syntax, check_niceness,
-                              check_links, ignore_errors,
-                              is_api_site)
+                              check_links, is_api_site)
 
 
 def validate_all_files(rootdir, exceptions, verbose,
                        check_syntax, check_niceness=False,
-                       check_links=False, ignore_errors=False,
-                       is_api_site=False):
+                       check_links=False, is_api_site=False):
     """Validate all xml files."""
 
     files_to_check = []
@@ -652,7 +651,7 @@ def validate_all_files(rootdir, exceptions, verbose,
     validate_individual_files(files_to_check, rootdir,
                               verbose,
                               check_syntax, check_niceness,
-                              check_links, ignore_errors, is_api_site)
+                              check_links, is_api_site)
 
 
 def logging_build_book(result):
@@ -1171,8 +1170,7 @@ def generate_index_file():
 
 
 def build_affected_books(rootdir, book_exceptions, file_exceptions,
-                         force=False, ignore_errors=False,
-                         ignore_dirs=None):
+                         force=False, ignore_dirs=None):
     """Build all the books which are affected by modified files.
 
     Looks for all directories with "pom.xml" and checks if a
@@ -1254,14 +1252,15 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
                 print("\n%s" % output)
 
         print("Building of books finished with failures.\n")
-        if not ignore_errors:
-            sys.exit(1)
+        return 1
     else:
         print("Building of books finished successfully.\n")
 
     if len(RESULTS_OF_BUILDS) != len(books):
         print("ERROR: %d queued for building but only %d build!" %
               (len(books), len(RESULTS_OF_BUILDS)))
+        return 1
+    return 0
 
 
 def add_exceptions(file_exception, verbose):
@@ -1305,8 +1304,6 @@ cli_OPTS = [
     cfg.BoolOpt('force', default=False,
                 help="Force the validation of all files "
                 "and build all books."),
-    cfg.BoolOpt("ignore-errors", default=False,
-                help="Do not exit on failures."),
     cfg.BoolOpt("parallel", default=True,
                 help="Build books in parallel (default)."),
     cfg.BoolOpt("print-unused-files", default=False,
@@ -1447,6 +1444,7 @@ def doctest():
 
     print_gitinfo()
     handle_options()
+    errors = 0
 
     doc_path = get_gitroot()
     if CONF.language:
@@ -1468,37 +1466,41 @@ def doctest():
 
     if CONF.check_syntax or CONF.check_niceness or CONF.check_links:
         if CONF.force:
-            validate_all_files(doc_path, FILE_EXCEPTIONS,
-                               CONF.verbose,
-                               CONF.check_syntax,
-                               CONF.check_niceness,
-                               CONF.check_links,
-                               CONF.ignore_errors,
-                               CONF.api_site)
+            errors += validate_all_files(doc_path, FILE_EXCEPTIONS,
+                                         CONF.verbose,
+                                         CONF.check_syntax,
+                                         CONF.check_niceness,
+                                         CONF.check_links,
+                                         CONF.api_site)
         else:
-            validate_modified_files(doc_path, FILE_EXCEPTIONS,
-                                    CONF.verbose,
-                                    CONF.check_syntax,
-                                    CONF.check_niceness,
-                                    CONF.check_links,
-                                    CONF.ignore_errors,
-                                    CONF.api_site)
+            errors += validate_modified_files(doc_path, FILE_EXCEPTIONS,
+                                              CONF.verbose,
+                                              CONF.check_syntax,
+                                              CONF.check_niceness,
+                                              CONF.check_links,
+                                              CONF.api_site)
 
     if CONF.check_deletions:
-        check_deleted_files(doc_path, BUILD_FILE_EXCEPTIONS, CONF.verbose)
+        errors += check_deleted_files(doc_path, BUILD_FILE_EXCEPTIONS,
+                                      CONF.verbose)
 
     if CONF.check_build:
         # Some programs are called in subprocesses,  make sure that they
         # really exist.
         ensure_exists("mvn")
-        build_affected_books(doc_path, BOOK_EXCEPTIONS,
-                             BUILD_FILE_EXCEPTIONS,
-                             CONF.force,
-                             CONF.ignore_errors,
-                             CONF.ignore_dir)
+        errors += build_affected_books(doc_path, BOOK_EXCEPTIONS,
+                                       BUILD_FILE_EXCEPTIONS,
+                                       CONF.force,
+                                       CONF.ignore_dir)
 
     elapsed_time = (time.time() - start_time)
     print ("Run time was: %.2f seconds." % elapsed_time)
+    if errors == 0:
+        print("Congratulations, all tests passed!")
+        return 0
+    else:
+        print("Some tests failed!")
+        return 1
 
 if __name__ == "__main__":
     sys.exit(doctest())

@@ -68,9 +68,6 @@ OPTIONS
       Directory to ignore for building of manuals. The parameter can
       be passed multiple times to add several directories.
 
-  **--ignore-errors**
-      Do not exit on failures.
-
   **--language LANGUAGE, -l LANGUAGE**
       Build translated manual for language in path generate/$LANGUAGE .
 
