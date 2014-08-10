@@ -63,11 +63,15 @@ def fix_formatting(path):
 # -----------------------------------------------------------------------------
 
 
-def _indent_note(errstr):
+def _indent_note(note):
     """Indents and wraps a string."""
-    return textwrap.fill(errstr, initial_indent=8 * ' ',
-                         subsequent_indent=12 * ' ',
-                         width=80)
+    indented_note = []
+    # Split into single lines in case the argument is pre-formatted.
+    for line in note.splitlines():
+        indented_note.append(textwrap.fill(line, initial_indent=8 * ' ',
+                             subsequent_indent=12 * ' ',
+                             width=80))
+    return "\n".join(indented_note)
 
 
 def _get_demjson_diagnostics(raw):
