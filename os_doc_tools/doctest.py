@@ -723,8 +723,8 @@ def publish_book(publish_path, book):
 
 def ensure_exists(program):
     """Check that program exists, abort if not."""
-    retcode = subprocess.call("type " + program, shell=True,
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    retcode = subprocess.call(['which', program], stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
     if retcode != 0:
         print("Program '%s' does not exist, please install!" % program)
         sys.exit(1)
