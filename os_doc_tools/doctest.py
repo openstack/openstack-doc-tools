@@ -258,12 +258,8 @@ def error_message(error_log):
     return "\n".join(errs)
 
 
-def www_touched(check_only_www):
-    """Check whether files in www directory are touched.
-
-    If check_only_www is True: Check that only files in www are touched.
-    Otherwise check that files in www are touched.
-    """
+def www_touched():
+    """Check whether files in www directory are touched."""
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
@@ -280,9 +276,7 @@ def www_touched(check_only_www):
         else:
             other_changed = True
 
-    if check_only_www:
-        return www_changed and not other_changed
-    return www_changed
+    return www_changed and not other_changed
 
 
 def check_modified_affects_all(rootdir):
@@ -649,17 +643,6 @@ def get_publish_path():
     """Return path to use of publishing books."""
 
     return os.path.join(get_gitroot(), 'publish-docs')
-
-
-def publish_www():
-    """Copy www files."""
-
-    publish_path = get_publish_path()
-    www_path = os.path.join(publish_path, 'www')
-    shutil.rmtree(www_path, ignore_errors=True)
-
-    source = os.path.join(get_gitroot(), 'www')
-    shutil.copytree(source, www_path)
 
 
 def ignore_for_publishing(_, names):
@@ -1405,13 +1388,7 @@ def doctest():
     elif not CONF.api_site:
         doc_path = os.path.join(doc_path, 'doc')
 
-    # Do not publish www directory if we build for external
-    # publishing
-    if (CONF.check_build and
-       (www_touched(False) and not CONF.publish)):
-        publish_www()
-
-    if not CONF.force and www_touched(True):
+    if not CONF.force and www_touched():
         print("Only files in www directory changed, nothing to do.\n")
         return
 
