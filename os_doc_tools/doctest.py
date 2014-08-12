@@ -1440,9 +1440,12 @@ def doctest():
     CONF = cfg.CONF
     print ("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
            % os_doc_tools.__version__)
-
+    try:
+        handle_options()
+    except cfg.Error as e:
+        print(e)
+        return 1
     print_gitinfo()
-    handle_options()
     errors = 0
 
     doc_path = get_gitroot()
