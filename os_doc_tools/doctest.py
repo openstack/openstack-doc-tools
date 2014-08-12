@@ -626,10 +626,10 @@ def validate_modified_files(rootdir, exceptions, verbose,
     modified_files = [f for f in modified_files if
                       is_testable_file(f, exceptions)]
 
-    validate_individual_files(modified_files, rootdir,
-                              verbose,
-                              check_syntax, check_niceness,
-                              check_links, is_api_site)
+    return validate_individual_files(modified_files, rootdir,
+                                     verbose,
+                                     check_syntax, check_niceness,
+                                     check_links, is_api_site)
 
 
 def validate_all_files(rootdir, exceptions, verbose,
@@ -648,10 +648,10 @@ def validate_all_files(rootdir, exceptions, verbose,
                 path = os.path.abspath(os.path.join(root, f))
                 files_to_check.append(path)
 
-    validate_individual_files(files_to_check, rootdir,
-                              verbose,
-                              check_syntax, check_niceness,
-                              check_links, is_api_site)
+    return validate_individual_files(files_to_check, rootdir,
+                                     verbose,
+                                     check_syntax, check_niceness,
+                                     check_links, is_api_site)
 
 
 def logging_build_book(result):
