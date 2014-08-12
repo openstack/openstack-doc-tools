@@ -47,7 +47,10 @@ from oslo.config import cfg
 
 import os_doc_tools
 from os_doc_tools.common import check_output   # noqa
+from os_doc_tools.openstack.common import log
 
+
+LOG = log.getLogger('openstack-doc-test')
 
 # These are files that are known to not pass syntax or niceness checks
 # Add values via --file-exceptions.
@@ -1299,8 +1302,6 @@ cli_OPTS = [
     cfg.BoolOpt("create-index", default=True,
                 help="When publishing create an index.html file to find books "
                 "in an easy way."),
-    cfg.BoolOpt('debug', default=False,
-                help="Enable debug code."),
     cfg.BoolOpt('force', default=False,
                 help="Force the validation of all files "
                 "and build all books."),
@@ -1312,8 +1313,6 @@ cli_OPTS = [
     cfg.BoolOpt("publish", default=False,
                 help="Setup content in publish-docs directory for "
                 "publishing to external website."),
-    cfg.BoolOpt('verbose', default=False, short='v',
-                help="Verbose execution."),
     cfg.MultiStrOpt("build-file-exception",
                     help="File that will be skipped during delete and "
                          "build checks to generate dependencies. This should "
