@@ -54,9 +54,9 @@ def check_formatting(path):
     _process_file(path, formatting='check')
 
 
-def fix_formatting(path):
+def fix_formatting(path, verbose=False):
     """Fix formatting of one JSON file."""
-    _process_file(path, formatting='fix')
+    _process_file(path, formatting='fix', verbose=verbose)
 
 # -----------------------------------------------------------------------------
 # Implementation details
@@ -110,29 +110,32 @@ def _format_parsed_json(parsed):
                       indent=4)
 
 
-def _process_file(path, formatting=None):
+def _process_file(path, formatting=None, verbose=False):
     """Check syntax/formatting and fix formatting of a JSON file.
 
     :param formatting: one of 'check' or 'fix' (default: None)
+
+    Raises ValueError if JSON syntax is invalid or reformatting needed.
     """
     with open(path, 'r') as infile:
         raw = infile.read()
         try:
             parsed = _parse_json(raw)
         except ParserException as err:
-            print("%s\n%s" % (path, _indent_note(str(err))))
+            raise ValueError(err)
         else:
-            if formatting in (None, 'check', 'fix'):
+            if formatting in ('check', 'fix'):
                 formatted = _format_parsed_json(parsed)
                 if formatted != raw:
                     if formatting == "fix":
                         with open(path, 'w') as outfile:
                             outfile.write(formatted)
-                        errstr = "Reformatted"
+                        if verbose:
+                            print("%s\n%s" % (path,
+                                              _indent_note("Reformatted")))
                     else:
-                        errstr = "Reformatting needed"
-                    print("%s\n%s" % (path, _indent_note(errstr)))
-            else:
+                        raise ValueError("Reformatting needed")
+            elif formatting is not None:
                 # for the benefit of external callers
                 raise ValueError("Called with invalid formatting value.")
 
@@ -146,7 +149,10 @@ def main():
     args = parser.parse_args()
 
     for path in args.files:
-        _process_file(path, args.formatting)
+        try:
+            _process_file(path, args.formatting, verbose=True)
+        except ValueError as err:
+            print("%s\n%s" % (path, _indent_note(str(err))))
 
 if __name__ == "__main__":
     sys.exit(main())
