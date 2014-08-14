@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# NOTE(berendt): This is the Vagrantfile included with the box provided
+#                on the Vagrant cloud as openstack/openstack-manuals. The
+#                box is created with the script package.sh.
+
+filename = File.expand_path("../repositories.tar.bz2", __FILE__)
+if not File.exists?('repositories/.placeholder')
+  system("tar xjf #{filename}")
+end
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "openstack/openstack-manuals"
+  config.vm.hostname = "manuals.site"
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ['modifyvm', :id, '--memory', 1024]
+    vb.customize ['modifyvm', :id, '--cpus', 2]
+  end
+  config.vm.synced_folder "repositories", "/home/vagrant/repositories", create: true
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+end

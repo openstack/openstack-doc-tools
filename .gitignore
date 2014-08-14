@@ -30,3 +30,7 @@ autogenerate_config_docs/*-conf-changes-*.xml
 
 # sitemap
 sitemap/sitemap_docs.openstack.org.xml
+
+# build and test environment
+build_environment/.vagrant/
+build_environment/repositories/

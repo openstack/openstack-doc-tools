@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.hostname = "manuals.site"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ['modifyvm', :id, '--memory', 1024]
+    vb.customize ['modifyvm', :id, '--cpus', 2]
+  end
+
+  # access the webserver from your workstation
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # create the local repositories directory (available as /opt/repositories
+  # inside the virtual system)
+  Dir.mkdir('repositories') unless Dir.exists?('repositories')
+
+  # repositories live here
+  config.vm.synced_folder "repositories", "/home/vagrant/repositories"
+
+  # cache distribution packages when cachier plugin is available
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+
+  # provision the virtual system using Ansible
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "files/playbook.yaml"
+  end
+end

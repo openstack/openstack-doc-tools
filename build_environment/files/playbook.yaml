@@ -1,0 +1,47 @@
+---
+- hosts: all
+  sudo: True
+
+  tasks:
+  - apt: update_cache=yes
+  - apt: upgrade=dist
+  - apt: name={{ item }} state=present
+    with_items:
+    - git
+    - git-review
+    - maven
+    - nginx
+    - python-tox
+
+  - copy: src=nginx.default dest=/etc/nginx/sites-available/default
+    notify: restart nginx
+  - service: name=nginx enabled=yes state=started
+
+  - copy: src=fetch.sh dest=/usr/local/bin/fetch.sh mode=0755
+
+  - lineinfile: dest=/etc/environment regexp='^JAVA_HOME=' line='JAVA_HOME=/usr/lib/jvm/default-java'
+    sudo: True
+
+  - git: repo=https://github.com/openstack/{{ item }} dest=/home/vagrant/repositories/{{ item }}
+    with_items:
+    - api-site
+    - compute-api
+    - docs-specs
+    - identity-api
+    - image-api
+    - netconn-api
+    - object-api
+    - openstack-doc-tools
+    - openstack-manuals
+    - operations-guide
+    - security-doc
+    - training-guides
+    - volume-api
+    sudo: False
+
+  - command: /usr/local/bin/fetch.sh
+    sudo: False
+
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restarted

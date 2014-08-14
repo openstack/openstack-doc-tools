@@ -1,0 +1,22 @@
+server {
+  listen 80 default_server;
+  listen [::]:80 default_server ipv6only=on;
+
+  root /home/vagrant/repositories;
+  index index.html index.htm;
+
+  server_name manuals.site;
+
+  location / {
+    autoindex on;
+    autoindex_exact_size on;
+    try_files $uri $uri/ =404;
+  }
+
+  location /openstack-manuals/doc {
+    index local-files.html;
+    autoindex on;
+    autoindex_exact_size on;
+    try_files $uri $uri/ =404;
+  }
+}
