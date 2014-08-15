@@ -1150,7 +1150,7 @@ def generate_index_file():
                                  (path, f, f))
                 index_file.write('<br/>\n')
 
-    if os.path.is_file(os.path.join(get_publish_path(), 'www-index.html')):
+    if os.path.isfile(os.path.join(get_publish_path(), 'www-index.html')):
         index_file.write('<br/>\n')
         index_file.write('<a href="www-index.html">list of generated '
                          'WWW pages</a>\n')
