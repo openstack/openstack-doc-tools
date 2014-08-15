@@ -27,7 +27,7 @@ OPTIONS
 
   **--build-file-exception BUILD_FILE_EXCEPTION**
       File that will be skipped during delete and build checks to
-      generate depenencies. This should be done for invalid XML files
+      generate dependencies. This should be done for invalid XML files
       only.
 
   **--check-build**
