@@ -565,7 +565,7 @@ def validate_individual_files(files_to_check, rootdir, verbose,
         checks.append("niceness")
     if check_syntax:
         checks.append("syntax")
-    print("Checking XML files for %s..." % (", ".join(checks)))
+    print("Checking files for %s..." % (", ".join(checks)))
 
     for f in files_to_check:
         validate_schema = True
@@ -604,18 +604,18 @@ def validate_individual_files(files_to_check, rootdir, verbose,
         no_validated = no_validated + 1
 
     if no_failed > 0:
-        print("Check failed, validated %d XML files with %d failures.\n"
+        print("Check failed, validated %d files with %d failures.\n"
               % (no_validated, no_failed))
         return 1
     else:
-        print("Check passed, validated %d XML files.\n" % no_validated)
+        print("Check passed, validated %d files.\n" % no_validated)
     return 0
 
 
 def validate_modified_files(rootdir, exceptions, verbose,
                             check_syntax=False, check_niceness=False,
                             check_links=False, is_api_site=False):
-    """Validate list of modified files."""
+    """Validate list of modified, testable files."""
 
     # Do not select deleted files, just Added, Copied, Modified, Renamed,
     # or Type changed
@@ -632,7 +632,7 @@ def validate_modified_files(rootdir, exceptions, verbose,
 def validate_all_files(rootdir, exceptions, verbose,
                        check_syntax, check_niceness=False,
                        check_links=False, is_api_site=False):
-    """Validate all xml files."""
+    """Validate all testable files (XML, WADL, JSON, etc.)."""
 
     files_to_check = []
 
