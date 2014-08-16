@@ -31,7 +31,6 @@ Requires:
 '''
 
 import gzip
-import json
 import multiprocessing
 import operator
 import os
@@ -47,6 +46,7 @@ from oslo.config import cfg
 
 import os_doc_tools
 from os_doc_tools.common import check_output   # noqa
+from os_doc_tools import jsoncheck
 from os_doc_tools.openstack.common import log
 
 
@@ -486,6 +486,15 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
     return 0
 
 
+def indent(text, spaces):
+    """Indent each line of a string by given number of spaces.
+
+    The text argument is passed through str() first to turn objects such
+    as exceptions into strings.
+    """
+    return ''.join((spaces * ' ') + i for i in str(text).splitlines(True))
+
+
 def validate_one_json_file(rootdir, path, verbose, check_syntax,
                            check_niceness):
     """Validate a single JSON file."""
@@ -496,12 +505,20 @@ def validate_one_json_file(rootdir, path, verbose, check_syntax,
 
     try:
         if check_syntax:
-            json_file = open(path, 'rb')
-            json.load(json_file)
+            jsoncheck.check_syntax(path)
     except ValueError as e:
         any_failures = True
-        print("  Invalid JSON file %s: %s" %
-              (os.path.relpath(path, rootdir), e))
+        print("  Invalid JSON file %s:\n%s" %
+              (os.path.relpath(path, rootdir), indent(e, 4)))
+    else:
+        try:
+            if check_niceness:
+                jsoncheck.check_formatting(path)
+        except ValueError as e:
+            any_failures = True
+            print("  %s:\n%s" % (os.path.relpath(path, rootdir),
+                                 indent(e, 4)))
+
     try:
         if check_niceness:
             verify_whitespace_niceness(path)
