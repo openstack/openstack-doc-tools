@@ -19,7 +19,7 @@ Release notes
 0.17
 ----
 
-* Added support for *-manage CLI doc generation.
+* Added support for ``*-manage`` CLI doc generation.
 * ``openstack-dn2osdbk``: Converts Docutils Native XML to docbook.
 * ``openstack-doc-test``: Handle the upcoming HOT guide.
 * ``autohelp.py``: Provide our own sanitizer.
@@ -99,7 +99,7 @@ Release notes
 ----
 
 * Fix ``openstack-doc-test`` to handle changes in ``api-site`` repository:
-  Do not publish wadls directory, *.fo files and add api-ref-guides
+  Do not publish wadls directory, ``*.fo`` files and add api-ref-guides
   PDF files to index file for docs-draft.
 * Many improvements for generation of option tables.
 * Improvements for ``openstack-auto-commands``: handle ironic, sahara;
@@ -110,7 +110,8 @@ Release notes
 
 Fixes for openstack-doc-test:
 
-* openstack-doc-test now validates JSON files for well-formed-ness and whitespace.
+* openstack-doc-test now validates JSON files for well-formed-ness and
+  whitespace.
 * Create proper chapter title for markdown files.
 * Ignore publish-docs directory completely.
 * Do not check for xml:ids in wadl resource.

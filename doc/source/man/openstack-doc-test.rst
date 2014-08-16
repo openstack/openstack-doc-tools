@@ -14,7 +14,8 @@ openstack-doc-test [options]
 DESCRIPTION
 ===========
 
-openstack-doc-test allows to test the validity of the OpenStack documentation content.
+openstack-doc-test allows to test the validity of the OpenStack
+documentation content.
 
 OPTIONS
 =======
