@@ -1,27 +1,34 @@
 #!/bin/bash -ex
 
-# Documentation can be submitted in markdown and then converted to docbook
-# so it can be built with the maven plugin. This is used by Jenkins when
-# invoking certain docs jobs and the resulting output is made available to maven.
+# Documentation can be submitted in markdown and then converted to
+# docbook so it can be built with the maven plugin. This is used by
+# Jenkins when invoking certain docs jobs and the resulting output is
+# made available to maven.
 
 # In case we start doing something more sophisticated with other refs
 # later (such as tags).
 BRANCH=$ZUUL_REFNAME
 shopt -s extglob
 
-# This function figures out the location of the original script (as opposed to any chain of
-# symlinks pointing to it). Source:
+# This function figures out the location of the original script (as
+# opposed to any chain of symlinks pointing to it). Source:
 # http://muffinresearch.co.uk/archives/2008/10/10/bash-resolving-symlinks-to-shellscripts/
 function resolve_symlink {
     SCRIPT=$1 NEWSCRIPT=''
     until [ "$SCRIPT" = "$NEWSCRIPT" ]; do
-        if [ "${SCRIPT:0:1}" = '.' ]; then SCRIPT=$PWD/$SCRIPT; fi
+        if [ "${SCRIPT:0:1}" = '.' ]; then
+            SCRIPT=$PWD/$SCRIPT;
+        fi
         cd $(dirname $SCRIPT)
-        if [ ! "${SCRIPT:0:1}" = '.' ]; then SCRIPT=$(basename $SCRIPT); fi
+        if [ ! "${SCRIPT:0:1}" = '.' ]; then
+            SCRIPT=$(basename $SCRIPT);
+        fi
         SCRIPT=${NEWSCRIPT:=$SCRIPT}
         NEWSCRIPT=$(ls -l $SCRIPT | awk '{ print $NF }')
     done
-    if [ ! "${SCRIPT:0:1}" = '/' ]; then SCRIPT=$PWD/$SCRIPT; fi
+    if [ ! "${SCRIPT:0:1}" = '/' ]; then
+        SCRIPT=$PWD/$SCRIPT;
+    fi
     echo $(dirname $SCRIPT)
 }
 DIR=$(resolve_symlink $0)
@@ -36,10 +43,12 @@ else
     exit 1
 fi
 
-# Need to get the file name to insert here so it can be reused for multiple projects
-# Filenames for the known repos that could do this are openstackapi-programming.mdown
-# and images-api-v2.0.md and openstackapi-programming and images-api-v2.0 are the names
-# for the ID and xml filename.
+# Need to get the file name to insert here so it can be reused for
+# multiple projects Filenames for the known repos that could do this
+# are openstackapi-programming.mdown and images-api-v2.0.md and
+# openstackapi-programming and images-api-v2.0 are the names for the
+# ID and xml filename.
+
 FILENAME=$1
 FILEPATH=`find ./ -regextype posix-extended -regex ".*${FILENAME}\.(md|markdown|mdown)"`
 DIRPATH=`dirname $FILEPATH`

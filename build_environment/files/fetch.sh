@@ -6,11 +6,11 @@ set -x
 # to build the documents.
 
 for repository in $(ls -d -1 /home/vagrant/repositories/*); do
-  cd $repository
-  for document in $(find . -name pom.xml); do
-    pushd ${document%/*};
-    mvn clean generate-sources
-    mvn clean
-    popd
-  done
+    cd $repository
+    for document in $(find . -name pom.xml); do
+        pushd ${document%/*};
+        mvn clean generate-sources
+        mvn clean
+        popd
+    done
 done

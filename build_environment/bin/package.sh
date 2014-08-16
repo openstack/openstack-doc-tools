@@ -12,6 +12,6 @@ rm -f working.tar.bz2
 touch working/.placeholder
 tar cjf working.tar.bz2 working
 vagrant package \
-  --output=openstack-manuals-$version.box \
-  --vagrantfile=Vagrantfile.box \
-  --include working.tar.bz2
+    --output=openstack-manuals-$version.box \
+    --vagrantfile=Vagrantfile.box \
+    --include working.tar.bz2
