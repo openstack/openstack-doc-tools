@@ -148,11 +148,15 @@ def main():
                         help='check or fix formatting of JSON files')
     args = parser.parse_args()
 
+    exit_status = 0
     for path in args.files:
         try:
             _process_file(path, args.formatting, verbose=True)
         except ValueError as err:
             print("%s\n%s" % (path, _indent_note(str(err))))
+            exit_status = 1
+
+    return exit_status
 
 if __name__ == "__main__":
     sys.exit(main())
