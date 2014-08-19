@@ -221,7 +221,8 @@ def _sanitize_default(opt):
         if pathelm.endswith('/'):
             pathelm = pathelm[:-1]
         if default.startswith(pathelm):
-            default.replace(pathelm, '/usr/lib/python/site-packages')
+            default = re.sub(r'%s(/sources)?' % pathelm,
+                             '/usr/lib/python/site-packages', default)
 
     return default
 
