@@ -1,8 +1,16 @@
 Release notes
 =============
 
+0.19
+----
+
+* ``openstack-doc-test``: Optimize translation imports, improve output
+  messages.
+* ``autohelp.py``: Improve sanitizer.
+
 0.18.1
 ------
+
 * Fix ``doc-tools-check-languages`` to handle all repositories and
   setups.
 

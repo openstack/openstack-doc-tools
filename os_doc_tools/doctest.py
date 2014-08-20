@@ -319,6 +319,27 @@ def www_touched():
     return www_changed and not other_changed
 
 
+def only_po_touched():
+    """Check whether only files in locale directory are touched."""
+
+    try:
+        git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
+        modified_files = check_output(git_args).strip().split()
+    except (subprocess.CalledProcessError, OSError) as e:
+        print("git failed: %s" % e)
+        sys.exit(1)
+
+    locale_changed = False
+    other_changed = False
+    for f in modified_files:
+        if "/locale/" in f and f.endswith((".po", ".pot")):
+            locale_changed = True
+        else:
+            other_changed = True
+
+    return locale_changed and not other_changed
+
+
 def check_modified_affects_all(rootdir):
     """Check whether special files were modified.
 
@@ -1445,6 +1466,10 @@ def doctest():
 
     if not CONF.force and www_touched():
         print("Only files in www directory changed, nothing to do.\n")
+        return
+
+    if not CONF.force and not CONF.language and only_po_touched():
+        print("Only files in locale directories changed, nothing to do.\n")
         return
 
     if CONF.check_syntax or CONF.check_niceness or CONF.check_links:
