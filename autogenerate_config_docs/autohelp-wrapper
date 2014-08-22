@@ -40,7 +40,7 @@ usage() {
 }
 
 setup_venv() {
-    if [ ! -e $VENVDIR ]; then
+    if [ ! -e $VENVDIR/bin/activate ]; then
         virtualenv $VENVDIR
     fi
     . $VENVDIR/bin/activate
@@ -52,7 +52,9 @@ get_project() {
     if [ ! -e $SOURCESDIR/$project ]; then
         git clone $GITBASE/$project $SOURCESDIR/$project
     else
-        (cd $SOURCESDIR/$project && git pull)
+        if [ $project != openstack-manuals ]; then
+            (cd $SOURCESDIR/$project && git pull)
+        fi
     fi
 }
 
@@ -62,6 +64,9 @@ setup_tools() {
 
     (cd $SOURCESDIR/oslo-incubator && python setup.py install)
     pip install "GitPython>=0.3.2.RC1"
+
+    # autohelp.py requires this
+    pip install oslo.i18n
 
     # For some reason the ceilometer installation fails without these 2
     # packages pre-installed
@@ -77,7 +82,7 @@ setup_tools() {
 
     # Cinder
     # hp3parclient is needed for icehouse, but not for juno
-    pip install hp3parclient
+    pip install hp3parclient hplefthandclient
 
     # Neutron
     pip install ryu
@@ -139,9 +144,6 @@ fi
 setup_venv
 setup_tools
 
-cd $MANUALSREPO
-git checkout $BRANCH
-
 for project in $PROJECTS; do
     get_project $project
 
@@ -150,9 +152,11 @@ for project in $PROJECTS; do
         git checkout $BRANCH
         python setup.py install
     )
+done
 
+for project in $PROJECTS; do
     if [ "$ACTION" = "setup" ]; then
-        continue
+        break
     fi
 
     if [ -d $MANUALSREPO/tools/autogenerate-config-flagmappings ]; then

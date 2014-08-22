@@ -38,6 +38,7 @@ def setup_venv(branch, novenvupdate):
     if not os.path.exists('venv'):
         os.mkdir('venv')
     args = ["./autohelp-wrapper", "-b", branch, "-e", dirname, "setup"]
+    args.extend(PROJECTS)
     if subprocess.call(args) != 0:
         print("Impossible to create the %s environment." % branch)
         sys.exit(1)
@@ -176,16 +177,16 @@ def format_option_name(name):
         section, name = name.split('/')
     except ValueError:
         # name without a section ('log_dir')
-        return "[DEFAULT]/%s" % name
+        return "[DEFAULT] %s" % name
 
     try:
         # If we're dealing with swift, we'll have a filename to extract
         # ('proxy-server|filter:tempurl/use')
         filename, section = section.split('|')
-        return "%s.conf: [%s]/%s" % (filename, section, name)
+        return "%s.conf: [%s] %s" % (filename, section, name)
     except ValueError:
         # section but no filename ('database/connection')
-        return "[%s]/%s" % (section, name)
+        return "[%s] %s" % (section, name)
 
 
 def generate_docbook(project, new_branch, old_list, new_list):

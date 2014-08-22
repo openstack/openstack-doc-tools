@@ -6,7 +6,10 @@ Release notes
 
 * ``openstack-doc-test``: Optimize translation imports, improve output
   messages.
-* ``autohelp.py``: Improve sanitizer.
+* ``autohelp.py``: Improve sanitizer, better support for i18n in projects.
+* ``autohelp-wrapper``: Smarter handling of the manuals repo and environment
+  setup.
+* ``diff_branches.py``: Updated output format.
 
 0.18.1
 ------

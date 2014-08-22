@@ -88,10 +88,24 @@ def import_modules(repo_location, package_name, verbose=0):
     # the builtins contain the _ function.
     requirements = os.path.join(repo_location, 'requirements.txt')
     with open(requirements) as fd:
+        with_i18n = False
         for line in fd:
             if line.startswith('oslo.i18n'):
                 i18n.enable_lazy()
                 i18n.install(package_name)
+                with_i18n = True
+                break
+        if not with_i18n:
+            # NOTE(gpocentek): projects didn't use oslo.i18n on havana, and
+            # some imports fail because _ is not yet registered in the
+            # builtins. We try to import and setup the translation tools
+            # manually.
+            try:
+                modname = "%s.openstack.common.gettextutils" % package_name
+                module = importlib.import_module(modname)
+                module.install(package_name)
+            except Exception:
+                pass
 
     pkg_location = os.path.join(repo_location, package_name)
     for root, dirs, files in os.walk(pkg_location):
