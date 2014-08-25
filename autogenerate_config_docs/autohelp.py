@@ -44,7 +44,7 @@ BASE_XML = '''<?xml version="1.0" encoding="UTF-8"?>
      generated and your changes will be overwritten.
      The tool to do so lives in openstack-doc-tools repository. -->
   <table rules="all" xml:id="config_table_%(pkg)s_%(cat)s">
-    <caption>Description of configuration options for %(cat)s</caption>
+    <caption>Description of %(nice_cat)s configuration options</caption>
     <col width="50%%"/>
     <col width="50%%"/>
     <thead>
@@ -334,12 +334,29 @@ def write_docbook(package_name, options, target, verbose=0):
             for category in categories.split():
                 options_by_cat.setdefault(category, []).append(opt)
 
+    category_names = {}
+    try:
+        with open(package_name + '.headers') as f:
+            for line in f:
+                cat, nice_name = line.split(' ', 1)
+                category_names[cat] = nice_name.strip()
+    except IOError:
+        print("Cannot open %s (ignored)" % (package_name + '.headers'))
+
     if not os.path.isdir(target):
         os.makedirs(target)
 
     for cat in options_by_cat.keys():
         parser = etree.XMLParser(remove_blank_text=True)
-        xml = etree.XML(BASE_XML % {'pkg': package_name, 'cat': cat}, parser)
+        if cat in category_names:
+            nice_cat = category_names[cat]
+        else:
+            nice_cat = cat
+            print("No nicename for %s" % cat)
+        xml = etree.XML(BASE_XML %
+                        {'pkg': package_name, 'cat': cat,
+                         'nice_cat': nice_cat},
+                        parser)
         tbody = xml.find(".//{http://docbook.org/ns/docbook}tbody")
         curgroup = None
         for optname in options_by_cat[cat]:
@@ -428,7 +445,9 @@ def write_docbook_rootwrap(package_name, repo, target, verbose=0):
         os.makedirs(target)
 
     parser = etree.XMLParser(remove_blank_text=True)
-    xml = etree.XML(BASE_XML % {'pkg': package_name, 'cat': 'rootwrap'},
+    xml = etree.XML(BASE_XML % {'pkg': package_name,
+                                'cat': 'rootwrap',
+                                'nice_cat': 'rootwrap'},
                     parser)
     tbody = xml.find(".//{http://docbook.org/ns/docbook}tbody")
 
