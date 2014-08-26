@@ -415,12 +415,20 @@ INLINETAGS
 </xsl:template>
 
 <xsl:template match="strong">
-    <emphasis>
-        <xsl:attribute name="role">
-            <xsl:value-of select="'strong'"/>
-        </xsl:attribute>
-        <xsl:apply-templates/>
-    </emphasis>
+    <xsl:choose>
+        <xsl:when test="@classes='command'">
+            <command>
+                <xsl:apply-templates/>
+            </command>
+        </xsl:when>
+        <xsl:otherwise>
+            <emphasis>
+                <xsl:attribute name="role">
+                    <xsl:apply-templates/>
+                </xsl:attribute>
+            </emphasis>
+        </xsl:otherwise>
+    </xsl:choose>
 </xsl:template>
 
 <xsl:template match="literal">
