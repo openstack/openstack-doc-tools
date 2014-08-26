@@ -29,6 +29,7 @@ usage() {
     echo "  $(basename $0) [ OPTIONS ] update|docbook|setup [ project1 ... ]"
     echo
     echo "Subcommands:"
+    echo "  create:    Create an initial flagmapping file"
     echo "  update:    Update the flagmapping files"
     echo "  docbook:   Generate the options tables"
     echo "  setup:     Install the environment only"
@@ -127,7 +128,7 @@ ACTION=$1
 shift
 
 case $ACTION in
-    update|docbook|setup) ;;
+    create|update|docbook|setup) ;;
     *)
         usage
         exit 1
@@ -167,6 +168,15 @@ for project in $PROJECTS; do
     fi
 
     case $ACTION in
+    create)
+        [ "$project" = "swift" ] && continue
+        file=$MANUALSREPO/tools/autogenerate-config-flagmappings/$project.flagmappings
+        if [ -e $file ]; then
+            echo "$project.flagmappings already exists, ignoring."
+            continue
+        fi
+        $AUTOHELP create $project -i $SOURCESDIR/$project
+        ;;
     update)
         [ "$project" = "swift" ] && continue
         $AUTOHELP update $project -i $SOURCESDIR/$project
