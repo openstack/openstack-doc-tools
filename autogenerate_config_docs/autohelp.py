@@ -334,14 +334,16 @@ def write_docbook(package_name, options, target, verbose=0):
             for category in categories.split():
                 options_by_cat.setdefault(category, []).append(opt)
 
+    package_headers = package_name + '.headers'
     category_names = {}
-    try:
-        with open(package_name + '.headers') as f:
-            for line in f:
-                cat, nice_name = line.split(' ', 1)
-                category_names[cat] = nice_name.strip()
-    except IOError:
-        print("Cannot open %s (ignored)" % (package_name + '.headers'))
+    for headers_file in ('shared.headers', package_headers):
+        try:
+            with open(headers_file) as f:
+                for line in f:
+                    cat, nice_name = line.split(' ', 1)
+                    category_names[cat] = nice_name.strip()
+        except IOError:
+            print("Cannot open %s (ignored)" % headers_file)
 
     if not os.path.isdir(target):
         os.makedirs(target)
