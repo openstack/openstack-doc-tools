@@ -320,6 +320,12 @@ class OptionsCache(object):
             return cmp(x, y)
 
 
+def pass_through(line):
+    """Whether to ignore the line."""
+    return (not line.strip() or
+            line.startswith('#'))
+
+
 def write_docbook(package_name, options, target, verbose=0):
     """Write DocBook tables.
 
@@ -330,6 +336,8 @@ def write_docbook(package_name, options, target, verbose=0):
 
     with open(package_name + '.flagmappings') as f:
         for line in f:
+            if pass_through(line):
+                continue
             opt, categories = line.split(' ', 1)
             for category in categories.split():
                 options_by_cat.setdefault(category, []).append(opt)
@@ -340,6 +348,8 @@ def write_docbook(package_name, options, target, verbose=0):
         try:
             with open(headers_file) as f:
                 for line in f:
+                    if pass_through(line):
+                        continue
                     cat, nice_name = line.split(' ', 1)
                     category_names[cat] = nice_name.strip()
         except IOError:
