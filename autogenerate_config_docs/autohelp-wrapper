@@ -22,6 +22,7 @@ EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
 PROJECTS="ceilometer cinder glance heat keystone neutron nova sahara swift trove"
 BRANCH=master
+FAST=0
 
 usage() {
     echo "Wrapper for autohelp.py"
@@ -37,6 +38,7 @@ usage() {
     echo "Options:"
     echo "  -b BRANCH: Work on this branch (defaults to master)"
     echo "  -c:        Recreate the virtual environment"
+    echo "  -f:        Work offline: Do not change environment or sources"
     echo "  -e PATH:   Create the virtualenv in PATH"
 }
 
@@ -98,7 +100,7 @@ setup_tools() {
     fi
 }
 
-while getopts :b:e:c opt; do
+while getopts :b:e:cf opt; do
     case $opt in
     b)
         BRANCH=$OPTARG
@@ -111,6 +113,10 @@ while getopts :b:e:c opt; do
     e)
         VENVDIR=$OPTARG
         shift 2
+        ;;
+    f)
+        FAST=1
+        shift
         ;;
     \?)
         usage
@@ -143,17 +149,19 @@ fi
 [ $# != 0 ] && PROJECTS="$*"
 
 setup_venv
-setup_tools
+if [ "$FAST" -eq 0 ] ; then
+    setup_tools
 
-for project in $PROJECTS; do
-    get_project $project
+    for project in $PROJECTS; do
+        get_project $project
 
-    (
-        cd $SOURCESDIR/$project
-        git checkout $BRANCH
-        python setup.py install
-    )
-done
+        (
+            cd $SOURCESDIR/$project
+            git checkout $BRANCH
+            python setup.py install
+        )
+    done
+fi
 
 for project in $PROJECTS; do
     if [ "$ACTION" = "setup" ]; then
