@@ -12,6 +12,8 @@ Release notes
   setup, add support for the ``create`` subcommand, add support for
   offline/fast operation.
 * ``diff_branches.py``: Updated output format.
+* Provide a ``hotref`` extension for sphinx, to automate the creation of
+  references to the HOT resources documentation.
 
 0.18.1
 ------
