@@ -15,6 +15,7 @@ Release notes
 * ``diff_branches.py``: Updated output format.
 * Provide a ``hotref`` extension for sphinx, to automate the creation of
   references to the HOT resources documentation.
+* ``openstack-auto-commands``: Handle python-openstackclient.
 
 0.18.1
 ------
