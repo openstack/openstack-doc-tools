@@ -13,6 +13,8 @@ Release notes
 * ``autohelp-wrapper``: Add support for offline/fast operation.
 * ``autohelp-wrapper``: Add a module blacklisting mechanism.
 * ``diff_branches.py``: Updated output format.
+* Provide a ``hotref`` extension for sphinx, to automate the creation of
+  references to the HOT resources documentation.
 
 0.18.1
 ------
