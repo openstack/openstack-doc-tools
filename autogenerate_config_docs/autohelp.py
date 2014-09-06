@@ -37,6 +37,11 @@ from hooks import HOOKS  # noqa
 
 EXTENSIONS = ['oslo.messaging', 'oslo.db']
 
+IGNORE = ['trove.guestagent.datastore.postgresql.manager',
+          'trove.guestagent.datastore.postgresql.service.root',
+          'trove.guestagent.datastore.postgresql.service.users',
+          'trove.guestagent.datastore.postgresql.service.database']
+
 BASE_XML = '''<?xml version="1.0" encoding="UTF-8"?>
 <para xmlns="http://docbook.org/ns/docbook"
   version="5.0">
@@ -127,6 +132,8 @@ def import_modules(repo_location, package_name, verbose=0):
                 modname = '.'.join(modname)
                 if modname.endswith('.__init__'):
                     modname = modname[:modname.rfind(".")]
+                if modname in IGNORE:
+                    continue
                 try:
                     module = importlib.import_module(modname)
                     if verbose >= 1:

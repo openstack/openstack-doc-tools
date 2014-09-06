@@ -9,8 +9,9 @@ Release notes
 * ``autohelp.py``: Improve sanitizer, better support for i18n in
   projects, allow setting of title name for tables.
 * ``autohelp-wrapper``: Smarter handling of the manuals repo and environment
-  setup, add support for the ``create`` subcommand, add support for
-  offline/fast operation.
+  setup, add support for the ``create`` subcommand.
+* ``autohelp-wrapper``: Add support for offline/fast operation.
+* ``autohelp-wrapper``: Add a module blacklisting mechanism.
 * ``diff_branches.py``: Updated output format.
 
 0.18.1
