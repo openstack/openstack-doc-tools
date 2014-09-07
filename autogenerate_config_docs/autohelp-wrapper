@@ -154,7 +154,12 @@ if [ "$FAST" -eq 0 ] ; then
 
         (
             cd $SOURCESDIR/$project
-            git checkout $BRANCH
+            GIT_CMD="git show-ref --verify --quiet refs/heads/$BRANCH"
+            if $GIT_CMD; then
+                git checkout $BRANCH
+            else
+                git checkout -b $BRANCH remotes/origin/$BRANCH
+            fi
             python setup.py install
         )
     done
