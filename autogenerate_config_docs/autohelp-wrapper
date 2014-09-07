@@ -154,6 +154,7 @@ if [ "$FAST" -eq 0 ] ; then
 
         (
             cd $SOURCESDIR/$project
+            find $project -name "*.pyc" -delete
             GIT_CMD="git show-ref --verify --quiet refs/heads/$BRANCH"
             if $GIT_CMD; then
                 git checkout $BRANCH
