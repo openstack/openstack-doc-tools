@@ -1470,7 +1470,10 @@ def doctest():
         print("Only files in www directory changed, nothing to do.\n")
         return
 
-    if not CONF.force and not CONF.language and only_po_touched():
+    # Build everything if we publish so that regularly all manuals are
+    # published, for testing ignore the locale directories.
+    if (not CONF.force and not CONF.publish and not CONF.language
+            and only_po_touched()):
         print("Only files in locale directories changed, nothing to do.\n")
         return
 
