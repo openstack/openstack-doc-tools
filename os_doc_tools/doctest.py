@@ -1059,6 +1059,8 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
                 dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
             for f in files:
+                if not f.endswith('.xml'):
+                    continue
                 f_base = os.path.basename(f)
                 f_abs = os.path.abspath(os.path.join(root, f))
 
