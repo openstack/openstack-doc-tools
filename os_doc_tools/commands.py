@@ -466,6 +466,18 @@ def generate_end(os_file):
     os_file.write("</chapter>\n")
 
 
+def get_openstack_subcommands(commands):
+    """Get all subcommands of 'openstack' without using bashcompletion."""
+    subcommands = []
+    for command in commands:
+        output = check_output(["openstack", "help", command])
+        for line in output.split("\n"):
+            if line.strip().startswith(command):
+                subcommands.append(line.strip())
+
+    return subcommands
+
+
 def document_single_project(os_command, output_dir):
     """Create documenation for os_command."""
 
@@ -541,78 +553,15 @@ def document_single_project(os_command, output_dir):
     elif os_command == 'openstack':
         api_name = ''
         title = "OpenStack client"
-        # Does not support bash-completion command in the form
-        # required by this tool.
-        subcommands = ["aggregate add host", "aggregate create",
-                       "aggregate delete", "aggregate list",
-                       "aggregate remove host", "aggregate set",
-                       "aggregate show", "backup create",
-                       "backup delete", "backup list",
-                       "backup restore", "backup show",
-                       "compute agent create", "compute agent delete",
-                       "compute agent list", "compute agent set",
-                       "compute service list", "compute service set",
-                       "console log show", "console url show",
-                       "container list", "container show",
-                       "ec2 credentials create", "ec2 credentials delete",
-                       "ec2 credentials list", "ec2 credentials show",
-                       "endpoint create", "endpoint delete",
-                       "endpoint list", "endpoint show",
-                       "extension list",
-                       "flavor create", "flavor delete",
-                       "flavor list", "flavor show",
-                       "host list",
-                       "host show", "hypervisor list",
-                       "hypervisor show", "image create",
-                       "image delete", "image list",
-                       "image save", "image set",
-                       "image show", "ip fixed add",
-                       "ip fixed remove", "ip floating add",
-                       "ip floating create", "ip floating delete",
-                       "ip floating list", "ip floating pool list",
-                       "ip floating remove", "keypair create",
-                       "keypair delete", "keypair list",
-                       "keypair show", "limits show",
-                       "module list", "object list",
-                       "object show", "project create",
-                       "project delete", "project list",
-                       "project set", "project show",
-                       "project usage list", "quota set",
-                       "quota show", "role add",
-                       "role create", "role delete",
-                       "role list", "role remove",
-                       "role show", "security group create",
-                       "security group delete", "security group list",
-                       "security group rule create",
-                       "security group rule delete",
-                       "security group rule list", "security group set",
-                       "security group show", "server add security group",
-                       "server add volume", "server create",
-                       "server delete", "server image create",
-                       "server list", "server lock",
-                       "server migrate", "server pause",
-                       "server reboot", "server rebuild",
-                       "server remove security group", "server remove volume",
-                       "server rescue", "server resize",
-                       "server resume", "server set",
-                       "server show", "server ssh",
-                       "server suspend", "server unlock",
-                       "server unpause", "server unrescue",
-                       "server unset", "service create",
-                       "service delete", "service list",
-                       "service show", "snapshot create",
-                       "snapshot delete", "snapshot list",
-                       "snapshot set", "snapshot show",
-                       "token issue", "token revoke",
-                       "user create",
-                       "user delete", "user list",
-                       "user role list", "user set",
-                       "user show", "volume create",
-                       "volume delete", "volume list",
-                       "volume set", "volume show",
-                       "volume type create", "volume type delete",
-                       "volume type list", "volume type set",
-                       "volume type unset", "volume unset"]
+        # Does not know about bash-completion yet, need to specify
+        # commands manually and to fetch subcommands automatically
+        commands = ["aggregate", "backup", "compute", "console", "container",
+                    "ec2", "endpoint", "extension", "flavor", "host",
+                    "hypervisor", "image", "ip", "keypair", "limits", "module",
+                    "network", "object", "project", "quota", "role",
+                    "security", "server", "service", "snapshot", "token",
+                    "user", "volume"]
+        subcommands = get_openstack_subcommands(commands)
     else:
         print("'%s' command not yet handled" % os_command)
         sys.exit(-1)
