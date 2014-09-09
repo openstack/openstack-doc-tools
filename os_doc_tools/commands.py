@@ -95,7 +95,7 @@ def generate_heading(os_command, api_name, title, os_file):
 
     header3 = """
        This chapter documents <command>%(os_command)s</command> version
-        %(version)s.
+        <literal>%(version)s</literal>.
     </para>
 
     <para>For help on a specific <command>%(os_command)s</command>
@@ -364,7 +364,7 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     os_subcommandid = os_subcommand.replace(' ', '_')
     os_file.write("    <section xml:id=\"%sclient_subcommand_%s\">\n"
                   % (os_command, os_subcommandid))
-    os_file.write("        <title>%s %s command</title>\n"
+    os_file.write("        <title>%s %s</title>\n"
                   % (os_command, os_subcommand))
 
     if os_command == "swift":
