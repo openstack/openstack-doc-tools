@@ -497,15 +497,6 @@ def document_single_project(os_command, output_dir):
     elif os_command == 'ironic':
         api_name = "Bare metal"
         title = "Bare metal command-line client"
-        # Does not know about bash-completion yet, need to specify
-        # subcommands manually
-        subcommands = ["chassis-create", "chassis-delete", "chassis-list",
-                       "chassis-node-list", "chassis-show", "chassis-update",
-                       "driver-list", "node-create", "node-delete",
-                       "node-list", "node-port-list", "node-set-power-state",
-                       "node-show", "node-update", "node-validate",
-                       "port-create", "port-delete", "port-list", "port-show",
-                       "port-update"]
     elif os_command == 'keystone':
         api_name = "OpenStack Identity API"
         title = "Identity service command-line client"
