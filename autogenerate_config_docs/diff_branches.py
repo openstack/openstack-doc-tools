@@ -69,7 +69,10 @@ def get_options(project, branch, args):
     serialized = subprocess.check_output(cmd, shell=True,
                                          env={'VIRTUAL_ENV': dirname,
                                               'PATH': path})
-    return pickle.loads(serialized)
+    sys.path.insert(0, repo_path)
+    ret = pickle.loads(serialized)
+    sys.path.pop(0)
+    return ret
 
 
 def _cmpopts(x, y):
