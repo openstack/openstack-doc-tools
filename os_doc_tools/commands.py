@@ -346,26 +346,34 @@ def generate_command(os_command, os_file):
     os_file.write("    </section>\n")
 
 
-def generate_subcommand(os_command, os_subcommand, os_file):
+def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
+                        suffix, title_suffix):
     """Convert os_command help os_subcommand to DocBook.
 
     :param os_command: client command to document
     :param os_subcommand: client subcommand to document
     :param os_file:    open filehandle for output of DocBook file
+    :param extra_params: Extra parameter to pass to os_command
+    :param suffix: Extra suffix to add to xml:id
+    :param title_suffix: Extra suffix for title
     """
 
+    args = [os_command]
+    if extra_params:
+        args.extend(extra_params)
     if use_help_flag(os_command):
-        help_lines = check_output([os_command, os_subcommand,
-                                   "--help"]).split('\n')
+        args.append(os_subcommand)
+        args.append("--help")
     else:
-        help_lines = check_output([os_command, "help",
-                                   os_subcommand]).split('\n')
+        args.append("help")
+        args.append(os_subcommand)
+    help_lines = check_output(args).split('\n')
 
     os_subcommandid = os_subcommand.replace(' ', '_')
-    os_file.write("    <section xml:id=\"%sclient_subcommand_%s\">\n"
-                  % (os_command, os_subcommandid))
-    os_file.write("        <title>%s %s</title>\n"
-                  % (os_command, os_subcommand))
+    os_file.write("    <section xml:id=\"%sclient_subcommand_%s%s\">\n"
+                  % (os_command, os_subcommandid, suffix))
+    os_file.write("        <title>%s %s%s</title>\n"
+                  % (os_command, os_subcommand, title_suffix))
 
     if os_command == "swift":
         next_line_screen = False
@@ -377,6 +385,10 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     else:
         next_line_screen = True
         in_para = False
+    if extra_params:
+        extra_paramstr = ' '.join(extra_params)
+        help_lines[0] = help_lines[0].replace(os_command, "%s %s" %
+                                              (os_command, extra_paramstr))
     line_index = -1
     # Content is:
     # usage...
@@ -430,13 +442,17 @@ def generate_subcommand(os_command, os_subcommand, os_file):
     os_file.write("    </section>\n")
 
 
-def generate_subcommands(os_command, os_file, blacklist, only_subcommands):
+def generate_subcommands(os_command, os_file, blacklist, only_subcommands,
+                         extra_params, suffix, title_suffix):
     """Convert os_command help subcommands for all subcommands to DocBook.
 
     :param os_command: client command to document
     :param os_file:    open filehandle for output of DocBook file
     :param blacklist:  list of elements that will not be documented
     :param only_subcommands: if not empty, list of subcommands to document
+    :param extra_params: Extra parameter to pass to os_command.
+    :param suffix: Extra suffix to add to xml:id
+    :param title_suffix: Extra suffix for title
     """
 
     print("Documenting '%s' subcommands..." % os_command)
@@ -452,7 +468,8 @@ def generate_subcommands(os_command, os_file, blacklist, only_subcommands):
     subcommands = [o for o in all_options if not
                    (o.startswith('-') or o in blacklist)]
     for subcommand in sorted(subcommands):
-        generate_subcommand(os_command, subcommand, os_file)
+        generate_subcommand(os_command, subcommand, os_file, extra_params,
+                            suffix, title_suffix)
     print ("%d subcommands documented." % len(subcommands))
 
 
@@ -612,8 +629,53 @@ def document_single_project(os_command, output_dir):
     out_file = open(os.path.join(output_dir, out_filename), 'w')
     generate_heading(os_command, api_name, title, out_file)
     generate_command(os_command, out_file)
+
+    if os_command == 'glance':
+        out_file.write("""
+    <section xml:id=\"glance_cli_v1\">
+       <title>Image Service API v1 commands</title>\n""")
+
     generate_subcommands(os_command, out_file, blacklist,
-                         subcommands)
+                         subcommands, None, "", "")
+
+    if os_command == 'glance':
+        out_file.write("    </section>\n")
+        subcommands = ['explain', 'image-create', 'image-delete',
+                       'image-download', 'image-list', 'image-show',
+                       'image-tag-delete', 'image-tag-update', 'image-update',
+                       'image-upload', 'location-add', 'location-delete',
+                       'location-update', 'md-namespace-create',
+                       'md-namespace-delete', 'md-namespace-import',
+                       'md-namespace-list', 'md-namespace-objects-delete',
+                       'md-namespace-properties-delete',
+                       'md-namespace-resource-type-list', 'md-namespace-show',
+                       'md-namespace-update', 'md-object-create',
+                       'md-object-delete', 'md-object-list',
+                       'md-object-property-show', 'md-object-show',
+                       'md-object-update', 'md-property-create',
+                       'md-property-delete', 'md-property-list',
+                       'md-property-show', 'md-property-update',
+                       'md-resource-type-associate',
+                       'md-resource-type-deassociate',
+                       'md-resource-type-list', 'member-create',
+                       'member-delete', 'member-list', 'member-update']
+
+        out_file.write("""
+    <section xml:id=\"glance_cli_v2\">
+       <title>Image Service API v2 commands</title>
+    <para>
+       You can select an API version to use by adding the
+       <parameter>--os-image-api-version</parameter> option or by setting
+       the corresponding environment variable:\n""")
+        out_file.write("<screen><prompt>$</prompt> <userinput>"
+                       "export OS_IMAGE_API_VERSION=2</userinput></screen>\n"
+                       "</para>\n")
+
+        generate_subcommands(os_command, out_file, blacklist,
+                             subcommands, ["--os-image-api-version", "2"],
+                             "_v2", " (v2)")
+        out_file.write("    </section>\n")
+
     generate_end(out_file)
     out_file.close()
 
