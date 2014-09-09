@@ -28,6 +28,16 @@ from lxml import etree
 
 PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'keystone', 'neutron',
             'nova', 'swift', 'trove']
+MASTER_RELEASE = 'Juno'
+CODENAME_TITLE = {'ceilometer': 'Telemetry',
+                  'cinder': 'OpenStack Block Storage',
+                  'glance': 'OpenStack Image Service',
+                  'heat': 'Orchestration',
+                  'keystone': 'OpenStack Identity',
+                  'neutron': 'OpenStack Networking',
+                  'nova': 'OpenStack Compute',
+                  'swift': 'OpenStack Object Storage',
+                  'trove': 'Database Service'}
 
 
 def setup_venv(branch, novenvupdate):
@@ -192,6 +202,13 @@ def format_option_name(name):
         return "[%s] %s" % (section, name)
 
 
+def release_from_branch(branch):
+    if branch == 'master':
+        return MASTER_RELEASE
+    else:
+        return branch.replace('stable/', '')
+
+
 def generate_docbook(project, new_branch, old_list, new_list):
     """Generate the diff between the 2 options lists for `project`."""
     new_opts, changed_default, deprecated_opts = diff(old_list, new_list)
@@ -209,7 +226,10 @@ def generate_docbook(project, new_branch, old_list, new_list):
                                  "lives in the openstack-doc-tools "
                                  "repository. "))
     title = etree.Element("title")
-    title.text = "New, updated and deprecated options for %s" % project
+    title.text = ("New, updated and deprecated options "
+                  "in %(release)s for %(project)s" %
+                  {'release': release_from_branch(new_branch),
+                   'project': CODENAME_TITLE[project]})
     section.append(title)
 
     # New options
@@ -299,7 +319,7 @@ def main():
 
         release = args.new_branch.replace('stable/', '')
         xml = generate_docbook(project, release, old_list, new_list)
-        filename = ("%(project)s-conf-changes-%(release)s.xml" %
+        filename = ("%(project)s-conf-changes.xml" %
                     {'project': project, 'release': release})
         if not os.path.exists(args.target):
             os.makedirs(args.target)
