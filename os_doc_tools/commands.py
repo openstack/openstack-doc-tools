@@ -460,8 +460,11 @@ def generate_subcommands(os_command, os_file, blacklist, only_subcommands,
     blacklist.append("complete")
     blacklist.append("help")
     if not only_subcommands:
-        all_options = check_output([os_command,
-                                    "bash-completion"]).strip().split()
+        args = [os_command]
+        if extra_params:
+            args.extend(extra_params)
+        args.append("bash-completion")
+        all_options = check_output(args).strip().split()
     else:
         all_options = only_subcommands
 
@@ -579,6 +582,10 @@ def document_single_project(os_command, output_dir):
     generate_heading(os_command, api_name, title, out_file)
     generate_command(os_command, out_file)
 
+    if os_command == 'cinder':
+        out_file.write("""
+    <section xml:id=\"cinder_cli_v1\">
+       <title>Block Storage API v1 commands</title>\n""")
     if os_command == 'glance':
         out_file.write("""
     <section xml:id=\"glance_cli_v1\">
@@ -587,6 +594,23 @@ def document_single_project(os_command, output_dir):
     generate_subcommands(os_command, out_file, blacklist,
                          subcommands, None, "", "")
 
+    if os_command == 'cinder':
+        out_file.write("    </section>\n")
+        out_file.write("""
+    <section xml:id=\"cinder_cli_v2\">
+       <title>Block Storage API v2 commands</title>
+    <para>
+       You can select an API version to use by adding the
+       <parameter>--os-volume-api-version</parameter> option or by setting
+       the corresponding environment variable:\n""")
+        out_file.write("<screen><prompt>$</prompt> <userinput>"
+                       "export OS_VOLUME_API_VERSION=2</userinput></screen>\n"
+                       "</para>\n")
+
+        generate_subcommands(os_command, out_file, blacklist,
+                             subcommands, ["--os-volume-api-version", "2"],
+                             "_v2", " (v2)")
+        out_file.write("    </section>\n")
     if os_command == 'glance':
         out_file.write("    </section>\n")
         subcommands = ['explain', 'image-create', 'image-delete',

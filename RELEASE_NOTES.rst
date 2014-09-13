@@ -16,7 +16,7 @@ Release notes
 * Provide a ``hotref`` extension for sphinx, to automate the creation of
   references to the HOT resources documentation.
 * ``openstack-auto-commands``: Handle python-openstackclient, handle
-  python-glanceclient v2 commands.
+  python-glanceclient and python-cinderclient v2 commands.
 
 0.18.1
 ------
