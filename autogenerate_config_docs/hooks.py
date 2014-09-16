@@ -24,4 +24,12 @@ def keystone_config():
     config.configure()
 
 
-HOOKS = {'keystone.common.config': keystone_config}
+def glance_store_config():
+    import glance_store
+    from oslo.config import cfg
+
+    glance_store.backend.register_opts(cfg.CONF)
+
+
+HOOKS = {'keystone.common.config': keystone_config,
+         'glance.common.config': glance_store_config}
