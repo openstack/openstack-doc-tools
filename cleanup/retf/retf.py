@@ -141,7 +141,7 @@ def write_text_to_file(dest, text, no_backup, in_place):
 
 
 def initialize_logging(debug, less_verbose):
-    """Initialze the Logger."""
+    """Initialize the Logger."""
     logger = logging.getLogger(name='retf')
     formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
     handler = logging.StreamHandler()
