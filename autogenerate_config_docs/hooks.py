@@ -25,10 +25,14 @@ def keystone_config():
 
 
 def glance_store_config():
-    import glance_store
-    from oslo.config import cfg
+    try:
+        import glance_store
+        from oslo.config import cfg
 
-    glance_store.backend.register_opts(cfg.CONF)
+        glance_store.backend.register_opts(cfg.CONF)
+    except ImportError:
+        # glance_store is not available before Juno
+        pass
 
 
 HOOKS = {'keystone.common.config': keystone_config,
