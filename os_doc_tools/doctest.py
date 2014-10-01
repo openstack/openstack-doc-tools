@@ -193,6 +193,17 @@ def verify_profiling(doc):
     verify_attribute_profiling(doc, "audience", KNOWN_AUDIENCE_VALUES)
 
 
+def verify_newline_end_of_file(docfile):
+    """Check that there is a newline at the end of file."""
+
+    with open(docfile, 'r') as fp:
+        lines = fp.readlines()
+        lastline = lines[-1]
+
+    if not lastline.endswith('\n'):
+        raise ValueError('last line of a file must end with a \\n')
+
+
 def verify_whitespace_niceness(docfile):
     """Check that no unnecessary whitespaces are used."""
     checks = [
@@ -494,6 +505,7 @@ def validate_one_json_file(rootdir, path, verbose, check_syntax,
     try:
         if check_niceness:
             verify_whitespace_niceness(path)
+            verify_newline_end_of_file(path)
     except ValueError as e:
         any_failures = True
         print("  %s: %s" % (os.path.relpath(path, rootdir), e))
@@ -524,6 +536,7 @@ def validate_one_file(schema, rootdir, path, verbose,
                     verify_valid_links(doc)
         if check_niceness:
             verify_whitespace_niceness(path)
+            verify_newline_end_of_file(path)
     except etree.XMLSyntaxError as e:
         any_failures = True
         print("  %s: %s" % (os.path.relpath(path, rootdir), e))

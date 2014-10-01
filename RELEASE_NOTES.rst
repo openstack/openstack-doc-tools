@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.20
+----
+
+* ``openstack-doc-test``: Check for a ``\n`` in the last line of a file.
+
 0.19
 ----
 
