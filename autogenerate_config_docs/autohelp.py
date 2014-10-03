@@ -407,7 +407,7 @@ def write_docbook(package_name, options, target, verbose=0):
             tr.append(td)
 
             td = etree.Element('td')
-            td.text = "(%s) %s" % (type(option).__name__, option.help)
+            td.text = "(%s) %s" % (type(option).__name__, option.help.strip())
             tr.append(td)
 
         file_path = ("%(target)s/%(package_name)s-%(cat)s.xml" %
