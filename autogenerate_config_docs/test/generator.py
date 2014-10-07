@@ -16,8 +16,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# @author: Zhongyue Luo, SINA Corporation.
-#
 # ====================
 # Leaving original copyright/licensing info for now... though I made
 # a couple small changes...

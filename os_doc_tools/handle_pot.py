@@ -12,12 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-'''
-Created on 2012-7-3
-
-@author: daisy
-'''
-
 import codecs
 import optparse
 import os
