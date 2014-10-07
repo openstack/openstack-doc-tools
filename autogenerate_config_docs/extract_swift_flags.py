@@ -82,7 +82,7 @@ def get_existing_options(optfiles):
     """Parse an existing XML table to compile a list of existing options."""
     options = {}
     for optfile in optfiles:
-        if '/swift-conf-changes-' in optfile:
+        if optfile.endswith('/swift-conf-changes.xml'):
             continue
         xml = etree.fromstring(open(optfile).read())
         tbody = xml.find(DBK_NS + "tbody")
