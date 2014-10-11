@@ -545,12 +545,25 @@ HYPERLINK & FOOTNOTES
 <xsl:template match="reference">
     <xsl:choose>
         <xsl:when test="@refuri">
-            <link>
-                <xsl:attribute name="xlink:href">
-                    <xsl:value-of select="@refuri"/>
-                </xsl:attribute>
-                <xsl:apply-templates/>
-            </link>
+            <xsl:choose>
+                <xsl:when test="@internal='True'">
+                    <xref>
+                        <xsl:attribute name="linkend">
+                            <xsl:value-of select="substring-after(@refuri, '#')"/>
+                        </xsl:attribute>
+                        <!-- Don't apply-templates here or invalid docbook will
+                             be generated (<emphasis> in <xref>). -->
+                    </xref>
+                </xsl:when>
+                <xsl:otherwise>
+                    <link>
+                        <xsl:attribute name="xlink:href">
+                            <xsl:value-of select="@refuri"/>
+                        </xsl:attribute>
+                        <xsl:apply-templates/>
+                    </link>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:when>
         <xsl:when test="@refid">
             <link>

@@ -5,6 +5,7 @@ Release notes
 ----
 
 * ``openstack-doc-test``: Check for a ``\n`` in the last line of a file.
+* ``openstack-dn2osdbk``: Properly handle internal references.
 
 0.19
 ----

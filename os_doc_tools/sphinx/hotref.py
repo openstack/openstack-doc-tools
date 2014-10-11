@@ -18,9 +18,6 @@
     Usage examples:
 
         The :hotref:`OS::Nova::Server` resource creates a new instance.
-        The :hotref:os:`OS::Nova:Server` resource also.
-        The :hotref:cfn:`AWS::CloudFormation::WaitCondition` is an AWS
-        resource.
 
     To use this extension, add 'os_doc_tools.sphinx.hotref' in the `extensions`
     list of your conf.py file."""
@@ -29,37 +26,21 @@ from docutils import nodes
 from docutils import utils
 
 
-def build_ref_node(prefix, rawtext, app, resource, options):
-    link = resource.replace(':', '_')
-    base = app.config.hotref_base_url
-    ref = "%(base)s/%(prefix)s_%(name)s.html" % {'base': base,
-                                                 'prefix': prefix,
-                                                 'name': link}
-    literal = nodes.literal('')
-    ref_node = nodes.reference(rawtext, utils.unescape(resource),
-                               refuri=ref, **options)
-    literal.append(ref_node)
-    return literal
-
-
 def hotref_os_role(name, rawtext, text, lineno, inliner, options={},
                    content=[]):
     app = inliner.document.settings.env.app
-    node = build_ref_node('openstack', rawtext, app, text, options)
-    return [node], []
-
-
-def hotref_cfn_role(name, rawtext, text, lineno, inliner, options={},
-                    content=[]):
-    app = inliner.document.settings.env.app
-    node = build_ref_node('cfn', rawtext, app, text, options)
-    return [node], []
+    link = text.replace(':', '_')
+    base = app.config.hotref_base_url
+    ref = "%(base)s/%(name)s.html" % {'base': base, 'name': link}
+    literal = nodes.literal('')
+    ref_node = nodes.reference(rawtext, utils.unescape(text),
+                               refuri=ref, **options)
+    literal.append(ref_node)
+    return [literal], []
 
 
 def setup(app):
     app.add_role('hotref', hotref_os_role)
-    app.add_role('hotref:os', hotref_os_role)
-    app.add_role('hotref:cfn', hotref_cfn_role)
     app.add_config_value('hotref_base_url',
                          'http://docs.openstack.org/hot-reference/content',
                          'env')
