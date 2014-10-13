@@ -15,6 +15,7 @@
 import argparse
 import glob
 import os
+import re
 import sys
 
 from lxml import etree
@@ -63,20 +64,21 @@ class XMLFileTransformer(object):
         root.insert(0, comment)
 
         for item in tree.iter():
-            # Find tags with an 'id' attribute, and prefix its value with the
-            # basename of the file being processed. This avoids id conflicts
-            # when working with multiple source files.
+            # Find tags with an 'id' attribute. In case there are multiple
+            # space-separated IDs, we have to make a choice.
             id_attrib = '%sid' % XML_NS
-            id = item.get(id_attrib)
-            if id is not None:
-                id = id.split(' ')[-1]
-                id = "%s_%s" % (self.basename, id)
-                item.attrib[id_attrib] = id
+            xml_id = item.get(id_attrib)
+            if xml_id is not None:
+                id_list = xml_id.split(' ')
+                # If the title and an associated reference target match, sphinx
+                # generates a second id like 'id[0-9]' which is hardly usable.
+                # So we take the first id in that case, otherwise the last.
+                if len(id_list) > 1 and re.match(r'id\d+', id_list[-1]):
+                    xml_id = id_list[0]
+                else:
+                    xml_id = id_list[-1]
 
-            # Same for the linkend attribute.
-            linkend = item.get('linkend')
-            if linkend is not None:
-                item.attrib['linkend'] = "%s_%s" % (self.basename, linkend)
+                item.attrib[id_attrib] = xml_id
 
         return tree
 
