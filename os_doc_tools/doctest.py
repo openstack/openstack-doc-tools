@@ -950,6 +950,86 @@ def is_book_master(filename):
             filename == 'openstack-glossary.xml')
 
 
+def print_unused(rootdir, ignore_dirs, included_by):
+    """Print list of files that are not included anywhere."""
+
+    if cfg.CONF.print_unused_files:
+        print("Checking for files that are not included anywhere...")
+        print(" Note: This only looks at files included by an .xml file "
+              "but not for files included by other files like .wadl.")
+        for root, dirs, files in os.walk(rootdir):
+            dirs[:] = filter_dirs(dirs)
+
+            # Filter out directories to be ignored
+            if ignore_dirs:
+                dirs[:] = [d for d in dirs if d not in ignore_dirs]
+
+            for f in files:
+                if not f.endswith('.xml'):
+                    continue
+                f_base = os.path.basename(f)
+                f_abs = os.path.abspath(os.path.join(root, f))
+
+                if (f_abs not in included_by and f_base != "pom.xml"
+                   and not is_book_master(f_base)):
+                    f_rel = os.path.relpath(f_abs, rootdir)
+                    print ("  %s " % f_rel)
+        print("\n")
+
+
+def generate_affected_books(rootdir, book_bk, ignore_dirs, abs_ignore_dirs,
+                            included_by):
+    """Generate list of affected books."""
+
+    affected_books = set()
+
+    # Generate list of modified_files
+    # Do not select deleted files, just Added, Copied, Modified, Renamed,
+    # or Type changed
+    modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
+    modified_files = [os.path.abspath(f) for f in modified_files]
+    if ignore_dirs:
+        for idir in abs_ignore_dirs:
+            non_ignored_files = []
+            for f in modified_files:
+                if not f.startswith(idir):
+                    non_ignored_files.append(f)
+            modified_files = non_ignored_files
+
+    # 2. Find all modified files and where they are included
+
+    # List of files that we have to iterate over, these are affected
+    # by some modification
+    new_files = modified_files
+
+    # All files that are affected (either directly or indirectly)
+    affected_files = set(modified_files)
+
+    # 3. Iterate over files that have includes on modified files
+    # and build a closure - the set of all files (affected_files)
+    # that have a path to a modified file via includes.
+    while len(new_files) > 0:
+        new_files_to_check = new_files
+        new_files = []
+        for f in new_files_to_check:
+            if "doc/hot-guide/" in f:
+                affected_books.add('hot-guide')
+                continue
+            # Skip bk*.xml files
+            if is_book_master(os.path.basename(f)):
+                book_modified = book_bk[f]
+                if book_modified not in affected_books:
+                    affected_books.add(book_modified)
+                continue
+            if f not in included_by:
+                continue
+            for g in included_by[f]:
+                if g not in affected_files:
+                    new_files.append(g)
+                    affected_files.add(g)
+    return affected_books
+
+
 def find_affected_books(rootdir, book_exceptions, file_exceptions,
                         force, ignore_dirs):
     """Check which books are affected by modified files.
@@ -959,7 +1039,6 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     book_root = rootdir
 
     books = []
-    affected_books = set()
 
     build_all_books = (force or check_modified_affects_all(rootdir) or
                        cfg.CONF.only_book)
@@ -1059,84 +1138,20 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
                     else:
                         included_by[href_abs] = set([f_abs])
 
-    # Print list of files that are not included anywhere
-    if cfg.CONF.print_unused_files:
-        print("Checking for files that are not included anywhere...")
-        print(" Note: This only looks at files included by an .xml file "
-              "but not for files included by other files like .wadl.")
-        for root, dirs, files in os.walk(rootdir):
-            dirs[:] = filter_dirs(dirs)
-
-            # Filter out directories to be ignored
-            if ignore_dirs:
-                dirs[:] = [d for d in dirs if d not in ignore_dirs]
-
-            for f in files:
-                if not f.endswith('.xml'):
-                    continue
-                f_base = os.path.basename(f)
-                f_abs = os.path.abspath(os.path.join(root, f))
-
-                if (f_abs not in included_by and f_base != "pom.xml"
-                   and not is_book_master(f_base)):
-                    f_rel = os.path.relpath(f_abs, rootdir)
-                    print ("  %s " % f_rel)
-        print("\n")
-
-    if not build_all_books:
-        # Generate list of modified_files
-        # Do not select deleted files, just Added, Copied, Modified, Renamed,
-        # or Type changed
-        modified_files = get_modified_files(rootdir, "--diff-filter=ACMRT")
-        modified_files = [os.path.abspath(f) for f in modified_files]
-        if ignore_dirs:
-            for idir in abs_ignore_dirs:
-                non_ignored_files = []
-                for f in modified_files:
-                    if not f.startswith(idir):
-                        non_ignored_files.append(f)
-                modified_files = non_ignored_files
-
-        # 2. Find all modified files and where they are included
-
-        # List of files that we have to iterate over, these are affected
-        # by some modification
-        new_files = modified_files
-
-        # All files that are affected (either directly or indirectly)
-        affected_files = set(modified_files)
-
-        # 3. Iterate over files that have includes on modified files
-        # and build a closure - the set of all files (affected_files)
-        # that have a path to a modified file via includes.
-        while len(new_files) > 0:
-            new_files_to_check = new_files
-            new_files = []
-            for f in new_files_to_check:
-                if "doc/hot-guide/" in f:
-                    affected_books.add('hot-guide')
-                    continue
-                # Skip bk*.xml files
-                if is_book_master(os.path.basename(f)):
-                    book_modified = book_bk[f]
-                    if book_modified not in affected_books:
-                        affected_books.add(book_modified)
-                    continue
-                if f not in included_by:
-                    continue
-                for g in included_by[f]:
-                    if g not in affected_files:
-                        new_files.append(g)
-                        affected_files.add(g)
+    print_unused(rootdir, ignore_dirs, included_by)
 
     if cfg.CONF.only_book:
         print("Building specified books.")
     elif build_all_books:
         print("Building all books.")
-    elif affected_books:
-        books = affected_books
     else:
-        print("No books are affected by modified files. Building all books.")
+        affected_books = generate_affected_books(rootdir, book_bk, ignore_dirs,
+                                                 abs_ignore_dirs, included_by)
+        if affected_books:
+            books = affected_books
+        else:
+            print("No books are affected by modified files. "
+                  "Building all books.")
 
     return books
 
