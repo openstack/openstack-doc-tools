@@ -206,7 +206,7 @@ def release_from_branch(branch):
     if branch == 'master':
         return MASTER_RELEASE
     else:
-        return branch.replace('stable/', '')
+        return branch.replace('stable/', '').title()
 
 
 def generate_docbook(project, new_branch, old_list, new_list):
