@@ -303,6 +303,23 @@ def generate_command(os_command, os_file):
                 next_line_screen = True
                 ignore_next_lines = True
                 continue
+            # sahara
+            if line.startswith('Common auth options'):
+                if in_screen:
+                    os_file.write("</computeroutput></screen>\n")
+                    in_screen = False
+                os_file.write("    </section>\n")
+                os_file.write("    <section ")
+                os_file.write("xml:id=\"%sclient_command_common_auth\">\n"
+                              % os_command)
+                os_file.write("        <title>%s common authentication "
+                              "arguments</title>\n"
+                              % os_command)
+                format_table('', help_lines[line_index + 1:],
+                             os_file)
+                next_line_screen = True
+                ignore_next_lines = True
+                continue
             # neutron
             if line.startswith('Commands for API v2.0:'):
                 if in_screen:
