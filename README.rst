@@ -45,6 +45,10 @@ On Ubuntu::
 
 For building from source,  install the dependencies of lxml.
 
+On Fedora::
+
+    yum install python-devel libxml2-devel libxslt-devel
+
 On openSUSE::
 
     zypper in libxslt-devel
