@@ -223,7 +223,18 @@ def _register_runtime_opts(module, abs_path, verbose):
 
 
 def _sanitize_default(opt):
+    """Adapts unrealistic default values."""
+
+    # If the Oslo version is recent enough, we can use the 'sample_default'
+    # attribute
+    if (hasattr(opt, 'sample_default') and opt.sample_default is not None):
+        return str(opt.sample_default)
+
+    if ((type(opt).__name__ == "ListOpt") and (type(opt.default) == list)):
+        return ", ".join(opt.default)
+
     default = str(opt.default)
+
     if default == os.uname()[1]:
         return 'localhost'
 
@@ -241,7 +252,7 @@ def _sanitize_default(opt):
             continue
         if pathelm.endswith('/'):
             pathelm = pathelm[:-1]
-        if default.startswith(pathelm):
+        if pathelm in default:
             default = re.sub(r'%s(/sources)?' % pathelm,
                              '/usr/lib/python/site-packages', default)
 
@@ -269,8 +280,7 @@ class OptionsCache(object):
             if self._verbose >= 2:
                 print ("Duplicate option name %s" % optname)
         else:
-            if opt.name == 'bindir':
-                opt.default = _sanitize_default(opt)
+            opt.default = _sanitize_default(opt)
 
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
@@ -390,14 +400,7 @@ def write_docbook(package_name, options, target, verbose=0):
 
             if not option.help:
                 option.help = "No help text available for this option."
-            if ((type(option).__name__ == "ListOpt") and (
-                    type(option.default) == list)):
-                option.default = ", ".join(option.default)
-            if (hasattr(option, 'sample_default') and
-               option.sample_default is not None):
-                default = str(option.sample_default)
-            else:
-                default = _sanitize_default(option)
+            default = _sanitize_default(option)
 
             tr = etree.Element('tr')
             tbody.append(tr)
