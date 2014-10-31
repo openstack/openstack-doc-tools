@@ -177,7 +177,8 @@ class BookTransformer(BaseFolderTransformer):
 
     <title>%(title)s</title>
     %(includes)s
-</book>''' % {'xml_id': xml_id, 'title': self.title, 'includes': includes}
+</book>
+''' % {'xml_id': xml_id, 'title': self.title, 'includes': includes}
 
         open(output_file, 'w').write(output)
 
@@ -203,7 +204,8 @@ class ChapterTransformer(BaseFolderTransformer):
 
     <title>%(title)s</title>
     %(includes)s
-</chapter>''' % {'xml_id': xml_id, 'title': self.title, 'includes': includes}
+</chapter>
+''' % {'xml_id': xml_id, 'title': self.title, 'includes': includes}
 
         open(output_file, 'w').write(output)
 
