@@ -675,8 +675,9 @@ def main():
           "openstack-doc-tools version %s)\n"
           % os_doc_tools.__version__)
 
-    api_clients = ["ceilometer", "cinder", "glance", "heat", "keystone",
-                   "nova", "neutron", "openstack", "sahara", "swift", "trove"]
+    api_clients = ["ceilometer", "cinder", "glance", "heat", "ironic",
+                   "keystone", "nova", "neutron", "openstack", "sahara",
+                   "swift", "trove"]
     manage_clients = ["trove-manage"]
     all_clients = api_clients + manage_clients
 
