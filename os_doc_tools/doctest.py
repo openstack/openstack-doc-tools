@@ -63,6 +63,10 @@ BUILD_FILE_EXCEPTIONS = []
 # These are books that we aren't checking yet.
 BOOK_EXCEPTIONS = []
 
+# These URLs will not be checked for reachability. Add values via
+# --url-exception.
+URL_EXCEPTIONS = []
+
 # Mappings from books to build directories under target
 BOOK_MAPPINGS = {}
 
@@ -275,6 +279,9 @@ def verify_valid_links(doc):
         try:
             url = node.attrib['{http://www.w3.org/1999/xlink}href']
         except Exception:
+            continue
+
+        if url in URL_EXCEPTIONS:
             continue
 
         try:
@@ -1339,6 +1346,15 @@ def add_build_exceptions(build_file_exception, verbose):
         BUILD_FILE_EXCEPTIONS.append(entry)
 
 
+def add_url_exceptions(url_exception, verbose):
+    """Add list of exceptions from url_exception."""
+
+    for entry in url_exception:
+        if verbose:
+            print(" Adding URL to ignore list: %s" % entry)
+        URL_EXCEPTIONS.append(entry)
+
+
 cli_OPTS = [
     cfg.BoolOpt("api-site", default=False,
                 help="Enable special handling for api-site repository."),
@@ -1384,6 +1400,9 @@ cli_OPTS = [
                "generate/$LANGUAGE ."),
     cfg.MultiStrOpt('only-book', default=None,
                     help="Build each specified manual."),
+    cfg.MultiStrOpt("url-exception",
+                    help="URL that will be skipped during reachability "
+                         "check."),
 ]
 
 OPTS = [
@@ -1441,6 +1460,9 @@ def handle_options():
 
     if CONF.build_file_exception:
         add_build_exceptions(CONF.build_file_exception, CONF.verbose)
+
+    if CONF.url_exception:
+        add_url_exceptions(CONF.url_exception, CONF.verbose)
 
     if (not CONF.check_build and not CONF.check_deletions and
        not CONF.check_niceness and not CONF.check_syntax and
