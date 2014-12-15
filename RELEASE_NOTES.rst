@@ -1,6 +1,16 @@
 Release notes
 =============
 
+0.21
+----
+
+* ``openstack-doc-test``: New option ``--url-exception`` to ignore
+  URLs in link check. Use jsoncheck in tests for more better tests and
+  output.
+* ``openstack-auto-commands``: Update list of supported commands to
+  include ironic, sahara
+* ``openstack-dn2osdbk``: Various fixes.
+
 0.20
 ----
 
