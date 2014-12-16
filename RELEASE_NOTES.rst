@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.21.1
+------
+
+* ``jsoncheck``: have formatted JSON files end with a newline (lp:bug 1403159)
+
 0.21
 ----
 

@@ -107,7 +107,7 @@ def _parse_json(raw):
 def _format_parsed_json(parsed):
     """Pretty-print JSON file content while retaining key order."""
     return json.dumps(parsed, sort_keys=False, separators=(',', ': '),
-                      indent=4)
+                      indent=4) + "\n"
 
 
 def _process_file(path, formatting=None, verbose=False):
