@@ -62,12 +62,17 @@ virtual system at ```/home/vagrant/repositories```.
 
 * api-site
 * compute-api
+* docs-specs
+* ha-guide
 * identity-api
 * image-api
 * netconn-api
 * object-api
 * openstack-doc-tools
 * openstack-manuals
+* operations-guide
+* security-doc
+* training-guides
 * volume-api
 
 ## Caveats

@@ -27,6 +27,7 @@
     - api-site
     - compute-api
     - docs-specs
+    - ha-guide
     - identity-api
     - image-api
     - netconn-api
