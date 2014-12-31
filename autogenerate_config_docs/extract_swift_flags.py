@@ -90,8 +90,7 @@ def get_existing_options(optfiles):
         for tr in trlist:
             try:
                 col1, col2 = tr.findall(DBK_NS + "td")
-                optentry = col1.text
-                option = optentry.split('=', 1)[0].strip()
+                option = col1.find(DBK_NS + "option").text
                 helptext = col2.text
             except IndexError:
                 continue
@@ -186,7 +185,11 @@ def write_docbook(options, manuals_repo):
         tbody.append(tr)
 
         td = etree.Element('td')
-        td.text = "%s = %s" % (oslo_opt.name, oslo_opt.default)
+        option_xml = etree.SubElement(td, 'option')
+        option_xml.text = "%s" % oslo_opt.name
+        option_xml.tail = " = "
+        replaceable_xml = etree.SubElement(td, 'replaceable')
+        replaceable_xml.text = "%s" % oslo_opt.default
         tr.append(td)
 
         td = etree.Element('td')
@@ -245,7 +248,7 @@ def read_options(swift_repo, manuals_repo, verbose):
                 else:
                     option_desc = 'No help text available for this option.'
                     if verbose > 0:
-                        print(parsed_line[0] + "has no help text")
+                        print(parsed_line[0] + " has no help text")
 
                 # \xa0 is a non-breacking space
                 name = parsed_line[0]
