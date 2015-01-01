@@ -406,9 +406,11 @@ def write_docbook(package_name, options, target, verbose=0):
             tbody.append(tr)
 
             td = etree.Element('td')
-            td.text = ("<option>%s</option> = "
-                       "<replaceable>%s</replaceable>"
-                       ) % (option.dest, default)
+            option_xml = etree.SubElement(td, 'option')
+            option_xml.text = "%s" % option.dest
+            option_xml.tail = " = "
+            replaceable_xml = etree.SubElement(td, 'replaceable')
+            replaceable_xml.text = "%s" % default
             tr.append(td)
 
             td = etree.Element('td')
@@ -491,9 +493,11 @@ def write_docbook_rootwrap(package_name, repo, target, verbose=0):
         tbody.append(tr)
 
         td = etree.Element('td')
-        td.text = ("<option>%s</option> = "
-                   "<replaceable>%s</replaceable>"
-                   ) % (optname, default)
+        option_xml = etree.SubElement(td, 'option')
+        option_xml.text = "%s" % optname
+        option_xml.tail = " = "
+        replaceable_xml = etree.SubElement(td, 'replaceable')
+        replaceable_xml.text = "%s" % default
         tr.append(td)
 
         td = etree.Element('td')
