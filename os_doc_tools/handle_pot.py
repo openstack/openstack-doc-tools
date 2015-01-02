@@ -31,7 +31,8 @@ class myDocbookXmlMode(docbookXmlMode):
                       'varlistentry', 'userinput', 'computeroutput',
                       'prompt', 'command', 'screen']
         self.objects = ['figure', 'textobject', 'imageobject', 'mediaobject',
-                        'screenshot', 'literallayout', 'programlisting']
+                        'screenshot', 'literallayout', 'programlisting',
+                        'option']
 
 default_mode = 'docbook'
 operation = 'merge'
