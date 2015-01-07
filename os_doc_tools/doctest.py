@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf8 -*-
 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -206,6 +207,23 @@ def verify_newline_end_of_file(docfile):
 
     if not lastline.endswith('\n'):
         raise ValueError('last line of a file must end with a \\n')
+
+
+def verify_unicode_niceness(docfile):
+    """Check that no unwanted unicode charaters are used."""
+
+    invalid_characters = '“”‘’―—'
+
+    affected_lines = []
+    lc = 0
+    for line in open(docfile, 'r'):
+        lc += 1
+        any(c in line for c in invalid_characters)
+
+    if len(affected_lines):
+        raise ValueError("unwanted unicode charaters (one of %s) "
+                         "found in line(s): %" % (" ".join(invalid_characters),
+                                                  ", ".join(affected_lines)))
 
 
 def verify_whitespace_niceness(docfile):
@@ -530,6 +548,7 @@ def validate_one_json_file(rootdir, path, verbose, check_syntax,
         if check_niceness:
             verify_whitespace_niceness(path)
             verify_newline_end_of_file(path)
+            verify_unicode_niceness(path)
     except ValueError as e:
         any_failures = True
         print("  %s: %s" % (os.path.relpath(path, rootdir), e))
@@ -561,6 +580,7 @@ def validate_one_file(schema, rootdir, path, verbose,
         if check_niceness:
             verify_whitespace_niceness(path)
             verify_newline_end_of_file(path)
+            verify_unicode_niceness(path)
     except etree.XMLSyntaxError as e:
         any_failures = True
         print("  %s: %s" % (os.path.relpath(path, rootdir), e))

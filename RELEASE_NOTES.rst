@@ -1,6 +1,12 @@
 Release notes
 =============
 
+0.22
+----
+
+* ``openstack-doc-test``: New niceness check to avoid specific unicode
+  characters.
+
 0.21.1
 ------
 
