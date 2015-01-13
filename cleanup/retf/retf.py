@@ -16,8 +16,6 @@ to automatically identify and fix typographical errors.
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# author: Christian Berendt <berendt@b1-systems.de>
-
 # Based on the idea of 'Topy' written by Marti Raudsepp <marti@juffo.org>.
 # Topy is available on Github at https://github.com/intgr/topy.
 

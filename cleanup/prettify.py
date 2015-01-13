@@ -22,7 +22,6 @@ in the following changes:
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# author: Christian Berendt <berendt@b1-systems.de>
 
 from __future__ import print_function
 import argparse
