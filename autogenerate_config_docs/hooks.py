@@ -35,5 +35,10 @@ def glance_store_config():
         pass
 
 
+def nova_spice():
+    import nova.cmd.spicehtml5proxy  # noqa
+
+
 HOOKS = {'keystone.common.config': keystone_config,
-         'glance.common.config': glance_store_config}
+         'glance.common.config': glance_store_config,
+         'nova.spice': nova_spice}
