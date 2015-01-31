@@ -32,7 +32,7 @@ from autohelp import OptionsCache  # noqa
 
 DBK_NS = ".//{http://docbook.org/ns/docbook}"
 
-BASE_XML = '''<?xml version="1.0" encoding="UTF-8"?>
+BASE_XML = '''<?xml version="1.0"?>
 <para xmlns="http://docbook.org/ns/docbook"
   version="5.0">
 <!-- The tool that generated this table lives in the
