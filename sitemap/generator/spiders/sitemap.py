@@ -34,6 +34,7 @@ class SitemapSpider(spiders.CrawlSpider):
                 ],
                 deny=[
                     r'/trunk/',
+                    r'/api/'
                 ]
             ),
             follow=True, callback='parse_item'
@@ -61,9 +62,9 @@ class SitemapSpider(spiders.CrawlSpider):
             item['priority'] = '1.0'
 
         weekly = [
+            'juno',
             'icehouse',
-            'havana',
-            'grizzly'
+            'havana'
         ]
 
         for entry in weekly:
