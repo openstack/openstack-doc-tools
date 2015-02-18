@@ -1255,7 +1255,8 @@ def generate_index_file():
 
 
 def build_affected_books(rootdir, book_exceptions, file_exceptions,
-                         force=False, ignore_dirs=None):
+                         force=False, ignore_dirs=None,
+                         ignore_books=None):
     """Build all the books which are affected by modified files.
 
     Looks for all directories with "pom.xml" and checks if a
@@ -1271,6 +1272,9 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
 
     books = find_affected_books(rootdir, book_exceptions,
                                 file_exceptions, force, ignore_dirs)
+
+    if ignore_books:
+        books = [b for b in books if os.path.basename(b) not in ignore_books]
 
     # Remove cache content which can cause build failures
     shutil.rmtree(os.path.expanduser("~/.fop"),
@@ -1415,6 +1419,10 @@ cli_OPTS = [
                     help="Directory to ignore for building of manuals. The "
                          "parameter can be passed multiple times to add "
                          "several directories."),
+    cfg.MultiStrOpt("ignore-book",
+                    help="Book to ignore when building manuals. The "
+                         "parameter can be passed multiple times to add "
+                         "several books."),
     cfg.StrOpt('language', default=None, short='l',
                help="Build translated manual for language in path "
                "generate/$LANGUAGE ."),
@@ -1591,7 +1599,8 @@ def doctest():
         errors += build_affected_books(doc_path, BOOK_EXCEPTIONS,
                                        BUILD_FILE_EXCEPTIONS,
                                        CONF.force,
-                                       CONF.ignore_dir)
+                                       CONF.ignore_dir,
+                                       CONF.ignore_book)
 
     elapsed_time = (time.time() - start_time)
     print ("Run time was: %.2f seconds." % elapsed_time)

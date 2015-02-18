@@ -5,7 +5,7 @@ Release notes
 ----
 
 * ``openstack-doc-test``: New niceness check to avoid specific unicode
-  characters.
+  characters; new option --ignore-book to not build a book.
 
 0.21.1
 ------
