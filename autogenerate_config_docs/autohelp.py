@@ -115,7 +115,7 @@ def import_modules(repo_location, package_name, verbose=0):
     pkg_location = os.path.join(repo_location, package_name)
     for root, dirs, files in os.walk(pkg_location):
         skipdir = False
-        for excludedir in ('tests', 'locale', 'cmd',
+        for excludedir in ('tests', 'locale',
                            os.path.join('db', 'migration'), 'transfer'):
             if ((os.path.sep + excludedir + os.path.sep) in root or (
                     root.endswith(os.path.sep + excludedir))):
@@ -218,6 +218,8 @@ def _register_runtime_opts(module, abs_path, verbose):
 
             if register:
                 for opt in obj:
+                    if not isinstance(opt, cfg.Opt):
+                        continue
                     try:
                         cfg.CONF.register_opt(opt, opts_group)
                     except cfg.DuplicateOptError:
@@ -269,7 +271,10 @@ class OptionsCache(object):
         self._opt_names = []
 
         for optname in cfg.CONF._opts:
-            self._add_opt(optname, 'DEFAULT', cfg.CONF._opts[optname]['opt'])
+            opt = cfg.CONF._opts[optname]['opt']
+            # We ignore some CLI opts by excluding SubCommandOpt objects
+            if not isinstance(opt, cfg.SubCommandOpt):
+                self._add_opt(optname, 'DEFAULT', opt)
 
         for group in cfg.CONF._groups:
             for optname in cfg.CONF._groups[group]._opts:
