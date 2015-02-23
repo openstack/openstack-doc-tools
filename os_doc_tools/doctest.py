@@ -1595,6 +1595,8 @@ def doctest():
     # If only RST files are touched, there's nothing to do.
     if (not CONF.force and only_rst_touched()):
         print("Only RST files changed, nothing to do.\n")
+        if cfg.CONF.create_index:
+            generate_index_file()
         return
 
     if CONF.check_syntax or CONF.check_niceness or CONF.check_links:
