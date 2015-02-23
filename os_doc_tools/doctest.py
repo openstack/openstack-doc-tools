@@ -376,6 +376,27 @@ def only_po_touched():
     return locale_changed and not other_changed
 
 
+def only_rst_touched():
+    """Check whether only RST files are touched."""
+
+    try:
+        git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
+        modified_files = check_output(git_args).strip().split()
+    except (subprocess.CalledProcessError, OSError) as e:
+        print("git failed: %s" % e)
+        sys.exit(1)
+
+    rst_changed = False
+    other_changed = False
+    for f in modified_files:
+        if f.endswith(".rst"):
+            rst_changed = True
+        else:
+            other_changed = True
+
+    return rst_changed and not other_changed
+
+
 def check_modified_affects_all(rootdir):
     """Check whether special files were modified.
 
@@ -1570,6 +1591,10 @@ def doctest():
     if (not CONF.force and not CONF.publish and not CONF.language
             and only_po_touched()):
         print("Only files in locale directories changed, nothing to do.\n")
+        return
+    # If only RST files are touched, there's nothing to do.
+    if (not CONF.force and only_rst_touched()):
+        print("Only RST files changed, nothing to do.\n")
         return
 
     if CONF.check_syntax or CONF.check_niceness or CONF.check_links:

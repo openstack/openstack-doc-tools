@@ -1,6 +1,12 @@
 Release notes
 =============
 
+0.23
+----
+
+* ``openstack-doc-test``: Don't build all books if only RST files are
+  changed.
+
 0.22
 ----
 
