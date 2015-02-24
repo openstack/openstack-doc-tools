@@ -194,7 +194,7 @@ def load_disabled_rules(src):
 
     if src:
         try:
-            listing = yaml.load(open(src))
+            listing = yaml.safe_load(open(src))
             for rule in listing:
                 logger.debug("Rule '%s' is disabled.", rule)
 
