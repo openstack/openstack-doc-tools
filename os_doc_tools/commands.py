@@ -20,6 +20,8 @@ import sys
 import os_doc_tools
 from os_doc_tools.common import check_output   # noqa
 
+DEVNULL = open(os.devnull, 'wb')
+
 
 def use_help_flag(os_command):
     """Use --help flag (instead of help keyword)
@@ -264,7 +266,8 @@ def generate_command(os_command, os_file):
     :param os_file:    open filehandle for output of DocBook file
     """
 
-    help_lines = check_output([os_command, "--help"]).split('\n')
+    help_lines = check_output([os_command, "--help"],
+                              stderr=DEVNULL).split('\n')
 
     ignore_next_lines = False
     next_line_screen = True
@@ -384,7 +387,7 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     else:
         args.append("help")
         args.append(os_subcommand)
-    help_lines = check_output(args).split('\n')
+    help_lines = check_output(args, stderr=DEVNULL).split('\n')
 
     os_subcommandid = os_subcommand.replace(' ', '_')
     os_file.write("    <section xml:id=\"%sclient_subcommand_%s%s\">\n"
@@ -507,7 +510,8 @@ def get_openstack_subcommands(commands):
     """Get all subcommands of 'openstack' without using bashcompletion."""
     subcommands = []
     for command in commands:
-        output = check_output(["openstack", "help", command])
+        output = check_output(["openstack", "--os-auth-type", "token",
+                               "help", command], stderr=DEVNULL)
         for line in output.split("\n"):
             if line.strip().startswith(command):
                 subcommands.append(line.strip())
@@ -583,12 +587,13 @@ def document_single_project(os_command, output_dir):
         title = "OpenStack client"
         # Does not know about bash-completion yet, need to specify
         # commands manually and to fetch subcommands automatically
-        commands = ["aggregate", "backup", "compute", "console", "container",
+        commands = ["aggregate", "availability", "backup", "catalog",
+                    "command", "compute", "console", "container",
                     "ec2", "endpoint", "extension", "flavor", "host",
                     "hypervisor", "image", "ip", "keypair", "limits", "module",
                     "network", "object", "project", "quota", "role",
                     "security", "server", "service", "snapshot", "token",
-                    "user", "volume"]
+                    "usage", "user", "volume"]
         subcommands = get_openstack_subcommands(commands)
     else:
         print("'%s' command not yet handled" % os_command)
@@ -609,7 +614,7 @@ def document_single_project(os_command, output_dir):
        <title>Image Service API v1 commands</title>\n""")
 
     generate_subcommands(os_command, out_file, blacklist,
-                         subcommands, None, "", "")
+                         subcommands, ["--os-auth-type", "token"], "", "")
 
     if os_command == 'cinder':
         out_file.write("    </section>\n")
