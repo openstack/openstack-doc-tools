@@ -613,8 +613,12 @@ def document_single_project(os_command, output_dir):
     <section xml:id=\"glance_cli_v1\">
        <title>Image Service API v1 commands</title>\n""")
 
-    generate_subcommands(os_command, out_file, blacklist,
-                         subcommands, ["--os-auth-type", "token"], "", "")
+    if os_command == 'openstack':
+        generate_subcommands(os_command, out_file, blacklist,
+                             subcommands, ["--os-auth-type", "token"], "", "")
+    else:
+        generate_subcommands(os_command, out_file, blacklist,
+                             subcommands, None, "", "")
 
     if os_command == 'cinder':
         out_file.write("    </section>\n")
