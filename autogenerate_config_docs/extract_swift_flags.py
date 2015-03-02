@@ -40,7 +40,7 @@ BASE_XML = '''<?xml version="1.0"?>
      this file will *not* be lost if you run the script again. -->
   <table rules="all">
     <caption>Description of configuration options for
-        <literal>[%s]</literal> in <literal>%s.conf</literal>
+        <literal>[%s]</literal> in <filename>%s.conf</filename>
     </caption>
     <col width="50%%"/>
     <col width="50%%"/>
