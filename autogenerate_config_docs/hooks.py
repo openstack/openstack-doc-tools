@@ -36,6 +36,11 @@ def glance_store_config():
 
 
 def nova_spice():
+    import os
+    # nova.cmd.__init__ before kilo requires to be imported before eventlet is.
+    # Since we can't make sure of that, we define this envvar to let nova know
+    # that the import is OK (see nova/cmd/__init__.py)
+    os.environ['EVENTLET_NO_GREENDNS'] = 'yes'
     import nova.cmd.spicehtml5proxy  # noqa
 
 
