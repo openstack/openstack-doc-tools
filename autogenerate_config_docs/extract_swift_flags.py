@@ -307,7 +307,7 @@ def main():
         write_docbook(options, args.manuals_repo)
 
     elif args.subcommand == 'dump':
-        dump_options(options)
+        options.dump()
 
     return 0
 
