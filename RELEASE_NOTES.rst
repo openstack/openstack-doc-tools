@@ -1,6 +1,12 @@
 Release notes
 =============
 
+0.24
+----
+
+* Added ``doc-tools-update-cli-reference``, a wrapper script to update
+  CLI references in the ``openstack-manuals`` repository.
+
 0.23
 ----
 
