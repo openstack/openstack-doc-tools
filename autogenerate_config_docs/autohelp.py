@@ -329,6 +329,24 @@ class OptionsCache(object):
     def get_option(self, name):
         return self._opts_by_name[name]
 
+    def dump(self):
+        """Dumps the list of options with their attributes.
+
+        This output is consumed by the diff_branches script.
+        """
+        for name, (group, option) in self._opts_by_name.items():
+            deprecated_opts = [{'group': deprecated.group,
+                                'name': deprecated.name}
+                               for deprecated in option.deprecated_opts]
+            new_option = {
+                'default': option.default,
+                'help': option.help,
+                'deprecated_opts': deprecated_opts,
+                'type': option.__class__.__name__.split('.')[-1]
+            }
+            self._opts_by_name[name] = (group, new_option)
+        print(pickle.dumps(self._opts_by_name))
+
     @staticmethod
     def _cmpopts(x, y):
         if '/' in x and '/' in y:
@@ -575,14 +593,6 @@ def update_flagmappings(package_name, options, verbose=0):
             print(line)
 
 
-def dump_options(options):
-    """Dumps the list of options with their attributes.
-
-    This output is consumed by the diff_branches script.
-    """
-    print(pickle.dumps(options._opts_by_name))
-
-
 def main():
     parser = argparse.ArgumentParser(
         description='Manage flag files, to aid in updating documentation.',
@@ -644,7 +654,7 @@ def main():
         write_docbook_rootwrap(package_name, args.repo, args.target,
                                verbose=args.verbose)
     elif args.subcommand == 'dump':
-        dump_options(options)
+        options.dump()
 
 
 if __name__ == "__main__":

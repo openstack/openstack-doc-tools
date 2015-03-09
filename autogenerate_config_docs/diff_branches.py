@@ -161,22 +161,22 @@ def diff(old_list, new_list):
             new_opts.append(name)
 
         # Find the options for which the default value has changed
-        elif option.default != old_list[name][1].default:
+        elif option['default'] != old_list[name][1]['default']:
             changed_default.append(name)
 
         # Find options that have been deprecated in the new release.
         # If an option name is a key in the old_list dict, it means that it
         # wasn't deprecated.
-        for deprecated in option.deprecated_opts:
+        for deprecated in option['deprecated_opts']:
             # deprecated_opts is a list which always holds at least 1 invalid
             # dict. Forget it.
-            if deprecated.name is None:
+            if deprecated['name'] is None:
                 continue
 
-            if deprecated.group in [None, 'DEFAULT']:
-                full_name = deprecated.name
+            if deprecated['group'] in [None, 'DEFAULT']:
+                full_name = deprecated['name']
             else:
-                full_name = deprecated.group + '/' + deprecated.name
+                full_name = deprecated['group'] + '/' + deprecated['name']
 
             if full_name in old_list.viewkeys():
                 deprecated_opts.append((full_name, name))
@@ -240,11 +240,11 @@ def generate_docbook(project, new_branch, old_list, new_list):
                                   "(Type) Help string"])
         for name in sorted(new_opts, _cmpopts):
             opt = new_list[name][1]
-            type = opt.__class__.__name__.split('.')[-1]
             name = format_option_name(name)
             cells = ["%(name)s = %(default)s" % {'name': name,
-                                                 'default': opt.default},
-                     "(%(type)s) %(help)s" % {'type': type, 'help': opt.help}]
+                                                 'default': opt['default']},
+                     "(%(type)s) %(help)s" % {'type': opt['type'],
+                                              'help': opt['help']}]
             dbk_append_row(table, cells)
 
     # Updated default
@@ -253,8 +253,8 @@ def generate_docbook(project, new_branch, old_list, new_list):
         dbk_append_header(table, ["Option", "Previous default value",
                                   "New default value"])
         for name in sorted(changed_default, _cmpopts):
-            old_default = old_list[name][1].default
-            new_default = new_list[name][1].default
+            old_default = old_list[name][1]['default']
+            new_default = new_list[name][1]['default']
             if isinstance(old_default, list):
                 old_default = ", ".join(old_default)
             if isinstance(new_default, list):
