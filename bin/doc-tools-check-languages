@@ -50,6 +50,11 @@ function test_language {
     fi
     args+=("--check-build" "-l $language")
     for book in ${BOOKS["$language"]}; do
+        if [ ${SPECIAL_BOOKS[$book]+_} ] ; then
+            if [ ${SPECIAL_BOOKS[$book]} == "RST" ] ; then
+                continue
+            fi
+        fi
         args+=("--only-book $book")
     done
 
@@ -75,7 +80,8 @@ function usage {
     echo "LANG is a language code like 'fr' or 'ja'."
 }
 
-
+# Declare in case it's not in the file
+declare -A SPECIAL_BOOKS
 CONF_FILE=$1
 shift
 
