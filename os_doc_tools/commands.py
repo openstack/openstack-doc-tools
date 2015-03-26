@@ -109,6 +109,16 @@ def generate_heading(os_command, api_name, title, os_file):
     <section xml:id=\"%(os_command)sclient_command_usage\">
        <title>%(os_command)s usage</title>\n"""
 
+    if os_command == "keystone":
+        header_deprecation = """
+    <warning>
+        <para>The %(os_command)s CLI is deprecated in favor of
+            python-openstackclient. For a Python library, continue using
+            python-%(os_command)sclient.</para>
+    </warning>\n"""
+    else:
+        header_deprecation = None
+
     format_dict = {
         "os_command": os_command,
         "api_name": api_name,
@@ -117,6 +127,8 @@ def generate_heading(os_command, api_name, title, os_file):
         "help_str": help_str
     }
     os_file.write(header1 % format_dict)
+    if header_deprecation:
+        os_file.write(header_deprecation % format_dict)
     os_file.write(header2 % format_dict)
     os_file.write(header3 % format_dict)
 
