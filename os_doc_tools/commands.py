@@ -65,7 +65,7 @@ def generate_heading(os_command, api_name, title, os_file):
             print("Command %s not found, aborting." % os_command)
             sys.exit(1)
     # Extract version from "swift 0.3"
-    version = version.strip().rpartition(' ')[2]
+    version = version.splitlines()[-1].strip().rpartition(' ')[2]
 
     print("Documenting '%s help (version %s)'" % (os_command, version))
 
