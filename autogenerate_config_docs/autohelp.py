@@ -349,7 +349,7 @@ class OptionsCache(object):
                                for deprecated in option.deprecated_opts]
             new_option = {
                 'default': option.default,
-                'help': option.help,
+                'help': option.help.strip(),
                 'deprecated_opts': deprecated_opts,
                 'type': option.__class__.__name__.split('.')[-1]
             }
