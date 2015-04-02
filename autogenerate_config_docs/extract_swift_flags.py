@@ -91,7 +91,8 @@ def get_existing_options(optfiles):
             try:
                 col1, col2 = tr.findall(DBK_NS + "td")
                 option = col1.find(DBK_NS + "option").text
-                helptext = col2.text
+                helptext = etree.tostring(col2, xml_declaration=False,
+                                          method="text")
             except IndexError:
                 continue
             if option not in options or 'No help text' in options[option]:
