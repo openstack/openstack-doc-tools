@@ -37,10 +37,19 @@ from hooks import HOOKS  # noqa
 
 EXTENSIONS = ['oslo.messaging', 'oslo.db']
 
-IGNORE = ['trove.guestagent.datastore.postgresql.manager',
-          'trove.guestagent.datastore.postgresql.service.root',
-          'trove.guestagent.datastore.postgresql.service.users',
-          'trove.guestagent.datastore.postgresql.service.database']
+IGNORE = [
+    'trove.guestagent.datastore.postgresql.manager',
+    'trove.guestagent.datastore.postgresql.service.root',
+    'trove.guestagent.datastore.postgresql.service.users',
+    'trove.guestagent.datastore.postgresql.service.database',
+    'trove.guestagent.datastore.experimental.postgresql.manager',
+    'trove.guestagent.datastore.experimental.postgresql.service.database',
+    'trove.guestagent.datastore.experimental.postgresql.service.root',
+    'trove.guestagent.datastore.experimental.postgresql.service.users',
+    'glance.contrib.plugins.image_artifact.setup',
+    'glance.contrib.plugins.artifacts_sample.setup'
+]
+
 
 BASE_XML = '''<?xml version="1.0"?>
 <para xmlns="http://docbook.org/ns/docbook"
