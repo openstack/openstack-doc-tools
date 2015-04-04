@@ -1250,6 +1250,11 @@ def generate_index_file():
             index_file.write('<a href="%s/content/index.html">%s</a>\n' %
                              (path, path))
             index_file.write('<br/>\n')
+        elif os.path.isfile(os.path.join(root, 'index.html')):
+            path = os.path.relpath(root, publish_path)
+            index_file.write('<a href="%s/index.html">%s</a>\n' %
+                             (path, path))
+            index_file.write('<br/>\n')
 
         if os.path.isfile(os.path.join(root, 'api-ref.html')):
             path = os.path.relpath(root, publish_path)

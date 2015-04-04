@@ -6,6 +6,8 @@ Release notes
 
 * Added ``doc-tools-update-cli-reference``, a wrapper script to update
   CLI references in the ``openstack-manuals`` repository.
+* Handle guides that published without a content/ sub directory.
+* Various fixes for auto generating commands and options.
 
 0.23
 ----
