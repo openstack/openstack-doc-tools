@@ -27,6 +27,10 @@ The workflow is:
     $ # check the results in sources/openstack-manuals
 
 This will generate the tables for all the known projects.
+Note for Neutron project: If the driver/plugin resides outside the Neutron
+repository in stackforge, then the driver/plugin has to be explicitly
+installed within the virtual environment to generate the configuration
+options.
 
 To generate the mappings and tables for a subset of projects, use the code
 names as arguments:
