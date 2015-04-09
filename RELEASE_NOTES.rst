@@ -8,6 +8,7 @@ Release notes
   CLI references in the ``openstack-manuals`` repository.
 * Handle guides that published without a content/ sub directory.
 * Various fixes for auto generating commands and options.
+* Handle translation of RST guides.
 
 0.23
 ----
