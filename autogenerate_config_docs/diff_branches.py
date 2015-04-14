@@ -31,13 +31,13 @@ PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'keystone', 'neutron',
 MASTER_RELEASE = 'Kilo'
 CODENAME_TITLE = {'ceilometer': 'Telemetry',
                   'cinder': 'OpenStack Block Storage',
-                  'glance': 'OpenStack Image Service',
+                  'glance': 'OpenStack Image service',
                   'heat': 'Orchestration',
                   'keystone': 'OpenStack Identity',
                   'neutron': 'OpenStack Networking',
                   'nova': 'OpenStack Compute',
                   'swift': 'OpenStack Object Storage',
-                  'trove': 'Database Service'}
+                  'trove': 'Database service'}
 
 
 def setup_venv(branch, novenvupdate):

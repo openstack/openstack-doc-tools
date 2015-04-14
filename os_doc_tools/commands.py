@@ -546,8 +546,8 @@ def document_single_project(os_command, output_dir):
         api_name = "OpenStack Block Storage API"
         title = "Block Storage command-line client"
     elif os_command == 'glance':
-        api_name = 'OpenStack Image Service API'
-        title = "Image Service command-line client"
+        api_name = 'OpenStack Image service API'
+        title = "Image service command-line client"
         # Does not know about bash-completion yet, need to specify
         # subcommands manually
         subcommands = ["image-create", "image-delete", "image-list",
@@ -584,11 +584,11 @@ def document_single_project(os_command, output_dir):
                        "stat", "upload"]
     elif os_command == 'trove':
         api_name = "Database API"
-        title = "Database Service command-line client"
+        title = "Database service command-line client"
         blacklist = ["resize-flavor"]
     elif os_command == 'trove-manage':
         api_name = "Database Management Utility"
-        title = "Database Service Management command-line client"
+        title = "Database service management command-line client"
         # Does not know about bash-completion yet, need to specify
         # subcommands manually
         subcommands = ["db_sync", "db_upgrade",
@@ -623,7 +623,7 @@ def document_single_project(os_command, output_dir):
     if os_command == 'glance':
         out_file.write("""
     <section xml:id=\"glance_cli_v1\">
-       <title>Image Service API v1 commands</title>\n""")
+       <title>Image service API v1 commands</title>\n""")
 
     if os_command == 'openstack':
         generate_subcommands(os_command, out_file, blacklist,
@@ -673,7 +673,7 @@ def document_single_project(os_command, output_dir):
 
         out_file.write("""
     <section xml:id=\"glance_cli_v2\">
-       <title>Image Service API v2 commands</title>
+       <title>Image service API v2 commands</title>
     <para>
        You can select an API version to use by adding the
        <parameter>--os-image-api-version</parameter> option or by setting
