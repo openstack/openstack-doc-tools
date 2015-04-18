@@ -34,6 +34,7 @@ class SitemapSpider(spiders.CrawlSpider):
                 ],
                 deny=[
                     r'/trunk/',
+                    r'/draft/',
                     r'/api/'
                 ]
             ),
