@@ -43,10 +43,19 @@ usage() {
 }
 
 setup_venv() {
-    if [ ! -e $VENVDIR/bin/activate ]; then
-        virtualenv $VENVDIR
+    project=$1
+
+    if [ ! -e $VENVDIR/$project/bin/activate ]; then
+        mkdir -p $VENVDIR/$project
+        virtualenv $VENVDIR/$project
     fi
-    . $VENVDIR/bin/activate
+    activate_venv $project
+}
+
+activate_venv() {
+    project=$1
+
+    . $VENVDIR/$project/bin/activate
 }
 
 get_project() {
@@ -62,9 +71,6 @@ get_project() {
 }
 
 setup_tools() {
-    get_project oslo-incubator
-    get_project openstack-manuals
-
     (cd $SOURCESDIR/oslo-incubator && python setup.py install)
     pip install "GitPython>=0.3.2.RC1"
 
@@ -74,6 +80,9 @@ setup_tools() {
     # For some reason the ceilometer installation fails without these 2
     # packages pre-installed
     pip install setuptools pbr
+
+    # For autohelp.py
+    pip install lxml
 
     # Some projects don't have explicit dependencies on some less used packages.
     # Without these packages installed some modules can't be imported and
@@ -145,11 +154,13 @@ fi
 
 [ $# != 0 ] && PROJECTS="$*"
 
-setup_venv
 if [ "$FAST" -eq 0 ] ; then
-    setup_tools
+    get_project oslo-incubator
+    get_project openstack-manuals
 
     for project in $PROJECTS; do
+        setup_venv $project
+        setup_tools
         get_project $project
 
         (
@@ -161,12 +172,15 @@ if [ "$FAST" -eq 0 ] ; then
             else
                 git checkout -b $BRANCH remotes/origin/$BRANCH
             fi
+            pip install -rrequirements.txt -rtest-requirements.txt
             python setup.py install
         )
     done
 fi
 
 for project in $PROJECTS; do
+    echo "Working on $project..."
+    activate_venv $project
     if [ "$ACTION" = "setup" ]; then
         break
     fi
