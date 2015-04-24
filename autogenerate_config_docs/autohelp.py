@@ -35,7 +35,11 @@ import stevedore
 from hooks import HOOKS  # noqa
 
 
-EXTENSIONS = ['oslo.messaging', 'oslo.db']
+EXTENSIONS = ['oslo.concurrency'
+              'oslo.db',
+              'oslo.log',
+              'oslo.messaging',
+              'oslo.policy']
 
 IGNORE = [
     'trove.guestagent.datastore.postgresql.manager',
