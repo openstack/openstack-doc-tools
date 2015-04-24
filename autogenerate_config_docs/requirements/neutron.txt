@@ -1,0 +1,33 @@
+ryu
+# for vmware
+-e git://git.openstack.org/openstack/nova.git#egg=nova
+
+# for a bunch of plugins
+-e git://git.openstack.org/openstack/neutron.git@master#egg=neutron
+-e git://git.openstack.org/openstack/neutron-lbaas.git@master#egg=neutron-lbaas
+
+# for midonet
+-e git://github.com/midonet/python-midonetclient.git@master#egg=midonetclient
+
+-e git+https://git.openstack.org/stackforge/networking-arista.git#egg=networking-arista
+-e git+https://git.openstack.org/stackforge/networking-bagpipe-l2.git#egg=networking-bagpipe-l2
+-e git+https://git.openstack.org/stackforge/networking-bgpvpn.git#egg=networking-bgpvpn
+-e git+https://git.openstack.org/stackforge/networking-bigswitch.git#egg=networking-bigswitch
+-e git+https://git.openstack.org/stackforge/networking-brocade.git#egg=networking-brocade
+-e git+https://git.openstack.org/stackforge/networking-cisco.git#egg=networking-cisco
+-e git+https://git.openstack.org/stackforge/networking-edge-vpn.git#egg=networking-edge-vpn
+-e git+https://git.openstack.org/stackforge/networking-hyperv.git#egg=networking-hyperv
+-e git+https://git.openstack.org/stackforge/networking-ibm.git#egg=networking-ibm
+-e git+https://git.openstack.org/stackforge/networking-l2gw.git#egg=networking-l2gw
+# pip dependency installation failure
+-e git+https://git.openstack.org/stackforge/networking-midonet.git#egg=networking-midonet
+-e git+https://git.openstack.org/stackforge/networking-mlnx.git#egg=networking-mlnx
+-e git+https://git.openstack.org/stackforge/networking-nec.git#egg=networking-nec
+-e git+https://git.openstack.org/stackforge/networking-odl.git#egg=networking-odl
+-e git+https://git.openstack.org/stackforge/networking-ofagent.git#egg=networking-ofagent
+-e git+https://git.openstack.org/stackforge/networking-ovn.git#egg=networking-ovn
+-e git+https://git.openstack.org/stackforge/networking-ovs-dpdk.git#egg=networking-ovs-dpdk
+-e git+https://git.openstack.org/stackforge/networking-plumgrid.git#egg=networking-plumgrid
+-e git+https://git.openstack.org/stackforge/networking-portforwarding.git#egg=networking-portforwarding
+-e git+https://git.openstack.org/stackforge/networking-vsphere.git#egg=networking-vsphere
+-e git+https://git.openstack.org/stackforge/neutron-powervm.git#egg=neutron-powervm

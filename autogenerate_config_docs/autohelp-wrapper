@@ -75,29 +75,7 @@ setup_tools() {
     pip install "GitPython>=0.3.2.RC1"
 
     # autohelp.py requires this
-    pip install oslo.i18n
-
-    # For some reason the ceilometer installation fails without these 2
-    # packages pre-installed
-    pip install setuptools pbr
-
-    # For autohelp.py
-    pip install lxml
-
-    # Some projects don't have explicit dependencies on some less used packages.
-    # Without these packages installed some modules can't be imported and
-    # configuration options are not discovered. We install these packages to
-    # make sure that we get the options.
-
-    # Ceilometer
-    pip install swift
-
-    # Cinder
-    # hp3parclient is needed for icehouse, but not for juno
-    pip install hp3parclient hplefthandclient
-
-    # Neutron
-    pip install ryu
+    pip install oslo.i18n lxml
 
     # This is a workaround to avoid pulling in new configuration options brought
     # by python-keystoneclient >= 0.8. This version also deprecates some options
@@ -161,6 +139,10 @@ if [ "$FAST" -eq 0 ] ; then
     for project in $PROJECTS; do
         setup_venv $project
         setup_tools
+        if [ -e requirements/$project.txt ]; then
+            pip install -r requirements/$project.txt \
+                --allow-all-external
+        fi
         get_project $project
 
         (
