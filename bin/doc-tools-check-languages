@@ -34,6 +34,47 @@ function setup_language {
     fi
 }
 
+function build_rst {
+    language=$1
+    book=$2
+
+    # Generate glossary first
+    tools/glossary2rst.py doc/${book}/source/glossary.rst
+
+    # First build all the single po files
+    # Note that we need to run inside a venv since the venv we are run in
+    # uses SitePackages=True and we have to install Sphinx in the venv
+    # together with openstackdocstheme. With SitePackages, the global Sphinx
+    # is used and that will not work with a local openstackdocstheme installed.
+    tox -evenv "sphinx-build -W -b gettext doc/${book}/source/ doc/${book}/source/locale/"
+    # Now run msgmerge on all files
+
+    for f in doc/${book}/source/locale/*.pot ; do
+        # Skip the master file
+        if [ $f == "doc/${book}/source/locale/${book}.pot" ] ; then
+            continue
+        fi
+        bf=$(basename $f)
+        # Remove .pot
+        bfname=${bf%.pot}
+        msgmerge -o doc/${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
+            doc/${book}/source/locale/${language}/LC_MESSAGES/${book}.po \
+            doc/${book}/source/locale/${bf}
+        msgfmt doc/${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
+            -o doc/${book}/source/locale/${language}/LC_MESSAGES/${bfname}.mo
+    done
+    if [ ${book} == "user-guides" ] ; then
+        tox -evenv "sphinx-build -t user_only -D language=${language} \
+            doc/${book}/source/ \
+            doc/${book}/build/html"
+        tox -evenv "sphinx-build -t admin_only -D language=${language} \
+            doc/${book}/source/ \
+            doc/${book}/build-admin/html"
+    else
+        tox -evenv "sphinx-build -D language=${language} doc/${book}/source/ \
+            doc/${book}/build/html"
+    fi
+}
 
 function test_language {
     language=$1
@@ -42,30 +83,57 @@ function test_language {
     echo "Building for language $language"
     echo
 
-    setup_language $language
-
     args=("-v")
     if [[ $PURPOSE -eq "publish" ]]; then
         args+=("--publish")
     fi
     args+=("--check-build" "-l $language")
+    BUILD_XML=0
     for book in ${BOOKS["$language"]}; do
         if [ ${SPECIAL_BOOKS[$book]+_} ] ; then
             if [ ${SPECIAL_BOOKS[$book]} == "RST" ] ; then
+                echo "Building translated RST book $book for $language"
+                build_rst $language $book
+                if [[ $? -eq 0 ]] ; then
+                    echo "... succeeded"
+                else
+                    echo "... failed"
+                    BUILD_FAIL=1
+                fi
                 continue
             fi
         fi
         args+=("--only-book $book")
+        BUILD_XML=1
     done
 
-    openstack-doc-test ${args[@]}
+    if [ "$BUILD_XML" -eq "1" ] ; then
 
-    if [[ $? -eq 0 ]] ; then
-        echo "... succeeded"
-    else
-        echo "... failed"
-        BUILD_FAIL=1
+        setup_language $language
+
+        openstack-doc-test ${args[@]}
+
+        if [[ $? -eq 0 ]] ; then
+            echo "... succeeded"
+        else
+            echo "... failed"
+            BUILD_FAIL=1
+        fi
     fi
+}
+
+
+function handle_draft_language {
+    language=$1
+
+    echo
+    echo "Moving drafts for language $language"
+    echo
+
+    mkdir -p publish-docs/draft/$language
+    for book in ${DRAFTS["$language"]}; do
+        mv publish-docs/$language/$book publish-docs/draft/$language/$book
+    done
 }
 
 
@@ -82,6 +150,7 @@ function usage {
 
 # Declare in case it's not in the file
 declare -A SPECIAL_BOOKS
+declare -A DRAFTS
 CONF_FILE=$1
 shift
 
@@ -121,10 +190,17 @@ for language in "$@" ; do
             for language in "${!BOOKS[@]}"; do
                 test_language $language
             done
+            # Move draft language guides
+            for language in "${!DRAFTS[@]}"; do
+                handle_draft_language $language
+            done
             ;;
         *)
             if [[ -n ${BOOKS[$language]} ]]; then
                 test_language $language
+                if [ ${DRAFTS["${language}"]+_} ] ; then
+                    handle_draft_language $language
+                fi
             else
                 BUILD_FAIL=1
                 echo "Error: language $language not handled"
@@ -132,5 +208,6 @@ for language in "$@" ; do
             ;;
     esac
 done
+
 
 exit $BUILD_FAIL
