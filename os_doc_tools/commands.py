@@ -639,7 +639,7 @@ def document_single_project(os_command, output_dir):
        <title>Block Storage API v2 commands</title>
     <para>
        You can select an API version to use by adding the
-       <parameter>--os-volume-api-version</parameter> option or by setting
+       <parameter>--os-volume-api-version</parameter> parameter or by setting
        the corresponding environment variable:\n""")
         out_file.write("<screen><prompt>$</prompt> <userinput>"
                        "export OS_VOLUME_API_VERSION=2</userinput></screen>\n"
@@ -676,7 +676,7 @@ def document_single_project(os_command, output_dir):
        <title>Image service API v2 commands</title>
     <para>
        You can select an API version to use by adding the
-       <parameter>--os-image-api-version</parameter> option or by setting
+       <parameter>--os-image-api-version</parameter> parameter or by setting
        the corresponding environment variable:\n""")
         out_file.write("<screen><prompt>$</prompt> <userinput>"
                        "export OS_IMAGE_API_VERSION=2</userinput></screen>\n"
