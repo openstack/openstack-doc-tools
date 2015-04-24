@@ -35,6 +35,19 @@ def glance_store_config():
         pass
 
 
+def neutron_misc():
+    import bsnstacklib.plugins.bigswitch.config
+    import networking_cisco.plugins.cisco.cfg_agent.device_status  # noqa
+    import networking_l2gw.services.l2gateway.common.config as l2gw
+    import networking_vsphere.common.config
+    from oslo.config import cfg
+
+    bsnstacklib.plugins.bigswitch.config.register_config()
+    networking_vsphere.common.config.register_options()
+    l2gw.register_l2gw_opts_helper()
+    l2gw.register_ovsdb_opts_helper(cfg.CONF)
+
+
 def nova_spice():
     import os
     # nova.cmd.__init__ before kilo requires to be imported before eventlet is.
@@ -46,4 +59,5 @@ def nova_spice():
 
 HOOKS = {'keystone.common.config': keystone_config,
          'glance.common.config': glance_store_config,
+         'neutron': neutron_misc,
          'nova.spice': nova_spice}
