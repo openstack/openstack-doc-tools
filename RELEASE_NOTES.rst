@@ -6,6 +6,11 @@ Release notes
 
 * Enhance ``doc-tools-check-languages`` to handle translation of RST
   guides and publishing of draft guides to /draft/.
+* ``autohelp.py``: lookup configuration options in more oslo libraries.
+* ``autohelp-wrapper``: improve reliability by building a virtual env per
+  project, rather than a common virtual env.
+* ``autohelp-wrapper``: define the custom dependencies for each project in
+  their own requirements files.
 
 0.24
 ----
