@@ -41,6 +41,7 @@ def neutron_misc():
     import networking_l2gw.services.l2gateway.common.config as l2gw
     import networking_vsphere.common.config
     from oslo.config import cfg
+    import vmware_nsx.neutron.plugins.vmware.common.config  # noqa
 
     bsnstacklib.plugins.bigswitch.config.register_config()
     networking_vsphere.common.config.register_options()
