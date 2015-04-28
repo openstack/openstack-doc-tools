@@ -36,17 +36,21 @@ def glance_store_config():
 
 
 def neutron_misc():
-    import bsnstacklib.plugins.bigswitch.config
-    import networking_cisco.plugins.cisco.cfg_agent.device_status  # noqa
-    import networking_l2gw.services.l2gateway.common.config as l2gw
-    import networking_vsphere.common.config
-    from oslo_config import cfg
-    import vmware_nsx.neutron.plugins.vmware.common.config  # noqa
+    try:
+        # These imports are needed for kilo only
+        import bsnstacklib.plugins.bigswitch.config
+        import networking_cisco.plugins.cisco.cfg_agent.device_status  # noqa
+        import networking_l2gw.services.l2gateway.common.config as l2gw
+        import networking_vsphere.common.config
+        from oslo_config import cfg
+        import vmware_nsx.neutron.plugins.vmware.common.config  # noqa
 
-    bsnstacklib.plugins.bigswitch.config.register_config()
-    networking_vsphere.common.config.register_options()
-    l2gw.register_l2gw_opts_helper()
-    l2gw.register_ovsdb_opts_helper(cfg.CONF)
+        bsnstacklib.plugins.bigswitch.config.register_config()
+        networking_vsphere.common.config.register_options()
+        l2gw.register_l2gw_opts_helper()
+        l2gw.register_ovsdb_opts_helper(cfg.CONF)
+    except Exception:
+        pass
 
 
 def nova_spice():

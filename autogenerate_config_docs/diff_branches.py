@@ -65,7 +65,9 @@ def get_options(project, branch, args):
 
     # And run autohelp script to get a serialized dict of the discovered
     # options
-    dirname = os.path.abspath(os.path.join('venv', branch.replace('/', '_')))
+    dirname = os.path.abspath(os.path.join('venv',
+                                           branch.replace('/', '_'),
+                                           project))
     if project == 'swift':
         cmd = ("python extract_swift_flags.py dump "
                "-s %(sources)s/swift -m %(sources)s/openstack-manuals" %
