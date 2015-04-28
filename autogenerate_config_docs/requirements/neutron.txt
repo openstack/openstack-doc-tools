@@ -31,3 +31,4 @@ ryu
 -e git+https://git.openstack.org/stackforge/networking-portforwarding.git#egg=networking-portforwarding
 -e git+https://git.openstack.org/stackforge/networking-vsphere.git#egg=networking-vsphere
 -e git+https://git.openstack.org/stackforge/neutron-powervm.git#egg=neutron-powervm
+-e git+https://git.openstack.org/stackforge/vmware-nsx.git#egg=vmware-nsx
