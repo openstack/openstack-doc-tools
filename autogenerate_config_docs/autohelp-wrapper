@@ -76,15 +76,6 @@ setup_tools() {
 
     # autohelp.py requires this
     pip install oslo.i18n lxml
-
-    # This is a workaround to avoid pulling in new configuration options brought
-    # by python-keystoneclient >= 0.8. This version also deprecates some options
-    # still expected by the projects. The release of version 0.8 happened too
-    # late in the icehouse release cycle to let the doc team handle the changes
-    # properly in the documentation.
-    if echo $BRANCH | grep -q stable/; then
-        pip install "python-keystoneclient==0.7"
-    fi
 }
 
 while getopts :b:e:cf opt; do

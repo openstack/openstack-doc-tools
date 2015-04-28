@@ -51,7 +51,8 @@ IGNORE = [
     'trove.guestagent.datastore.experimental.postgresql.service.root',
     'trove.guestagent.datastore.experimental.postgresql.service.users',
     'glance.contrib.plugins.image_artifact.setup',
-    'glance.contrib.plugins.artifacts_sample.setup'
+    'glance.contrib.plugins.artifacts_sample.setup',
+    'neutron.plugins.ml2.drivers.cisco.nexus.type_nexus_vxlan'
 ]
 
 
@@ -351,9 +352,10 @@ class OptionsCache(object):
             deprecated_opts = [{'group': deprecated.group,
                                 'name': deprecated.name}
                                for deprecated in option.deprecated_opts]
+            help_str = option.help.strip() if option.help else "None"
             new_option = {
                 'default': option.default,
-                'help': option.help.strip(),
+                'help': help_str,
                 'deprecated_opts': deprecated_opts,
                 'type': option.__class__.__name__.split('.')[-1]
             }
