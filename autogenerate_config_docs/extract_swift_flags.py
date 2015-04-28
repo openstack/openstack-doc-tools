@@ -97,7 +97,7 @@ def get_existing_options(optfiles):
                 continue
             if option not in options or 'No help text' in options[option]:
                 # options[option.split('=',1)[0]] = helptext
-                options[option] = helptext
+                options[option] = helptext.strip()
     return options
 
 
@@ -194,7 +194,7 @@ def write_docbook(options, manuals_repo):
         tr.append(td)
 
         td = etree.Element('td')
-        td.text = oslo_opt.help
+        td.text = oslo_opt.help.strip()
         tr.append(td)
 
     write_xml(manuals_repo, section, xml)
