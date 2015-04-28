@@ -27,7 +27,7 @@ def keystone_config():
 def glance_store_config():
     try:
         import glance_store
-        from oslo.config import cfg
+        from oslo_config import cfg
 
         glance_store.backend.register_opts(cfg.CONF)
     except ImportError:
@@ -40,7 +40,7 @@ def neutron_misc():
     import networking_cisco.plugins.cisco.cfg_agent.device_status  # noqa
     import networking_l2gw.services.l2gateway.common.config as l2gw
     import networking_vsphere.common.config
-    from oslo.config import cfg
+    from oslo_config import cfg
     import vmware_nsx.neutron.plugins.vmware.common.config  # noqa
 
     bsnstacklib.plugins.bigswitch.config.register_config()

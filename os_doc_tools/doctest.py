@@ -43,7 +43,7 @@ import time
 import urllib2
 
 from lxml import etree
-from oslo.config import cfg
+from oslo_config import cfg
 
 import os_doc_tools
 from os_doc_tools.common import check_output   # noqa

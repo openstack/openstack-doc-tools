@@ -30,7 +30,7 @@ import socket
 import sys
 import textwrap
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 # from openstack.common import gettextutils
 from openstack.common import importutils

@@ -18,7 +18,7 @@
 #
 
 # Must import this before argparse
-from oslo.config import cfg
+from oslo_config import cfg
 
 import argparse
 import importlib
@@ -29,7 +29,7 @@ import sys
 
 import git
 from lxml import etree
-import oslo.i18n as i18n
+import oslo_i18n as i18n
 import stevedore
 
 from hooks import HOOKS  # noqa

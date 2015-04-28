@@ -19,7 +19,7 @@ import pickle
 import sys
 
 from lxml import etree
-from oslo.config import cfg
+from oslo_config import cfg
 
 from autohelp import OptionsCache  # noqa
 
