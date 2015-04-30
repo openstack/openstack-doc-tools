@@ -67,12 +67,18 @@ function build_rst {
         tox -evenv "sphinx-build -t user_only -D language=${language} \
             doc/${book}/source/ \
             doc/${book}/build/html"
+        mkdir -p publish-docs/${language}/user-guide/
+        rsync -a doc/user-guides/build/html/ publish-docs/${language}/user-guide/
         tox -evenv "sphinx-build -t admin_only -D language=${language} \
             doc/${book}/source/ \
             doc/${book}/build-admin/html"
+        mkdir -p publish-docs/${language}/user-guide-admin/
+        rsync -a doc/user-guides/build-admin/html/ publish-docs/${language}/user-guide-admin/
     else
         tox -evenv "sphinx-build -D language=${language} doc/${book}/source/ \
             doc/${book}/build/html"
+        mkdir -p publish-docs/${language}/${book}/
+        rsync -a doc/${book}/build-admin/html/ publish-docs/${language}/${book}/
     fi
 }
 
@@ -132,8 +138,23 @@ function handle_draft_language {
 
     mkdir -p publish-docs/draft/$language
     for book in ${DRAFTS["$language"]}; do
-        mv publish-docs/$language/$book publish-docs/draft/$language/$book
+        case "${book}" in
+            user-guides)
+                mv publish-docs/$language/user-guide publish-docs/draft/$language/user-guide
+                mv publish-docs/$language/user-guide-admin publish-docs/draft/$language/user-guide-admin
+                ;;
+            install-guide|config-reference)
+                mv publish-docs/$language/draft/$book publish-docs/draft/$language/$book
+                # Remove directory if it's empty and do not fail if it's non-empty
+                rmdir publish-docs/$language/draft || true
+                ;;
+            *)
+                mv publish-docs/$language/$book publish-docs/draft/$language/$book
+                ;;
+        esac
     done
+
+
 }
 
 

@@ -1,6 +1,12 @@
 Release notes
 =============
 
+0.26
+----
+
+* Fix ``doc-tools-check-languages`` handling of RST guides and
+  publishing to translated draft guides.
+
 0.25
 ----
 
