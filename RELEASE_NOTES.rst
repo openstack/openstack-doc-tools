@@ -6,6 +6,8 @@ Release notes
 
 * Fix ``doc-tools-check-languages`` handling of RST guides and
   publishing to translated draft guides.
+* Improve ``openstack-auto-commands``: bash-completion support for
+  python-glanceclient, new commands for python-swiftclient
 
 0.25
 ----
