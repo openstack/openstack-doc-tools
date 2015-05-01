@@ -1,0 +1,87 @@
+---
+barbican:
+    name: Key management service
+    subcommands: complete
+ceilometer:
+    name: Telemetry
+cinder:
+    name: OpenStack Block Storage
+    title: Block Storage
+designate:
+    name: DNS service
+    subcommands: complete
+glance:
+    name: OpenStack Image service
+    title: Image service
+heat:
+    name: Orchestration
+ironic:
+    name: Bare metal
+keystone:
+    name: OpenStack Identity
+    title: Identity service
+neutron:
+    name: OpenStack Networking
+    title: Networking
+magnetodb:
+    name: Key-Value Store as a Service
+magnum:
+    name: Containers service
+manila:
+    name: Shared file systems
+mistral:
+    name: Workflow service
+    subcommands: complete
+nova:
+    name: OpenStack Compute
+    title: Compute
+manila:
+    name: Shared file systems
+sahara:
+    name: Data processing
+swift:
+    name: OpenStack Object Storage
+    title: Object Storage
+    subcommands:
+      - capabilities
+      - delete
+      - download
+      - list
+      - post
+      - stat
+      - tempurl
+      - upload
+tuskar:
+    name: Deployment
+    subcommands:
+      - plan-add-role
+      - plan-create
+      - plan-delete
+      - plan-flavor
+      - plan-list
+      - plan-patch
+      - plan-remove-role
+      - plan-scale
+      - plan-show
+      - plan-show-flavors
+      - plan-show-scale
+      - plan-templates
+      - plan-update
+      - role-list
+trove:
+    name: Database
+    title: Database service
+trove-manage:
+    name: Database Management Utility
+    title: Database service management
+    subcommands:
+      - datastore_update
+      - datastore_version_update
+      - db_downgrade
+      - db_load_datastore_config_parameters
+      - db_recreate
+      - db_sync
+      - db_upgrade
+openstack:
+    title: OpenStack
+    subcommands: complete

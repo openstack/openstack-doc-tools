@@ -7,7 +7,11 @@ Release notes
 * Fix ``doc-tools-check-languages`` handling of RST guides and
   publishing to translated draft guides.
 * Improve ``openstack-auto-commands``: bash-completion support for
-  python-glanceclient, new commands for python-swiftclient
+  python-glanceclient, new commands for python-swiftclient, new command
+  for trove-manage, automatically identify deprecated subcommands,
+  move client definitions into a YAML resource file, support of the
+  complete subcommand, support for new clients (barbican, designate, manila,
+  magnetodb, manila, mistral, tuskar).
 
 0.25
 ----

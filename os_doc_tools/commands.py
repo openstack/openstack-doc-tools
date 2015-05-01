@@ -16,6 +16,7 @@ import argparse
 import os
 import subprocess
 import sys
+import yaml
 
 import os_doc_tools
 from os_doc_tools.common import check_output   # noqa
@@ -390,6 +391,8 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     :param title_suffix: Extra suffix for title
     """
 
+    print("Documenting subcommand '%s'..." % os_subcommand)
+
     args = [os_command]
     if extra_params:
         args.extend(extra_params)
@@ -399,7 +402,18 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     else:
         args.append("help")
         args.append(os_subcommand)
-    help_lines = check_output(args, stderr=DEVNULL).split('\n')
+    help_lines = check_output(args, stderr=DEVNULL)
+
+    if 'positional arguments' in help_lines.lower():
+        index = help_lines.lower().index('positional arguments')
+    else:
+        index = len(help_lines)
+
+    if 'deprecated' in (help_lines[0:index].lower()):
+        print("Subcommand '%s' is deprecated, skipping." % os_subcommand)
+        return
+
+    help_lines = help_lines.split('\n')
 
     os_subcommandid = os_subcommand.replace(' ', '_')
     os_file.write("    <section xml:id=\"%sclient_subcommand_%s%s\">\n"
@@ -474,35 +488,40 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     os_file.write("    </section>\n")
 
 
-def generate_subcommands(os_command, os_file, blacklist, only_subcommands,
-                         extra_params, suffix, title_suffix):
+def generate_subcommands(os_command, os_file, subcommands, extra_params,
+                         suffix, title_suffix):
     """Convert os_command help subcommands for all subcommands to DocBook.
 
     :param os_command: client command to document
     :param os_file:    open filehandle for output of DocBook file
-    :param blacklist:  list of elements that will not be documented
-    :param only_subcommands: if not empty, list of subcommands to document
+    :param subcommands: list or type ('complete' or 'bash-completion')
+                        of subcommands to document
     :param extra_params: Extra parameter to pass to os_command.
     :param suffix: Extra suffix to add to xml:id
     :param title_suffix: Extra suffix for title
     """
 
     print("Documenting '%s' subcommands..." % os_command)
-    blacklist.append("bash-completion")
-    blacklist.append("complete")
-    blacklist.append("help")
-    if not only_subcommands:
+    blacklist = ['bash-completion', 'complete', 'help']
+    if type(subcommands) is str:
         args = [os_command]
         if extra_params:
             args.extend(extra_params)
-        args.append("bash-completion")
-        all_options = check_output(args).strip().split()
-    else:
-        all_options = only_subcommands
+        if subcommands == 'complete':
+            subcommands = []
+            args.append('complete')
+            for line in [x.strip() for x in check_output(args).split('\n')
+                         if x.strip().startswith('cmds_') and '-' in x]:
+                subcommand, _ = line.split('=')
+                subcommand = subcommand.replace('cmds_', '').replace('_', ' ')
+                subcommands.append(subcommand)
+        else:
+            args.append('bash-completion')
+            subcommands = check_output(args).strip().split()
 
-    subcommands = [o for o in all_options if not
-                   (o.startswith('-') or o in blacklist)]
-    for subcommand in sorted(subcommands):
+    subcommands = sorted([o for o in subcommands if not (o.startswith('-') or
+                                                         o in blacklist)])
+    for subcommand in subcommands:
         generate_subcommand(os_command, subcommand, os_file, extra_params,
                             suffix, title_suffix)
     print ("%d subcommands documented." % len(subcommands))
@@ -518,93 +537,33 @@ def generate_end(os_file):
     os_file.write("</chapter>\n")
 
 
-def get_openstack_subcommands(commands):
-    """Get all subcommands of 'openstack' without using bashcompletion."""
-    subcommands = []
-    for command in commands:
-        output = check_output(["openstack", "--os-auth-type", "token",
-                               "help", command], stderr=DEVNULL)
-        for line in output.split("\n"):
-            if line.strip().startswith(command):
-                subcommands.append(line.strip())
-
-    return subcommands
+def get_clients():
+    """Load client definitions from the resource file."""
+    fname = os.path.join(os.path.dirname(__file__),
+                         'resources/clients.yaml')
+    clients = yaml.load(open(fname, 'r'))
+    return clients
 
 
 def document_single_project(os_command, output_dir):
     """Create documenation for os_command."""
 
-    print ("Documenting '%s'" % os_command)
+    clients = get_clients()
 
-    blacklist = []
-    subcommands = []
-    if os_command == 'ceilometer':
-        api_name = "Telemetry API"
-        title = "Telemetry command-line client"
-        blacklist = ["alarm-create"]
-    elif os_command == 'cinder':
-        api_name = "OpenStack Block Storage API"
-        title = "Block Storage command-line client"
-    elif os_command == 'glance':
-        api_name = 'OpenStack Image service API'
-        title = "Image service command-line client"
-    elif os_command == 'heat':
-        api_name = "Orchestration API"
-        title = "Orchestration command-line client"
-        blacklist = ["create", "delete", "describe", "event",
-                     "gettemplate", "list", "resource",
-                     "update", "validate"]
-    elif os_command == 'ironic':
-        api_name = "Bare metal"
-        title = "Bare metal command-line client"
-    elif os_command == 'keystone':
-        api_name = "OpenStack Identity API"
-        title = "Identity service command-line client"
-    elif os_command == 'neutron':
-        api_name = "OpenStack Networking API"
-        title = "Networking command-line client"
-    elif os_command == 'nova':
-        api_name = "OpenStack Compute API"
-        title = "Compute command-line client"
-        blacklist = ["add-floating-ip", "remove-floating-ip"]
-    elif os_command == 'sahara':
-        api_name = "Data processing API"
-        title = "Data processing command-line client"
-    elif os_command == 'swift':
-        api_name = "OpenStack Object Storage API"
-        title = "Object Storage command-line client"
-        # Does not know about bash-completion yet, need to specify
-        # subcommands manually
-        subcommands = ["delete", "download", "list", "post",
-                       "stat", "upload", "capabilities", "tempurl"]
-    elif os_command == 'trove':
-        api_name = "Database API"
-        title = "Database service command-line client"
-        blacklist = ["resize-flavor"]
-    elif os_command == 'trove-manage':
-        api_name = "Database Management Utility"
-        title = "Database service management command-line client"
-        # Does not know about bash-completion yet, need to specify
-        # subcommands manually
-        subcommands = ["db_sync", "db_upgrade",
-                       "db_downgrade", "datastore_update",
-                       "datastore_version_update", "db_recreate"]
-    elif os_command == 'openstack':
-        api_name = ''
-        title = "OpenStack client"
-        # Does not know about bash-completion yet, need to specify
-        # commands manually and to fetch subcommands automatically
-        commands = ["aggregate", "availability", "backup", "catalog",
-                    "command", "compute", "console", "container",
-                    "ec2", "endpoint", "extension", "flavor", "host",
-                    "hypervisor", "image", "ip", "keypair", "limits", "module",
-                    "network", "object", "project", "quota", "role",
-                    "security", "server", "service", "snapshot", "token",
-                    "usage", "user", "volume"]
-        subcommands = get_openstack_subcommands(commands)
-    else:
+    if os_command not in clients:
         print("'%s' command not yet handled" % os_command)
         sys.exit(-1)
+
+    print ("Documenting '%s'" % os_command)
+
+    data = clients[os_command]
+    if 'name' in data:
+        api_name = "%s API" % data['name']
+        title = "%s command-line client" % data.get('title', data['name'])
+    else:
+        api_name = ''
+        title = data.get('title', '')
+    subcommands = data.get('subcommands', 'bash-completion')
 
     out_filename = "ch_cli_" + os_command + "_commands.xml"
     out_file = open(os.path.join(output_dir, out_filename), 'w')
@@ -621,11 +580,10 @@ def document_single_project(os_command, output_dir):
        <title>Image service API v1 commands</title>\n""")
 
     if os_command == 'openstack':
-        generate_subcommands(os_command, out_file, blacklist,
-                             subcommands, ["--os-auth-type", "token"], "", "")
+        generate_subcommands(os_command, out_file, subcommands,
+                             ["--os-auth-type", "token"], "", "")
     else:
-        generate_subcommands(os_command, out_file, blacklist,
-                             subcommands, None, "", "")
+        generate_subcommands(os_command, out_file, subcommands, None, "", "")
 
     if os_command == 'cinder':
         out_file.write("    </section>\n")
@@ -640,9 +598,8 @@ def document_single_project(os_command, output_dir):
                        "export OS_VOLUME_API_VERSION=2</userinput></screen>\n"
                        "</para>\n")
 
-        generate_subcommands(os_command, out_file, blacklist,
-                             subcommands, ["--os-volume-api-version", "2"],
-                             "_v2", " (v2)")
+        generate_subcommands(os_command, out_file, subcommands,
+                             ["--os-volume-api-version", "2"], "_v2", " (v2)")
         out_file.write("    </section>\n")
     if os_command == 'glance':
         out_file.write("""
@@ -657,9 +614,8 @@ def document_single_project(os_command, output_dir):
                        "export OS_IMAGE_API_VERSION=2</userinput></screen>\n"
                        "</para>\n")
 
-        generate_subcommands(os_command, out_file, blacklist,
-                             subcommands, ["--os-image-api-version", "2"],
-                             "_v2", " (v2)")
+        generate_subcommands(os_command, out_file, subcommands,
+                             ["--os-image-api-version", "2"], "_v2", " (v2)")
         out_file.write("    </section>\n")
 
     generate_end(out_file)
@@ -671,10 +627,9 @@ def main():
           "openstack-doc-tools version %s)\n"
           % os_doc_tools.__version__)
 
-    api_clients = ["ceilometer", "cinder", "glance", "heat", "ironic",
-                   "keystone", "nova", "neutron", "openstack", "sahara",
-                   "swift", "trove"]
-    manage_clients = ["trove-manage"]
+    clients = get_clients()
+    api_clients = sorted([x for x in clients if not x.endswith('-manage')])
+    manage_clients = sorted([x for x in clients if x.endswith('-manage')])
     all_clients = api_clients + manage_clients
 
     parser = argparse.ArgumentParser(description="Generate DocBook XML files "
@@ -686,7 +641,7 @@ def main():
                         "Namely " + ", ".join(all_clients) + ".",
                         action="store_true")
     parser.add_argument("--all-api", help="Document all API clients. "
-                        "Namely " + ", ".join(api_clients) + ".",
+                        "Namely " + ", ".join(clients.keys()) + ".",
                         action="store_true")
     parser.add_argument("--all-manage", help="Document all manage clients. "
                         "Namely " + ", ".join(manage_clients) + ".",
@@ -697,7 +652,7 @@ def main():
 
     if prog_args.all or prog_args.all_api or prog_args.all_manage:
         if prog_args.all or prog_args.all_api:
-            for client in api_clients:
+            for client in clients.keys():
                 document_single_project(client, prog_args.output_dir)
         if prog_args.all or prog_args.all_manage:
             for client in manage_clients:
