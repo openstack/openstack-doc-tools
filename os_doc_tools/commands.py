@@ -548,11 +548,6 @@ def document_single_project(os_command, output_dir):
     elif os_command == 'glance':
         api_name = 'OpenStack Image service API'
         title = "Image service command-line client"
-        # Does not know about bash-completion yet, need to specify
-        # subcommands manually
-        subcommands = ["image-create", "image-delete", "image-list",
-                       "image-show", "image-update", "member-create",
-                       "member-delete", "member-list"]
     elif os_command == 'heat':
         api_name = "Orchestration API"
         title = "Orchestration command-line client"
@@ -581,7 +576,7 @@ def document_single_project(os_command, output_dir):
         # Does not know about bash-completion yet, need to specify
         # subcommands manually
         subcommands = ["delete", "download", "list", "post",
-                       "stat", "upload"]
+                       "stat", "upload", "capabilities", "tempurl"]
     elif os_command == 'trove':
         api_name = "Database API"
         title = "Database service command-line client"
@@ -650,28 +645,8 @@ def document_single_project(os_command, output_dir):
                              "_v2", " (v2)")
         out_file.write("    </section>\n")
     if os_command == 'glance':
-        out_file.write("    </section>\n")
-        subcommands = ['explain', 'image-create', 'image-delete',
-                       'image-download', 'image-list', 'image-show',
-                       'image-tag-delete', 'image-tag-update', 'image-update',
-                       'image-upload', 'location-add', 'location-delete',
-                       'location-update', 'md-namespace-create',
-                       'md-namespace-delete', 'md-namespace-import',
-                       'md-namespace-list', 'md-namespace-objects-delete',
-                       'md-namespace-properties-delete',
-                       'md-namespace-resource-type-list', 'md-namespace-show',
-                       'md-namespace-update', 'md-object-create',
-                       'md-object-delete', 'md-object-list',
-                       'md-object-property-show', 'md-object-show',
-                       'md-object-update', 'md-property-create',
-                       'md-property-delete', 'md-property-list',
-                       'md-property-show', 'md-property-update',
-                       'md-resource-type-associate',
-                       'md-resource-type-deassociate',
-                       'md-resource-type-list', 'member-create',
-                       'member-delete', 'member-list', 'member-update']
-
         out_file.write("""
+    </section>\n
     <section xml:id=\"glance_cli_v2\">
        <title>Image service API v2 commands</title>
     <para>
