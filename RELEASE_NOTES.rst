@@ -1,6 +1,13 @@
 Release notes
 =============
 
+0.27
+----
+
+* ``openstack-doc-test``: Do not build Debian Install Guide by
+  default, built it only if the parameter ``--enable-debian-install``
+  is passed.
+
 0.26
 ----
 
