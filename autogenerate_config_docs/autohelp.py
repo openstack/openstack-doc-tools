@@ -39,6 +39,7 @@ EXTENSIONS = ['oslo.concurrency'
               'oslo.db',
               'oslo.log',
               'oslo.messaging',
+              'oslo.middleware',
               'oslo.policy']
 
 IGNORE = [
