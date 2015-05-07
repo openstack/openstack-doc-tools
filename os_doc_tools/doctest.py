@@ -893,14 +893,15 @@ def build_book(book, publish_path, log_path):
         out_file.write(output)
         if base_book == "install-guide":
             # Build Debian
-            base_book = "install-guide (for debian)"
-            output = subprocess.check_output(
-                ["mvn", "generate-sources", "-B",
-                 comments, release,
-                 "-Doperating.system=apt-debian", "-Dprofile.os=debian"],
-                stderr=subprocess.STDOUT
-            )
-            out_file.write(output)
+            if cfg.CONF.enable_debian_install:
+                base_book = "install-guide (for debian)"
+                output = subprocess.check_output(
+                    ["mvn", "generate-sources", "-B",
+                     comments, release,
+                     "-Doperating.system=apt-debian", "-Dprofile.os=debian"],
+                    stderr=subprocess.STDOUT
+                )
+                out_file.write(output)
             # Build Fedora
             base_book = "install-guide (for Fedora)"
             output = subprocess.check_output(
@@ -929,7 +930,10 @@ def build_book(book, publish_path, log_path):
                 stderr=subprocess.STDOUT
             )
             # Success
-            base_book = "install-guide (for Debian, Fedora, openSUSE, Ubuntu)"
+            base_book = "install-guide (for "
+            if cfg.CONF.enable_debian_install:
+                base_book += "Debian, "
+            base_book += "Fedora, openSUSE, Ubuntu)"
         # HOT template guide
         elif base_book == 'hot-guide':
             # Make sure that the build dir is clean
@@ -1457,6 +1461,8 @@ cli_OPTS = [
     cfg.MultiStrOpt("url-exception",
                     help="URL that will be skipped during reachability "
                          "check."),
+    cfg.BoolOpt("enable-debian-install", default=False,
+                help="Enable building of Debian Install Guide."),
 ]
 
 OPTS = [
