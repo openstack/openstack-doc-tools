@@ -6,4 +6,4 @@ bashate>=0.2 # Apache-2.0
 doc8  # Apache-2.0
 # Hacking already pins down pep8, pyflakes and flake8
 hacking>=0.10.0,<0.11
-pylint>=1.3.0  # GNU GPL v2
+pylint==1.4.1  # GNU GPL v2
