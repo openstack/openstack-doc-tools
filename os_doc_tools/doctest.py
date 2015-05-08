@@ -1243,7 +1243,8 @@ def generate_index_file():
 
     for root, dirs, files in os.walk(publish_path):
 
-        dirs[:] = [d for d in dirs if d not in ['common', 'webapp', 'content']]
+        dirs[:] = [d for d in dirs if d not in ['common', 'webapp', 'content',
+                                                'www']]
 
         # Ignore top-level index.html files
         if root == publish_path:

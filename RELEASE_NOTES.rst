@@ -6,7 +6,8 @@ Release notes
 
 * ``openstack-doc-test``: Do not build Debian Install Guide by
   default, built it only if the parameter ``--enable-debian-install``
-  is passed.
+  is passed. Fix index.html file and remove
+  www files that came in by accident.
 
 0.26
 ----
