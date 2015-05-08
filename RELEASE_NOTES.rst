@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.28
+----
+
+* ``openstack-doc-test``: Sort entries in index.html file.
+
 0.27
 ----
 

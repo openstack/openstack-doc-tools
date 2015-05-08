@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf8 -*-
 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1241,6 +1240,7 @@ def generate_index_file():
         '<body>\n'
         '<h1>Results of checkbuild</h1>\n')
 
+    links = {}
     for root, dirs, files in os.walk(publish_path):
 
         dirs[:] = [d for d in dirs if d not in ['common', 'webapp', 'content',
@@ -1252,29 +1252,29 @@ def generate_index_file():
 
         if os.path.isfile(os.path.join(root, 'content/index.html')):
             path = os.path.relpath(root, publish_path)
-            index_file.write('<a href="%s/content/index.html">%s</a>\n' %
-                             (path, path))
-            index_file.write('<br/>\n')
+            links[path] = ('<a href="%s/content/index.html">%s</a>\n' %
+                           (path, path))
         elif os.path.isfile(os.path.join(root, 'index.html')):
             path = os.path.relpath(root, publish_path)
-            index_file.write('<a href="%s/index.html">%s</a>\n' %
-                             (path, path))
-            index_file.write('<br/>\n')
+            links[path] = ('<a href="%s/index.html">%s</a>\n' %
+                           (path, path))
 
         if os.path.isfile(os.path.join(root, 'api-ref.html')):
             path = os.path.relpath(root, publish_path)
-            index_file.write('<a href="%s/api-ref.html">%s</a>\n' %
-                             (path, path))
-            index_file.write('<br/>\n')
+            links[path] = ('<a href="%s/api-ref.html">%s</a>\n' %
+                           (path, path))
 
         # List PDF files for api-site that have from "bk-api-ref*.pdf"
         # as well since they have no corresponding html file.
         for f in files:
             if f.startswith('bk-api-ref') and f.endswith('.pdf'):
                 path = os.path.relpath(root, publish_path)
-                index_file.write('<a href="%s/%s">%s</a>\n' %
-                                 (path, f, f))
-                index_file.write('<br/>\n')
+                links[f] = ('<a href="%s/%s">%s</a>\n' %
+                            (path, f, f))
+
+    for entry in sorted(links):
+        index_file.write(links[entry])
+        index_file.write('<br/>\n')
 
     if os.path.isfile(os.path.join(get_publish_path(), 'www-index.html')):
         index_file.write('<br/>\n')
