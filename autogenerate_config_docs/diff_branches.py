@@ -170,6 +170,12 @@ def diff(old_list, new_list):
         # Find options that have been deprecated in the new release.
         # If an option name is a key in the old_list dict, it means that it
         # wasn't deprecated.
+
+        # Some options are deprecated, but not replaced with a new option.
+        # These options usually contain 'DEPRECATED' in their help string.
+        if 'DEPRECATED' in option['help']:
+            deprecated_opts.append((name, None))
+
         for deprecated in option['deprecated_opts']:
             # deprecated_opts is a list which always holds at least 1 invalid
             # dict. Forget it.
@@ -189,6 +195,9 @@ def diff(old_list, new_list):
 
 def format_option_name(name):
     """Return a formatted string for the option path."""
+    if name is None:
+        return "None"
+
     try:
         section, name = name.split('/')
     except ValueError:
