@@ -38,15 +38,18 @@ function build_rst {
     language=$1
     book=$2
 
-    # Generate glossary first
-    tools/glossary2rst.py doc/${book}/source/glossary.rst
-
     # First build all the single po files
     # Note that we need to run inside a venv since the venv we are run in
     # uses SitePackages=True and we have to install Sphinx in the venv
     # together with openstackdocstheme. With SitePackages, the global Sphinx
     # is used and that will not work with a local openstackdocstheme installed.
-    tox -evenv "sphinx-build -W -b gettext doc/${book}/source/ doc/${book}/source/locale/"
+    if [ ${book} == "user-guide" ] ; then
+        TAG="-t user_only"
+    fi
+    if [ ${book} == "user-guide-admin" ] ; then
+        TAG="-t admin_only"
+    fi
+    tox -evenv "sphinx-build -W -b gettext $TAG doc/${book}/source/ doc/${book}/source/locale/"
     # Now run msgmerge on all files
 
     for f in doc/${book}/source/locale/*.pot ; do
@@ -75,10 +78,10 @@ function build_rst {
         mkdir -p publish-docs/${language}/user-guide-admin/
         rsync -a doc/user-guides/build-admin/html/ publish-docs/${language}/user-guide-admin/
     else
-        tox -evenv "sphinx-build -D language=${language} doc/${book}/source/ \
+        tox -evenv "sphinx-build $TAG -D language=${language} doc/${book}/source/ \
             doc/${book}/build/html"
         mkdir -p publish-docs/${language}/${book}/
-        rsync -a doc/${book}/build-admin/html/ publish-docs/${language}/${book}/
+        rsync -a doc/${book}/build/html/ publish-docs/${language}/${book}/
     fi
 }
 

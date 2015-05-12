@@ -7,6 +7,8 @@ Release notes
 * ``openstack-doc-test``: Sort entries in index.html file.
 * ``diff_branches.py``: Add options containing DEPRECATED in their help
   string to the deprecation list.
+* ``doc-tools-check-languages``: Fix bugs in RST handling that broke
+  handling of user-guide and user-guide-admin.
 
 0.27
 ----
