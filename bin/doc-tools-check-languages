@@ -43,45 +43,43 @@ function build_rst {
     # uses SitePackages=True and we have to install Sphinx in the venv
     # together with openstackdocstheme. With SitePackages, the global Sphinx
     # is used and that will not work with a local openstackdocstheme installed.
-    if [ ${book} == "user-guide" ] ; then
-        TAG="-t user_only"
+    TAG=""
+    # We need to extract all strings, so add all supported tags
+    if [ ${book} = "firstapp" ] ; then
+        TAG="-t libcloud -t fog"
     fi
-    if [ ${book} == "user-guide-admin" ] ; then
-        TAG="-t admin_only"
-    fi
-    tox -evenv "sphinx-build -W -b gettext $TAG doc/${book}/source/ doc/${book}/source/locale/"
+    tox -evenv "sphinx-build -W -b gettext $TAG ${DOC_DIR}${book}/source/ ${DOC_DIR}${book}/source/locale/"
     # Now run msgmerge on all files
-
-    for f in doc/${book}/source/locale/*.pot ; do
+    for f in ${DOC_DIR}${book}/source/locale/*.pot ; do
         # Skip the master file
-        if [ $f == "doc/${book}/source/locale/${book}.pot" ] ; then
+        if [ $f = "${DOC_DIR}${book}/source/locale/${book}.pot" ] ; then
             continue
         fi
         bf=$(basename $f)
         # Remove .pot
         bfname=${bf%.pot}
-        msgmerge -o doc/${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
-            doc/${book}/source/locale/${language}/LC_MESSAGES/${book}.po \
-            doc/${book}/source/locale/${bf}
-        msgfmt doc/${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
-            -o doc/${book}/source/locale/${language}/LC_MESSAGES/${bfname}.mo
+        msgmerge -o ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
+            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po \
+            ${DOC_DIR}${book}/source/locale/${bf}
+        msgfmt ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
+            -o ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.mo
     done
-    if [ ${book} == "user-guides" ] ; then
-        tox -evenv "sphinx-build -t user_only -D language=${language} \
-            doc/${book}/source/ \
-            doc/${book}/build/html"
-        mkdir -p publish-docs/${language}/user-guide/
-        rsync -a doc/user-guides/build/html/ publish-docs/${language}/user-guide/
-        tox -evenv "sphinx-build -t admin_only -D language=${language} \
-            doc/${book}/source/ \
-            doc/${book}/build-admin/html"
-        mkdir -p publish-docs/${language}/user-guide-admin/
-        rsync -a doc/user-guides/build-admin/html/ publish-docs/${language}/user-guide-admin/
+    if [ ${book} = "firstapp" ] ; then
+        tox -evenv "sphinx-build -t fog -D language=${language} \
+            ${DOC_DIR}${book}/source/ \
+            ${DOC_DIR}${book}/build-fog/html"
+        mkdir -p publish-docs/${language}/firstapp-fog
+        rsync -a ${DOC_DIR}firstapp/build-fog/html/ publish-docs/${language}/firstapp-fog
+        tox -evenv "sphinx-build -t libcloud -D language=${language} \
+            ${DOC_DIR}${book}/source/ \
+            ${DOC_DIR}${book}/build-libcloud/html"
+        mkdir -p publish-docs/${language}/firstapp-libcloud
+        rsync -a ${DOC_DIR}user-guides/build-libcloud/html/ publish-docs/${language}/firstapp-libcloud/
     else
-        tox -evenv "sphinx-build $TAG -D language=${language} doc/${book}/source/ \
-            doc/${book}/build/html"
+        tox -evenv "sphinx-build -D language=${language} ${DOC_DIR}${book}/source/ \
+            ${DOC_DIR}${book}/build/html"
         mkdir -p publish-docs/${language}/${book}/
-        rsync -a doc/${book}/build/html/ publish-docs/${language}/${book}/
+        rsync -a ${DOC_DIR}${book}/build/html/ publish-docs/${language}/${book}/
     fi
 }
 
@@ -100,7 +98,7 @@ function test_language {
     BUILD_XML=0
     for book in ${BOOKS["$language"]}; do
         if [ ${SPECIAL_BOOKS[$book]+_} ] ; then
-            if [ ${SPECIAL_BOOKS[$book]} == "RST" ] ; then
+            if [ ${SPECIAL_BOOKS[$book]} = "RST" ] ; then
                 echo "Building translated RST book $book for $language"
                 build_rst $language $book
                 if [[ $? -eq 0 ]] ; then
