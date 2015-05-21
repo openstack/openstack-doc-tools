@@ -468,92 +468,6 @@ def write_docbook(package_name, options, target, verbose=0):
                                     encoding="UTF-8"))
 
 
-def write_docbook_rootwrap(package_name, repo, target, verbose=0):
-    """Write a DocBook table for rootwrap options.
-
-    Prints a docbook-formatted table for options in a project's
-    rootwrap.conf configuration file.
-    """
-    target = target or '../../doc/common/tables/'
-
-    # The sample rootwrap.conf path is not the same in all projects. It is
-    # either in etc/ or in etc/<project>/, so we check both locations.
-    conffile = os.path.join(repo, 'etc', package_name, 'rootwrap.conf')
-    if not os.path.exists(conffile):
-        conffile = os.path.join(repo, 'etc', 'rootwrap.conf')
-        if not os.path.exists(conffile):
-            return
-
-    # Python's configparser doesn't pass comments through. We need those
-    # to have some sort of description for the options. This simple parser
-    # doesn't handle everything configparser does, but it handles everything
-    # in the currentr rootwrap example conf files.
-    curcomment = ''
-    curgroup = 'DEFAULT'
-    options = []
-    for line in open(conffile):
-        line = line.strip()
-        if line.startswith('#'):
-            if curcomment != '':
-                curcomment += ' '
-            curcomment += line[1:].strip()
-        elif line.startswith('['):
-            if line.endswith(']'):
-                curgroup = line[1:-1]
-                curcomment = ''
-        elif '=' in line:
-            key, val = line.split('=')
-            options.append((curgroup, key.strip(), val.strip(), curcomment))
-            curcomment = ''
-
-    if len(options) == 0:
-        return
-
-    if not os.path.isdir(target):
-        os.makedirs(target)
-
-    parser = etree.XMLParser(remove_blank_text=True)
-    xml = etree.XML(BASE_XML % {'pkg': package_name,
-                                'cat': 'rootwrap',
-                                'nice_cat': 'rootwrap'},
-                    parser)
-    tbody = xml.find(".//{http://docbook.org/ns/docbook}tbody")
-
-    curgroup = None
-    for group, optname, default, desc in options:
-        if group != curgroup:
-            curgroup = group
-            tr = etree.Element('tr')
-            th = etree.Element('th', colspan="2")
-            th.text = "[%s]" % group
-            tr.append(th)
-            tbody.append(tr)
-        if desc == '':
-            desc = "No help text available for this option."
-
-        tr = etree.Element('tr')
-        tbody.append(tr)
-
-        td = etree.Element('td')
-        option_xml = etree.SubElement(td, 'option')
-        option_xml.text = "%s" % optname
-        option_xml.tail = " = "
-        replaceable_xml = etree.SubElement(td, 'replaceable')
-        replaceable_xml.text = "%s" % default
-        tr.append(td)
-
-        td = etree.Element('td')
-        td.text = desc
-        tr.append(td)
-
-    file_path = ("%(target)s/%(package_name)s-rootwrap.xml" %
-                 {'target': target, 'package_name': package_name})
-    with open(file_path, 'w') as fd:
-        fd.write(etree.tostring(xml, pretty_print=True,
-                                xml_declaration=True,
-                                encoding="UTF-8"))
-
-
 def create_flagmappings(package_name, options, verbose=0):
     """Create a flagmappings file.
 
@@ -667,8 +581,6 @@ def main():
 
     elif args.subcommand == 'docbook':
         write_docbook(package_name, options, args.target, verbose=args.verbose)
-        write_docbook_rootwrap(package_name, args.repo, args.target,
-                               verbose=args.verbose)
     elif args.subcommand == 'dump':
         options.dump()
 
