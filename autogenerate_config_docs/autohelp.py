@@ -77,6 +77,23 @@ BASE_XML = '''<?xml version="1.0"?>
   </table>
 </para>'''
 
+BASE_RST = '''
+.. list-table:: Description of %(nice_cat)s configuration options
+   :header-rows: 2
+   :widths: 100 100
+   :class: config-ref-table
+
+   * - Configuration option = Default value
+     - Description
+'''
+
+NEW_GROUP_RST = '''
+.. list-table::
+   :header-rows: 1
+   :widths: 100 100
+   :class: config-ref-table
+
+'''
 
 register_re = re.compile(r'''^ +.*\.register_opts\((?P<opts>[^,)]+)'''
                          r'''(, (group=)?["'](?P<group>.*)["'])?\)''')
@@ -385,12 +402,7 @@ def pass_through(line):
             line.startswith('#'))
 
 
-def write_docbook(package_name, options, target, verbose=0):
-    """Write DocBook tables.
-
-    Prints a docbook-formatted table for every group of options.
-    """
-    target = target or '../../doc/common/tables/'
+def _get_options_by_cat(package_name):
     options_by_cat = {}
 
     with open(package_name + '.flagmappings') as f:
@@ -401,6 +413,10 @@ def write_docbook(package_name, options, target, verbose=0):
             for category in categories.split():
                 options_by_cat.setdefault(category, []).append(opt)
 
+    return options_by_cat
+
+
+def _get_category_names(package_name):
     package_headers = package_name + '.headers'
     category_names = {}
     for headers_file in ('shared.headers', package_headers):
@@ -413,6 +429,18 @@ def write_docbook(package_name, options, target, verbose=0):
                     category_names[cat] = nice_name.strip()
         except IOError:
             print("Cannot open %s (ignored)" % headers_file)
+
+    return category_names
+
+
+def write_docbook(package_name, options, target, verbose=0):
+    """Write DocBook tables.
+
+    Prints a docbook-formatted table for every group of options.
+    """
+    target = target or '../../doc/common/tables/'
+    options_by_cat = _get_options_by_cat(package_name)
+    category_names = _get_category_names(package_name)
 
     if not os.path.isdir(target):
         os.makedirs(target)
@@ -466,6 +494,53 @@ def write_docbook(package_name, options, target, verbose=0):
             fd.write(etree.tostring(xml, pretty_print=True,
                                     xml_declaration=True,
                                     encoding="UTF-8"))
+
+
+def write_rst(package_name, options, target, verbose=0):
+    """Write RST tables.
+
+    Prints an RST-formatted table for every group of options.
+    """
+    target = target or '../../doc/common/tables/rst/'
+    options_by_cat = _get_options_by_cat(package_name)
+    category_names = _get_category_names(package_name)
+
+    if not os.path.isdir(target):
+        os.makedirs(target)
+
+    for cat in options_by_cat.keys():
+        if cat in category_names:
+            nice_cat = category_names[cat]
+        else:
+            nice_cat = cat
+            print("No nicename for %s" % cat)
+        rst_table = (BASE_RST % {'pkg': package_name,
+                                 'cat': cat,
+                                 'nice_cat': nice_cat})
+        curgroup = None
+        for optname in options_by_cat[cat]:
+            group, option = options.get_option(optname)
+            if group != curgroup:
+                if curgroup is not None:
+                    rst_table += NEW_GROUP_RST
+                rst_table += '   * - **[%s]**\n     -\n' % group
+                curgroup = group
+
+            if not option.help:
+                option.help = "No help text available for this option."
+            default = _sanitize_default(option)
+
+            option_text = "%s = %s" % (option.dest, default)
+            option_text = "``%s``" % option_text.strip()
+            option_help = "(%s) %s" % (type(option).__name__,
+                                       option.help.strip())
+            rst_table += "   * - %s\n     - %s\n" % (option_text, option_help)
+
+        file_path = ("%(target)s/%(package_name)s-%(cat)s.rst" %
+                     {'target': target, 'package_name': package_name,
+                      'cat': cat})
+        with open(file_path, 'w') as fd:
+            fd.write(rst_table)
 
 
 def create_flagmappings(package_name, options, verbose=0):
@@ -529,7 +604,7 @@ def main():
         usage='%(prog)s <cmd> <package> [options]')
     parser.add_argument('subcommand',
                         help='Action (create, update, verify, dump).',
-                        choices=['create', 'update', 'docbook', 'dump'])
+                        choices=['create', 'update', 'docbook', 'rst', 'dump'])
     parser.add_argument('package',
                         help='Name of the top-level package.')
     parser.add_argument('-v', '--verbose',
@@ -581,6 +656,10 @@ def main():
 
     elif args.subcommand == 'docbook':
         write_docbook(package_name, options, args.target, verbose=args.verbose)
+
+    elif args.subcommand == 'rst':
+        write_rst(package_name, options, args.target, verbose=args.verbose)
+
     elif args.subcommand == 'dump':
         options.dump()
 
