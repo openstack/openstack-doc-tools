@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -20,7 +20,9 @@ MANUALSREPO=$SOURCESDIR/openstack-manuals
 AUTOHELP="python $HERE/autohelp.py"
 EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
+GITPROJ=git://git.openstack.org/openstack
 PROJECTS="ceilometer cinder glance heat ironic keystone neutron nova sahara swift trove"
+MANUALS_PROJECTS="openstack-manuals oslo-incubator"
 BRANCH=master
 FAST=0
 
@@ -30,16 +32,18 @@ usage() {
     echo "  $(basename $0) [ OPTIONS ] update|docbook|setup [ project1 ... ]"
     echo
     echo "Subcommands:"
-    echo "  create:    Create an initial flagmapping file"
-    echo "  update:    Update the flagmapping files"
-    echo "  docbook:   Generate the options tables"
-    echo "  setup:     Install the environment only"
+    echo "  create:     Create an initial flagmapping file"
+    echo "  update:     Update the flagmapping files"
+    echo "  docbook:    Generate the options tables"
+    echo "  setup:      Install the environment only"
     echo
     echo "Options:"
-    echo "  -b BRANCH: Work on this branch (defaults to master)"
-    echo "  -c:        Recreate the virtual environment"
-    echo "  -f:        Work offline: Do not change environment or sources"
-    echo "  -e PATH:   Create the virtualenv in PATH"
+    echo "  -b BRANCH:  Work on this branch (defaults to master)"
+    echo "  -g GITPROJ: Use this location for the project git repos "
+    echo "              (defaults to git://git.openstack.org/openstack)"
+    echo "  -c:         Recreate the virtual environment"
+    echo "  -f:         Work offline: Do not change environment or sources"
+    echo "  -e PATH:    Create the virtualenv in PATH"
 }
 
 setup_venv() {
@@ -60,9 +64,13 @@ activate_venv() {
 
 get_project() {
     project=$1
+    git_url=$GITPROJ
 
     if [ ! -e $SOURCESDIR/$project ]; then
-        git clone $GITBASE/$project $SOURCESDIR/$project
+        if [[ $MANUALS_PROJECTS =~ (^| )$project($| ) ]]; then
+            git_url=$GITBASE
+        fi
+        git clone $git_url/$project $SOURCESDIR/$project
     else
         if [ $project != openstack-manuals ]; then
             (cd $SOURCESDIR/$project && git pull)
@@ -78,10 +86,13 @@ setup_tools() {
     pip install oslo.i18n lxml
 }
 
-while getopts :b:e:cf opt; do
+while getopts :b:g:e:cf opt; do
     case $opt in
     b)
         BRANCH=$OPTARG
+        ;;
+    g)
+        GITPROJ=$OPTARG
         ;;
     c)
         rm -rf $VENVDIR
