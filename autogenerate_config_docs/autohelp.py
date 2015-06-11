@@ -339,9 +339,9 @@ class OptionsCache(object):
             for group, opts in ext.plugin():
                 for opt in opts:
                     if group is None:
-                        self._add_opt(opt.name, 'DEFAULT', opt)
+                        self._add_opt(opt.dest, 'DEFAULT', opt)
                     else:
-                        self._add_opt(group + '/' + opt.name, group, opt)
+                        self._add_opt(group + '/' + opt.dest, group, opt)
 
         self._opt_names.sort(OptionsCache._cmpopts)
 
