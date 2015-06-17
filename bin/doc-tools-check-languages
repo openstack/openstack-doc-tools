@@ -49,6 +49,14 @@ function build_rst {
         TAG="-t libcloud -t fog"
     fi
     tox -evenv "sphinx-build -W -b gettext $TAG ${DOC_DIR}${book}/source/ ${DOC_DIR}${book}/source/locale/"
+    # Merge the common-rst po file in
+    if [[ -e ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po ]] ; then
+        msgcat -o ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
+            ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po \
+            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+        mv -f ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
+            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+    fi
     # Now run msgmerge on all files
     for f in ${DOC_DIR}${book}/source/locale/*.pot ; do
         # Skip the master file

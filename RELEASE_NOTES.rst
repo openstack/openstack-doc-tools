@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.29.0
+------
+
+* ``doc-tools-check-languages``: Handle common-rst directory.
+
 0.28
 ----
 
