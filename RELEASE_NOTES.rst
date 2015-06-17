@@ -4,7 +4,10 @@ Release notes
 0.29.0
 ------
 
-* ``doc-tools-check-languages``: Handle common-rst directory.
+* ``doc-tools-check-languages``: Handle common-rst directory, update
+  for User Guides and firstapp.
+* ``autohelp.py``: Suport generation of RST tables, fixes for
+  extensions.
 
 0.28
 ----
