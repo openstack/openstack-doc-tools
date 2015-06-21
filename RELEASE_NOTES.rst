@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.29.1
+------
+
+* ``doc-tools-check-languages``: Fix building of translated RST guides.
+
 0.29.0
 ------
 

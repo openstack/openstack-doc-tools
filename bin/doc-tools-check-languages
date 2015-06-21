@@ -51,9 +51,9 @@ function build_rst {
     tox -evenv "sphinx-build -W -b gettext $TAG ${DOC_DIR}${book}/source/ ${DOC_DIR}${book}/source/locale/"
     # Merge the common-rst po file in
     if [[ -e ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po ]] ; then
-        msgcat -o ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
-            ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po \
-            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+        msgcat --use-first -o ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
+            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po \
+            ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po
         mv -f ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
             ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
     fi
