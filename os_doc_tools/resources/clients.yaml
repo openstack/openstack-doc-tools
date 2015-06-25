@@ -37,6 +37,8 @@ nova:
     title: Compute
 manila:
     name: Shared file systems
+murano:
+    name: Application catalog
 sahara:
     name: Data processing
 swift:
