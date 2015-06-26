@@ -1571,6 +1571,26 @@ def handle_options():
             print(" Comments enabled: %s" % cfg.CONF.comments_enabled)
 
 
+def check_no_building():
+    """Figure out whether we need to build XML files."""
+
+    CONF = cfg.CONF
+    if not CONF.force and www_touched():
+        print("Only files in www directory changed, nothing to do.\n")
+        return True
+    # Build everything if we publish so that regularly all manuals are
+    # published, for testing ignore the locale directories.
+    if (not CONF.force and not CONF.publish and not CONF.language
+            and only_po_touched()):
+        print("Only files in locale directories changed, nothing to do.\n")
+        return True
+    # If only RST files are touched, there's nothing to do.
+    if (not CONF.force and only_rst_touched()):
+        print("Only RST files changed, nothing to do.\n")
+        return True
+    return False
+
+
 def doctest():
     """Central entrypoint, parses arguments and runs tests."""
 
@@ -1594,20 +1614,8 @@ def doctest():
     elif not CONF.api_site:
         doc_path = os.path.join(doc_path, 'doc')
 
-    if not CONF.force and www_touched():
-        print("Only files in www directory changed, nothing to do.\n")
-        return
-
-    # Build everything if we publish so that regularly all manuals are
-    # published, for testing ignore the locale directories.
-    if (not CONF.force and not CONF.publish and not CONF.language
-            and only_po_touched()):
-        print("Only files in locale directories changed, nothing to do.\n")
-        return
-    # If only RST files are touched, there's nothing to do.
-    if (not CONF.force and only_rst_touched()):
-        print("Only RST files changed, nothing to do.\n")
-        if cfg.CONF.create_index:
+    if check_no_building():
+        if CONF.create_index:
             generate_index_file()
         return
 
