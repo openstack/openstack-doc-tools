@@ -41,7 +41,7 @@ if [[ ! -e $HOME/.gitconfig ]]; then
 fi
 
 if [[ ! -e .venv ]]; then
-    virtualenv .venv
+    virtualenv -p python2.7 .venv
 fi
 
 source .venv/bin/activate
