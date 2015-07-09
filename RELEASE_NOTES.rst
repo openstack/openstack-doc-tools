@@ -1,6 +1,12 @@
 Release notes
 =============
 
+0.30.0
+------
+
+* ``openstack-doc-test``: Always built index page in checkbuild.
+* ``openstack-auto-commands``: Add support for murano.
+
 0.29.1
 ------
 
