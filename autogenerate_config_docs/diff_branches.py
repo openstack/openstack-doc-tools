@@ -28,7 +28,7 @@ from lxml import etree
 
 PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'keystone', 'neutron',
             'nova', 'sahara', 'swift', 'trove']
-MASTER_RELEASE = 'Kilo'
+MASTER_RELEASE = 'Liberty'
 CODENAME_TITLE = {'ceilometer': 'Telemetry',
                   'cinder': 'OpenStack Block Storage',
                   'glance': 'OpenStack Image service',
