@@ -36,10 +36,15 @@ import operator
 import os
 import re
 import shutil
+import six
 import subprocess
 import sys
 import time
-import urllib2
+
+if six.PY3:
+    from urllib import request as urllib2
+else:
+    import urllib2
 
 from lxml import etree
 from oslo_config import cfg
@@ -472,7 +477,7 @@ def check_deleted_files(rootdir, file_exceptions, verbose):
     if verbose:
         print(" Removed files:")
         for f in deleted_files:
-            print ("   %s" % f)
+            print("   %s" % f)
 
     deleted_files = [os.path.abspath(x) for x in deleted_files]
     no_checked_files = 0
@@ -1041,7 +1046,7 @@ def print_unused(rootdir, ignore_dirs, included_by):
                 if (f_abs not in included_by and f_base != "pom.xml"
                    and not is_book_master(f_base)):
                     f_rel = os.path.relpath(f_abs, rootdir)
-                    print ("  %s " % f_rel)
+                    print("  %s " % f_rel)
         print("\n")
 
 
@@ -1505,7 +1510,7 @@ def handle_options():
          default_config_files=default_config_files)
 
     if CONF.repo_name:
-        print ("Testing repository '%s'\n" % CONF.repo_name)
+        print("Testing repository '%s'\n" % CONF.repo_name)
 
     if CONF.verbose:
         print("Verbose execution")
@@ -1596,8 +1601,8 @@ def doctest():
 
     start_time = time.time()
     CONF = cfg.CONF
-    print ("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
-           % os_doc_tools.__version__)
+    print("\nOpenStack Doc Checks (using openstack-doc-tools version %s)\n"
+          % os_doc_tools.__version__)
     try:
         handle_options()
     except cfg.Error as e:
@@ -1650,7 +1655,7 @@ def doctest():
                                        CONF.ignore_book)
 
     elapsed_time = (time.time() - start_time)
-    print ("Run time was: %.2f seconds." % elapsed_time)
+    print("Run time was: %.2f seconds." % elapsed_time)
     if errors == 0:
         print("Congratulations, all tests passed!")
         return 0
