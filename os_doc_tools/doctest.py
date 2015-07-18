@@ -50,7 +50,6 @@ from lxml import etree
 from oslo_config import cfg
 
 import os_doc_tools
-from os_doc_tools.common import check_output   # noqa
 from os_doc_tools import jsoncheck
 from os_doc_tools.openstack.common import log
 
@@ -343,7 +342,7 @@ def www_touched():
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(git_args).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -364,7 +363,7 @@ def only_po_touched():
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(git_args).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -385,7 +384,7 @@ def only_rst_touched():
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(git_args).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -412,7 +411,7 @@ def check_modified_affects_all(rootdir):
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(git_args).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -446,7 +445,7 @@ def get_modified_files(rootdir, filtering=None):
                     "HEAD"]
         if filtering is not None:
             git_args.append(filtering)
-        modified_files = check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(git_args).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -764,7 +763,7 @@ def get_gitroot():
 
     try:
         git_args = ["git", "rev-parse", "--show-toplevel"]
-        gitroot = check_output(git_args).rstrip()
+        gitroot = subprocess.check_output(git_args).rstrip()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -777,11 +776,11 @@ def print_gitinfo():
 
     try:
         git_cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
-        gitbranch = check_output(git_cmd).rstrip()
+        gitbranch = subprocess.check_output(git_cmd).rstrip()
         git_cmd = ["git", "show", "--format=%s", "-s"]
-        gitsubject = check_output(git_cmd).rstrip()
+        gitsubject = subprocess.check_output(git_cmd).rstrip()
         git_cmd = ["git", "show", "--format=%an", "-s"]
-        gitauthor = check_output(git_cmd).rstrip()
+        gitauthor = subprocess.check_output(git_cmd).rstrip()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)

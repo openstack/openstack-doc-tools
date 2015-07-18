@@ -19,7 +19,6 @@ import sys
 import yaml
 
 import os_doc_tools
-from os_doc_tools.common import check_output   # noqa
 
 DEVNULL = open(os.devnull, 'wb')
 
@@ -59,8 +58,8 @@ def generate_heading(os_command, api_name, title, os_file):
     """
 
     try:
-        version = check_output([os_command, "--version"],
-                               stderr=subprocess.STDOUT)
+        version = subprocess.check_output([os_command, "--version"],
+                                          stderr=subprocess.STDOUT)
     except OSError as e:
         if e.errno == os.errno.ENOENT:
             print("Command %s not found, aborting." % os_command)
@@ -279,8 +278,8 @@ def generate_command(os_command, os_file):
     :param os_file:    open filehandle for output of DocBook file
     """
 
-    help_lines = check_output([os_command, "--help"],
-                              stderr=DEVNULL).split('\n')
+    help_lines = subprocess.check_output([os_command, "--help"],
+                                         stderr=DEVNULL).split('\n')
 
     ignore_next_lines = False
     next_line_screen = True
@@ -402,7 +401,7 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     else:
         args.append("help")
         args.append(os_subcommand)
-    help_lines = check_output(args, stderr=DEVNULL)
+    help_lines = subprocess.check_output(args, stderr=DEVNULL)
 
     if 'positional arguments' in help_lines.lower():
         index = help_lines.lower().index('positional arguments')
@@ -510,14 +509,15 @@ def generate_subcommands(os_command, os_file, subcommands, extra_params,
         if subcommands == 'complete':
             subcommands = []
             args.append('complete')
-            for line in [x.strip() for x in check_output(args).split('\n')
+            for line in [x.strip() for x in
+                         subprocess.check_output(args).split('\n')
                          if x.strip().startswith('cmds_') and '-' in x]:
                 subcommand, _ = line.split('=')
                 subcommand = subcommand.replace('cmds_', '').replace('_', ' ')
                 subcommands.append(subcommand)
         else:
             args.append('bash-completion')
-            subcommands = check_output(args).strip().split()
+            subcommands = subprocess.check_output(args).strip().split()
 
     subcommands = sorted([o for o in subcommands if not (o.startswith('-') or
                                                          o in blacklist)])
