@@ -342,7 +342,9 @@ def www_touched():
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = subprocess.check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(
+            git_args,
+            universal_newlines=True).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -363,7 +365,9 @@ def only_po_touched():
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = subprocess.check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(
+            git_args,
+            universal_newlines=True).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -384,7 +388,9 @@ def only_rst_touched():
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = subprocess.check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(
+            git_args,
+            universal_newlines=True).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -411,7 +417,9 @@ def check_modified_affects_all(rootdir):
 
     try:
         git_args = ["git", "diff", "--name-only", "HEAD~1", "HEAD"]
-        modified_files = subprocess.check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(
+            git_args,
+            universal_newlines=True).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -445,7 +453,9 @@ def get_modified_files(rootdir, filtering=None):
                     "HEAD"]
         if filtering is not None:
             git_args.append(filtering)
-        modified_files = subprocess.check_output(git_args).strip().split()
+        modified_files = subprocess.check_output(
+            git_args,
+            universal_newlines=True).strip().split()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
@@ -763,11 +773,11 @@ def get_gitroot():
 
     try:
         git_args = ["git", "rev-parse", "--show-toplevel"]
-        gitroot = subprocess.check_output(git_args).rstrip()
+        gitroot = subprocess.check_output(git_args,
+                                          universal_newlines=True).rstrip()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
-
     return gitroot
 
 
@@ -776,11 +786,14 @@ def print_gitinfo():
 
     try:
         git_cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
-        gitbranch = subprocess.check_output(git_cmd).rstrip()
+        gitbranch = subprocess.check_output(git_cmd,
+                                            universal_newlines=True).rstrip()
         git_cmd = ["git", "show", "--format=%s", "-s"]
-        gitsubject = subprocess.check_output(git_cmd).rstrip()
+        gitsubject = subprocess.check_output(git_cmd,
+                                             universal_newlines=True).rstrip()
         git_cmd = ["git", "show", "--format=%an", "-s"]
-        gitauthor = subprocess.check_output(git_cmd).rstrip()
+        gitauthor = subprocess.check_output(git_cmd,
+                                            universal_newlines=True).rstrip()
     except (subprocess.CalledProcessError, OSError) as e:
         print("git failed: %s" % e)
         sys.exit(1)
