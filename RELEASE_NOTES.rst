@@ -6,6 +6,7 @@ Release notes
 
 * ``openstack-doc-test``: Always built index page in checkbuild.
 * ``openstack-auto-commands``: Add support for murano.
+* Remove ``dn2osdbk`` and the ``hotref`` sphinx extension
 
 0.29.1
 ------
