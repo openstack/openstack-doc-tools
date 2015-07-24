@@ -34,7 +34,8 @@ import stevedore
 from hooks import HOOKS  # noqa
 
 
-EXTENSIONS = ['oslo.concurrency',
+EXTENSIONS = ['oslo.cache',
+              'oslo.concurrency',
               'oslo.db',
               'oslo.log',
               'oslo.messaging',
