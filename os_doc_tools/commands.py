@@ -59,6 +59,7 @@ def generate_heading(os_command, api_name, title, os_file):
 
     try:
         version = subprocess.check_output([os_command, "--version"],
+                                          universal_newlines=True,
                                           stderr=subprocess.STDOUT)
     except OSError as e:
         if e.errno == os.errno.ENOENT:
@@ -279,6 +280,7 @@ def generate_command(os_command, os_file):
     """
 
     help_lines = subprocess.check_output([os_command, "--help"],
+                                         universal_newlines=True,
                                          stderr=DEVNULL).split('\n')
 
     ignore_next_lines = False
@@ -401,7 +403,9 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     else:
         args.append("help")
         args.append(os_subcommand)
-    help_lines = subprocess.check_output(args, stderr=DEVNULL)
+    help_lines = subprocess.check_output(args,
+                                         universal_newlines=True,
+                                         stderr=DEVNULL)
 
     if 'positional arguments' in help_lines.lower():
         index = help_lines.lower().index('positional arguments')
@@ -510,21 +514,25 @@ def generate_subcommands(os_command, os_file, subcommands, extra_params,
             subcommands = []
             args.append('complete')
             for line in [x.strip() for x in
-                         subprocess.check_output(args).split('\n')
+                         subprocess.check_output(
+                             args,
+                             universal_newlines=True).split('\n')
                          if x.strip().startswith('cmds_') and '-' in x]:
                 subcommand, _ = line.split('=')
                 subcommand = subcommand.replace('cmds_', '').replace('_', ' ')
                 subcommands.append(subcommand)
         else:
             args.append('bash-completion')
-            subcommands = subprocess.check_output(args).strip().split()
+            subcommands = subprocess.check_output(
+                args,
+                universal_newlines=True).strip().split()
 
     subcommands = sorted([o for o in subcommands if not (o.startswith('-') or
                                                          o in blacklist)])
     for subcommand in subcommands:
         generate_subcommand(os_command, subcommand, os_file, extra_params,
                             suffix, title_suffix)
-    print ("%d subcommands documented." % len(subcommands))
+    print("%d subcommands documented." % len(subcommands))
 
 
 def generate_end(os_file):
@@ -554,7 +562,7 @@ def document_single_project(os_command, output_dir):
         print("'%s' command not yet handled" % os_command)
         sys.exit(-1)
 
-    print ("Documenting '%s'" % os_command)
+    print("Documenting '%s'" % os_command)
 
     data = clients[os_command]
     if 'name' in data:
