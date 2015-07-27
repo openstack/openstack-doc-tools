@@ -27,7 +27,6 @@ import pickle
 import re
 import sys
 
-import git
 from lxml import etree
 import stevedore
 
@@ -97,21 +96,6 @@ NEW_GROUP_RST = '''
 
 register_re = re.compile(r'''^ +.*\.register_opts\((?P<opts>[^,)]+)'''
                          r'''(, (group=)?["'](?P<group>.*)["'])?\)''')
-
-
-def git_check(repo_path):
-    """Check a passed directory to verify it is a valid git repository."""
-
-    try:
-        repo = git.Repo(repo_path)
-        assert repo.bare is False
-        package_name = os.path.basename(repo.remotes.origin.url)
-        package_name = package_name.replace('.git', '')
-    except Exception:
-        print("\n%s doesn't seem to be a valid git repository." % repo_path)
-        print("Use the -i flag to specify the repository path.\n")
-        sys.exit(1)
-    return package_name
 
 
 def import_modules(repo_location, package_name, verbose=0):
@@ -322,15 +306,21 @@ class OptionsCache(object):
 
         self._opt_names.sort(OptionsCache._cmpopts)
 
-    def maybe_load_extensions(self, repo):
+    def maybe_load_extensions(self, repositories):
         # Use the requirements.txt of the project to guess if an oslo module
         # needs to be imported
-        for ext in EXTENSIONS:
-            requirements = os.path.join(repo, 'requirements.txt')
-            with open(requirements) as fd:
-                for line in fd:
-                    if line.startswith(ext):
-                        self.load_extension_options(ext)
+        needed_exts = set()
+        for repo in repositories:
+            base_path = os.path.dirname(repo)
+            for ext in EXTENSIONS:
+                requirements = os.path.join(base_path, 'requirements.txt')
+                with open(requirements) as fd:
+                    for line in fd:
+                        if line.startswith(ext):
+                            needed_exts.add(ext)
+
+        for ext in needed_exts:
+            self.load_extension_options(ext)
 
     def get_option_names(self):
         return self._opt_names
@@ -590,10 +580,13 @@ def main():
                         dest='verbose',
                         required=False,)
     parser.add_argument('-i', '--input',
-                        dest='repo',
-                        help='Path to a valid git repository.',
+                        dest='repos',
+                        help='Path to a python package in which options '
+                             'should be discoverd. Can be used multiple '
+                             'times.',
                         required=False,
-                        type=str,)
+                        type=str,
+                        action='append')
     parser.add_argument('-o', '--output',
                         dest='target',
                         help='Directory or file in which data will be saved.\n'
@@ -604,38 +597,42 @@ def main():
                         type=str,)
     args = parser.parse_args()
 
-    if args.repo is None:
-        args.repo = './sources/%s' % args.package
+    if args.repos is None:
+        args.repos = ['./sources/%s/%s' % args.package]
 
-    package_name = git_check(args.repo)
+    for repository in args.repos:
+        package_name = os.path.basename(repository)
+        base_path = os.path.dirname(repository)
 
-    sys.path.insert(0, args.repo)
-    try:
-        __import__(package_name)
-    except ImportError as e:
-        if args.verbose >= 1:
-            print(str(e))
-            print("Failed to import: %s (%s)" % (package_name, e))
+        sys.path.insert(0, base_path)
+        try:
+            __import__(package_name)
+        except ImportError as e:
+            if args.verbose >= 1:
+                print(str(e))
+                print("Failed to import: %s (%s)" % (package_name, e))
 
-    import_modules(args.repo, package_name, verbose=args.verbose)
+        import_modules(base_path, package_name, verbose=args.verbose)
+        sys.path.pop(0)
+
     options = OptionsCache(verbose=args.verbose)
-    options.maybe_load_extensions(args.repo)
+    options.maybe_load_extensions(args.repos)
 
     if args.verbose > 0:
         print("%s options imported from package %s." % (len(options),
                                                         str(package_name)))
 
     if args.subcommand == 'create':
-        create_flagmappings(package_name, options, verbose=args.verbose)
+        create_flagmappings(args.package, options, verbose=args.verbose)
 
     elif args.subcommand == 'update':
-        update_flagmappings(package_name, options, verbose=args.verbose)
+        update_flagmappings(args.package, options, verbose=args.verbose)
 
     elif args.subcommand == 'docbook':
-        write_docbook(package_name, options, args.target, verbose=args.verbose)
+        write_docbook(args.package, options, args.target, verbose=args.verbose)
 
     elif args.subcommand == 'rst':
-        write_rst(package_name, options, args.target, verbose=args.verbose)
+        write_rst(args.package, options, args.target, verbose=args.verbose)
 
     elif args.subcommand == 'dump':
         options.dump()
