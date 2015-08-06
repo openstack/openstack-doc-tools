@@ -52,7 +52,6 @@ setup_venv() {
     if [ ! -e $VENVDIR/$project/bin/activate ]; then
         mkdir -p $VENVDIR/$project
         virtualenv $VENVDIR/$project
-        pip install --upgrade pip
     fi
     activate_venv $project
 }
@@ -61,6 +60,7 @@ activate_venv() {
     project=$1
 
     . $VENVDIR/$project/bin/activate
+    pip install --upgrade pip
 }
 
 get_project() {
@@ -94,10 +94,7 @@ get_project() {
 
 setup_tools() {
     (cd $SOURCESDIR/oslo-incubator && python setup.py install)
-    pip install "GitPython>=0.3.2.RC1"
-
-    # autohelp.py requires this
-    pip install oslo.i18n lxml
+    pip install -rrequirements.txt
 }
 
 while getopts :b:g:e:cf opt; do
