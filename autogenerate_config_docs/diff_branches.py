@@ -302,6 +302,15 @@ def generate_docbook(project, new_branch, old_list, new_list):
             new = format_option_name(new)
             dbk_append_row(table, [deprecated, new])
 
+    # No new, updated and deprecated options
+    if not new_opts and not changed_default and not deprecated_opts:
+        para = etree.Element("para")
+        para.text = ("There are no new, updated and deprecated options "
+                     "in %(release)s for %(project)s." %
+                     {'release': release,
+                      'project': CODENAME_TITLE[project]})
+        section.append(para)
+
     return etree.tostring(section, pretty_print=True, xml_declaration=True,
                           encoding="UTF-8")
 
