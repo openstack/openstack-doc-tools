@@ -16,6 +16,15 @@ then runs the ``autohelp.py`` script in the virtual environment.
 New and updated flagmappings are generated in the ``openstack-manuals``
 repository (``tools/autogenerate-config-flagmappings/`` directory).
 
+Prior to running the following commands you need to install several development
+packages. For Ubuntu install the required packages with the following command:
+
+.. code-block:: console
+
+    $ sudo apt-get install python-dev libxml2-dev libxslt1-dev libz-dev \
+                           libmysqlclient-dev libpq-dev libffi-dev \
+                           libsqlite3-dev libldap2-dev libsasl2-dev
+
 The workflow is:
 
 .. code-block:: console
