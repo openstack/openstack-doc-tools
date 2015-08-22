@@ -33,4 +33,4 @@ To install the needed modules you can use pip or the package management system i
 in your distribution. When using the package management system maybe the name of the
 packages differ. When using pip it's maybe necessary to install some development packages.
 
-    $ pip install scrapy
+    $ pip install -r requirements.txt
