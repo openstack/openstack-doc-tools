@@ -9,6 +9,7 @@ Release notes
 * Remove ``dn2osdbk`` and the ``hotref`` sphinx extension.
 * ``autohelp.py``: Can now find options for a project in multiple python
   packages.
+* ``doc-tools-check-languages``: Handle RST Install Guide and FirstApp.
 
 0.29.1
 ------
