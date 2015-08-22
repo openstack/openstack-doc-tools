@@ -39,7 +39,8 @@ EXTENSIONS = ['oslo.cache',
               'oslo.log',
               'oslo.messaging',
               'oslo.middleware',
-              'oslo.policy']
+              'oslo.policy',
+              'oslo.service']
 
 IGNORE = [
     'trove.guestagent.datastore.postgresql.manager',
