@@ -16,7 +16,7 @@
 # All available configuration variables are documente at
 # http://doc.scrapy.org/en/latest/topics/settings.html.
 
-from scrapy import linkextractor
+from scrapy import linkextractors
 
 BOT_NAME = 'sitemap'
 SPIDER_MODULES = ['generator.spiders']
@@ -31,4 +31,4 @@ LOG_LEVEL = 'INFO'
 LOGGING_ENABLED = True
 RANDOMIZE_DOWNLOAD_DELAY = False
 TELNETCONSOLE_ENABLED = False
-linkextractor.IGNORED_EXTENSIONS.remove('pdf')
+linkextractors.IGNORED_EXTENSIONS.remove('pdf')
