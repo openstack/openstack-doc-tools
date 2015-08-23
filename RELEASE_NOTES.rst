@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.31.0
+------
+
+* Add ``doc-tools-build-rst`` to build RST guides.
+
 0.30.1
 ------
 
