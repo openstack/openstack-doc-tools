@@ -151,14 +151,16 @@ def extract_options(line):
 
     # We have a command or parameter to handle
     # Differentiate:
-    # 1. --version
-    # 2. --timeout <seconds>
-    # 3. --service <service>, --service-id <service>
-    # 4. -v, --verbose
-    # 5. -p PORT, --port PORT
-    # 6. <backup>              ID of the backup to restore.
-    # 7. --alarm-action <Webhook URL>
-    # 8.   <NAME or ID>  Name or ID of stack to resume.
+    #  1. --version
+    #  2. --timeout <seconds>
+    #  3. --service <service>, --service-id <service>
+    #  4. -v, --verbose
+    #  5. -p PORT, --port PORT
+    #  6. <backup>              ID of the backup to restore.
+    #  7. --alarm-action <Webhook URL>
+    #  8.   <NAME or ID>  Name or ID of stack to resume.
+    #  9. --json JSON  JSON representation of node group template.
+    # 10. --id <cluster_id> ID of the cluster to show.
 
     split_line = line.split(None, 2)
 
@@ -187,12 +189,16 @@ def extract_options(line):
             else:
                 i += 1
 
+        skip_is_option = False
         while len(words) > 1:
             if words[1].startswith('DEPRECATED'):
                 break
             if last_was_option:
                 if (words[1].startswith(("-", '<', '{', '[')) or
-                   is_option(words[1])):
+                   (is_option(words[1]) and skip_is_option is False)):
+                    skip_is_option = False
+                    if words[1].isupper() or words[1].startswith('<'):
+                        skip_is_option = True
                     words[0] = words[0] + ' ' + words[1]
                     del words[1]
                 else:
