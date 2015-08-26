@@ -110,6 +110,12 @@ function build_rst {
             rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
                 publish-docs/${language}/${book}-${tag}
         done
+        # Debian Install Guide uses index-debian, we need to rename the file
+        INSTALL_DEBIAN="publish-docs/${language}/install-guide-debian/"
+        if [ -f ${INSTALL_DEBIAN}/index-debian.html ] ; then
+            mv ${INSTALL_DEBIAN}/index-debian.html \
+                ${INSTALL_DEBIAN}/index.html
+        fi
     else
         tox -evenv "sphinx-build -q -E -D language=${language} \
             ${DOC_DIR}${book}/source/ \
@@ -117,6 +123,13 @@ function build_rst {
         mkdir -p publish-docs/${language}/${book}/
         rsync -a ${DOC_DIR}${book}/build/html/ publish-docs/${language}/${book}/
     fi
+    # Remove newly created files
+    git clean -f -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/*.po
+    git clean -f -x -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/*.mo
+    git clean -f -q ${DOC_DIR}${book}/source/locale/*.pot
+    # Revert changes to po file
+    git reset -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+    git checkout -- ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
 }
 
 

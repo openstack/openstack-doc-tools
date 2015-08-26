@@ -1,6 +1,12 @@
 Release notes
 =============
 
+0.30.1
+------
+
+* ``openstack-auto-commands``: Fix option parsing (bug#1488505)
+* ``doc-tools-check-languages``: Fix RST Debian Install Guide.
+
 0.30.0
 ------
 
