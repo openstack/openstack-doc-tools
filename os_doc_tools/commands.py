@@ -592,10 +592,6 @@ def document_single_project(os_command, output_dir):
         out_file.write("""
     <section xml:id=\"glance_cli_v1\">
        <title>Image service API v1 commands</title>\n""")
-    if os_command == 'murano':
-        out_file.write("""
-    <section xml:id=\"murano_cli_v1\">
-       <title>Application catalog API v1 commands</title>\n""")
     if os_command == 'openstack':
         generate_subcommands(os_command, out_file, subcommands,
                              ["--os-auth-type", "token"], "", "")
