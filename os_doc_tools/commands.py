@@ -531,7 +531,7 @@ def generate_subcommands(os_command, os_file, subcommands, extra_params,
             args.append('bash-completion')
             subcommands = subprocess.check_output(
                 args,
-                universal_newlines=True).strip().split()
+                universal_newlines=True).strip().split('\n')[-1].split()
 
     subcommands = sorted([o for o in subcommands if not (o.startswith('-') or
                                                          o in blacklist)])
@@ -588,13 +588,15 @@ def document_single_project(os_command, output_dir):
         out_file.write("""
     <section xml:id=\"cinder_cli_v1\">
        <title>Block Storage API v1 commands</title>\n""")
-    if os_command == 'glance':
-        out_file.write("""
-    <section xml:id=\"glance_cli_v1\">
-       <title>Image service API v1 commands</title>\n""")
     if os_command == 'openstack':
         generate_subcommands(os_command, out_file, subcommands,
                              ["--os-auth-type", "token"], "", "")
+    elif os_command == 'glance':
+        out_file.write("""
+    <section xml:id=\"glance_cli_v1\">
+       <title>Image service API v1 commands</title>\n""")
+        generate_subcommands(os_command, out_file, subcommands,
+                             ["--os-image-api-version", "1"], "_v1", " (v1)")
     else:
         generate_subcommands(os_command, out_file, subcommands, None, "", "")
 
