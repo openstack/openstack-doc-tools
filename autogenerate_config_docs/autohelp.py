@@ -43,18 +43,24 @@ EXTENSIONS = ['oslo.cache',
               'oslo.service']
 
 IGNORE = [
-    'trove.guestagent.datastore.postgresql.manager',
-    'trove.guestagent.datastore.postgresql.service.root',
-    'trove.guestagent.datastore.postgresql.service.users',
-    'trove.guestagent.datastore.postgresql.service.database',
+    'cinder.wsgi.wsgi',
+    'designate.api.v1.extensions.quotas',
+    'designate.api.v1.extensions.reports',
+    'designate.api.v1.extensions.sync',
+    'designate.api.v1.extensions.touch',
+    'glance.contrib.plugins.artifacts_sample.setup',
+    'glance.contrib.plugins.image_artifact.setup',
+    'manila.db.migrations.alembic.env',
+    'neutron.plugins.ml2.drivers.cisco.nexus.type_nexus_vxlan',
     'trove.guestagent.datastore.experimental.postgresql.manager',
     'trove.guestagent.datastore.experimental.postgresql.service.database',
     'trove.guestagent.datastore.experimental.postgresql.service.root',
     'trove.guestagent.datastore.experimental.postgresql.service.users',
-    'glance.contrib.plugins.image_artifact.setup',
-    'glance.contrib.plugins.artifacts_sample.setup',
-    'neutron.plugins.ml2.drivers.cisco.nexus.type_nexus_vxlan',
-    'cinder.wsgi.wsgi'
+    'trove.guestagent.datastore.postgresql.manager',
+    'trove.guestagent.datastore.postgresql.service.database',
+    'trove.guestagent.datastore.postgresql.service.root',
+    'trove.guestagent.datastore.postgresql.service.users',
+    'zaqar.transport.wsgi.app'
 ]
 
 
