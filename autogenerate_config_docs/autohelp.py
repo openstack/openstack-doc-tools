@@ -53,7 +53,8 @@ IGNORE = [
     'trove.guestagent.datastore.experimental.postgresql.service.users',
     'glance.contrib.plugins.image_artifact.setup',
     'glance.contrib.plugins.artifacts_sample.setup',
-    'neutron.plugins.ml2.drivers.cisco.nexus.type_nexus_vxlan'
+    'neutron.plugins.ml2.drivers.cisco.nexus.type_nexus_vxlan',
+    'cinder.wsgi.wsgi'
 ]
 
 
