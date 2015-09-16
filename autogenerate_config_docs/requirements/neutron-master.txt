@@ -28,6 +28,13 @@ neutron_radware_lbaas_v2
 -e git+https://git.openstack.org/stackforge/networking-hyperv.git#egg=networking-hyperv
 -e git+https://git.openstack.org/stackforge/networking-ibm.git#egg=networking-ibm
 -e git+https://git.openstack.org/openstack/networking-l2gw.git#egg=networking-l2gw
+-e git+https://git.openstack.org/openstack/networking-sfc.git#egg=networking-sfc
+-e git+https://git.openstack.org/openstack/networking-infoblox.git#egg=networking-infoblox
+-e git+https://git.openstack.org/openstack/networking-fujitsu.git#egg=networking-fujitsu
+-e git+https://git.openstack.org/openstack/networking-onos.git#egg=networking-onos
+-e git+https://git.openstack.org/openstack/networking-calico.git#egg=networking-calico
+-e git+https://git.openstack.org/openstack/networking-ale-omniswitch.git#egg=networking-ale-omniswitch
+-e git+https://git.openstack.org/openstack/networking-lenovo.git#egg=networking-lenovo
 # pip dependency installation failure
 -e git+https://git.openstack.org/openstack/networking-midonet.git#egg=networking-midonet
 -e git+https://git.openstack.org/stackforge/networking-mlnx.git#egg=networking-mlnx
@@ -41,3 +48,5 @@ neutron_radware_lbaas_v2
 -e git+https://git.openstack.org/openstack/networking-vsphere.git#egg=networking-vsphere
 -e git+https://git.openstack.org/openstack/networking-powervm.git#egg=networking-powervm
 -e git+https://git.openstack.org/openstack/vmware-nsx.git#egg=vmware-nsx
+-e git+https://git.openstack.org/stackforge/networking-zvm.git#egg=networking-zvm
+-e git+https://git.openstack.org/stackforge/networking-6wind.git#egg=networking-6wind
