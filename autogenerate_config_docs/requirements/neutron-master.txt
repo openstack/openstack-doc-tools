@@ -39,5 +39,5 @@ neutron_radware_lbaas_v2
 -e git+https://git.openstack.org/openstack/networking-plumgrid.git#egg=networking-plumgrid
 -e git+https://git.openstack.org/stackforge/networking-portforwarding.git#egg=networking-portforwarding
 -e git+https://git.openstack.org/openstack/networking-vsphere.git#egg=networking-vsphere
--e git+https://git.openstack.org/stackforge/neutron-powervm.git#egg=neutron-powervm
+-e git+https://git.openstack.org/openstack/networking-powervm.git#egg=networking-powervm
 -e git+https://git.openstack.org/openstack/vmware-nsx.git#egg=vmware-nsx
