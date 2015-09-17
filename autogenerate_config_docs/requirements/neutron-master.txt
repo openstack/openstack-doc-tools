@@ -34,8 +34,7 @@ neutron_radware_lbaas_v2
 -e git+https://git.openstack.org/openstack/networking-onos.git#egg=networking-onos
 -e git+https://git.openstack.org/openstack/networking-calico.git#egg=networking-calico
 -e git+https://git.openstack.org/openstack/networking-ale-omniswitch.git#egg=networking-ale-omniswitch
--e git+https://git.openstack.org/openstack/networking-lenovo.git#egg=networking-lenovo
-# pip dependency installation failure
+#-e git+https://git.openstack.org/openstack/networking-lenovo.git#egg=networking-lenovo
 -e git+https://git.openstack.org/openstack/networking-midonet.git#egg=networking-midonet
 -e git+https://git.openstack.org/stackforge/networking-mlnx.git#egg=networking-mlnx
 -e git+https://git.openstack.org/stackforge/networking-nec.git#egg=networking-nec
