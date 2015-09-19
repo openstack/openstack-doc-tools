@@ -257,7 +257,7 @@ def generate_docbook(project, new_branch, old_list, new_list):
                                  "lives in the openstack-doc-tools "
                                  "repository. "))
     title = etree.Element("title")
-    title.text = ("New, updated and deprecated options "
+    title.text = ("New, updated, and deprecated options "
                   "in %(release)s for %(project)s" %
                   {'release': release,
                    'project': CODENAME_TITLE[project]})
@@ -305,7 +305,7 @@ def generate_docbook(project, new_branch, old_list, new_list):
     # No new, updated and deprecated options
     if not new_opts and not changed_default and not deprecated_opts:
         para = etree.Element("para")
-        para.text = ("There are no new, updated and deprecated options "
+        para.text = ("There are no new, updated, and deprecated options "
                      "in %(release)s for %(project)s." %
                      {'release': release,
                       'project': CODENAME_TITLE[project]})
