@@ -23,8 +23,6 @@ keystone:
 neutron:
     name: OpenStack Networking
     title: Networking
-magnetodb:
-    name: Key-Value Store as a Service
 magnum:
     name: Containers service
 manila:
