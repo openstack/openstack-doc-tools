@@ -62,7 +62,20 @@ def nova_spice():
     import nova.cmd.spicehtml5proxy  # noqa
 
 
+def aodh_config():
+    # Aodh uses a local conf object, therefore we need to use the same method
+    # here to populate the global cfg.CONF object used by the script.
+    import aodh.opts as opts
+    from oslo_config import cfg
+
+    cfg.CONF = cfg.ConfigOpts()
+    for group, options in opts.list_opts():
+        cfg.CONF.register_opts(list(options),
+                               group=None if group == "DEFAULT" else group)
+
+
 HOOKS = {'keystone.common.config': keystone_config,
          'glance.common.config': glance_store_config,
          'neutron': neutron_misc,
-         'nova.spice': nova_spice}
+         'nova.spice': nova_spice,
+         'aodh': aodh_config}
