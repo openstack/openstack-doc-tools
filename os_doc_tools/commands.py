@@ -497,20 +497,18 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     os_file.write("    </section>\n")
 
 
-def generate_subcommands(os_command, os_file, subcommands, extra_params,
-                         suffix, title_suffix):
-    """Convert os_command help subcommands for all subcommands to DocBook.
+def discover_subcommands(os_command, subcommands, extra_params):
+    """Discover all help subcommands for the given command"
 
-    :param os_command: client command to document
-    :param os_file:    open filehandle for output of DocBook file
+    :param os_command: client command whose subcommands need to be discovered
     :param subcommands: list or type ('complete' or 'bash-completion')
                         of subcommands to document
     :param extra_params: Extra parameter to pass to os_command.
-    :param suffix: Extra suffix to add to xml:id
-    :param title_suffix: Extra suffix for title
+    :return: the list of subcommands discovered
+    :rtype: list(str)
     """
-
-    print("Documenting '%s' subcommands..." % os_command)
+    print(("Discovering subcommands of '%s' %s ..."
+          % (os_command, extra_params)))
     blacklist = ['bash-completion', 'complete', 'help']
     if type(subcommands) is str:
         args = [os_command]
@@ -535,10 +533,44 @@ def generate_subcommands(os_command, os_file, subcommands, extra_params,
 
     subcommands = sorted([o for o in subcommands if not (o.startswith('-') or
                                                          o in blacklist)])
+
+    print("%d subcommands discovered." % len(subcommands))
+    return subcommands
+
+
+def generate_subcommands(os_command, os_file, subcommands, extra_params,
+                         suffix, title_suffix):
+    """Convert os_command help subcommands for all subcommands to DocBook.
+
+    :param os_command: client command to document
+    :param os_file:    open filehandle for output of DocBook file
+    :param subcommands: list or type ('complete' or 'bash-completion')
+                        of subcommands to document
+    :param extra_params: Extra parameter to pass to os_command.
+    :param suffix: Extra suffix to add to xml:id
+    :param title_suffix: Extra suffix for title
+    """
     for subcommand in subcommands:
         generate_subcommand(os_command, subcommand, os_file, extra_params,
                             suffix, title_suffix)
     print("%d subcommands documented." % len(subcommands))
+
+
+def discover_and_generate_subcommands(os_command, os_file, subcommands,
+                                      extra_params, suffix, title_suffix):
+    """Convert os_command help subcommands for all subcommands to DocBook.
+
+    :param os_command: client command to document
+    :param os_file:    open filehandle for output of DocBook file
+    :param subcommands: list or type ('complete' or 'bash-completion')
+                        of subcommands to document
+    :param extra_params: Extra parameter to pass to os_command.
+    :param suffix: Extra suffix to add to xml:id
+    :param title_suffix: Extra suffix for title
+    """
+    subcommands = discover_subcommands(os_command, subcommands, extra_params)
+    generate_subcommands(os_command, os_file, subcommands, extra_params,
+                         suffix, title_suffix)
 
 
 def generate_end(os_file):
@@ -588,18 +620,29 @@ def document_single_project(os_command, output_dir):
         out_file.write("""
     <section xml:id=\"cinder_cli_v1\">
        <title>Block Storage API v1 commands</title>\n""")
-    if os_command == 'openstack':
-        generate_subcommands(os_command, out_file, subcommands,
-                             ["--os-auth-type", "token"], "", "")
+        generate_subcommands(os_command, out_file, subcommands, None, "", "")
+    elif os_command == 'openstack':
+        out_file.write("""
+    <section xml:id=\"openstack_cli_identity_api_v2\">
+       <title>OpenStack with Identity API v2 commands</title>\n""")
+        auth_type_token = ["--os-auth-type", "token"]
+        identity_api_v2 = ["--os-identity-api-version", "2"]
+        extra_params = auth_type_token + identity_api_v2
+        subcommands_v2 = discover_subcommands(os_command, subcommands,
+                                              extra_params)
+        generate_subcommands(os_command, out_file, subcommands_v2,
+                             extra_params, "_with_identity_api_v2", "")
     elif os_command == 'glance':
         out_file.write("""
     <section xml:id=\"glance_cli_v1\">
        <title>Image service API v1 commands</title>\n""")
-        generate_subcommands(os_command, out_file, subcommands,
-                             ["--os-image-api-version", "1"], "_v1", " (v1)")
+        discover_and_generate_subcommands(os_command, out_file, subcommands,
+                                          ["--os-image-api-version", "1"],
+                                          "_v1", " (v1)")
     else:
         generate_subcommands(os_command, out_file, subcommands, None, "", "")
 
+    # Print subcommands for different API versions
     if os_command == 'cinder':
         out_file.write("    </section>\n")
         out_file.write("""
@@ -613,8 +656,38 @@ def document_single_project(os_command, output_dir):
                        "export OS_VOLUME_API_VERSION=2</userinput></screen>\n"
                        "</para>\n")
 
-        generate_subcommands(os_command, out_file, subcommands,
-                             ["--os-volume-api-version", "2"], "_v2", " (v2)")
+        discover_and_generate_subcommands(os_command, out_file, subcommands,
+                                          ["--os-volume-api-version", "2"],
+                                          "_v2", " (v2)")
+        out_file.write("    </section>\n")
+    if os_command == 'openstack':
+        # Print the additional subcommands possible by using v3 of identity API
+        out_file.write("""
+    </section>\n
+    <section xml:id=\"openstack_cli_with_identity_api_v3\">
+       <title>OpenStack with Identity API v3 commands (diff)</title>
+    <para>
+       You can select the Identity API version to use by adding the
+       <parameter>--os-identity-api-version</parameter> parameter or by setting
+       the corresponding environment variable:\n""")
+        out_file.write("<screen><prompt>$</prompt> <userinput>"
+                       "export OS_IDENTITY_API_VERSION=3</userinput>"
+                       "</screen>\n</para>\n")
+        out_file.write("<para>\n"
+                       "This section documents only the difference in"
+                       " subcommands available for the openstack client when"
+                       " the identity API version is changed from v2 to v3.\n"
+                       "</para>\n")
+
+        identity_api_v3 = ["--os-identity-api-version", "3"]
+        extra_params = auth_type_token + identity_api_v3
+        subcommands_v3 = discover_subcommands(os_command, subcommands,
+                                              extra_params)
+        subcommands_delta = sorted(list(set(subcommands_v3) -
+                                        set(subcommands_v2)))
+        generate_subcommands(os_command, out_file, subcommands_delta,
+                             extra_params, "_with_identity_api_v3",
+                             " (Identity API v3)")
         out_file.write("    </section>\n")
     if os_command == 'glance':
         out_file.write("""
@@ -629,8 +702,9 @@ def document_single_project(os_command, output_dir):
                        "export OS_IMAGE_API_VERSION=2</userinput></screen>\n"
                        "</para>\n")
 
-        generate_subcommands(os_command, out_file, subcommands,
-                             ["--os-image-api-version", "2"], "_v2", " (v2)")
+        discover_and_generate_subcommands(os_command, out_file, subcommands,
+                                          ["--os-image-api-version", "2"],
+                                          "_v2", " (v2)")
         out_file.write("    </section>\n")
 
     generate_end(out_file)
