@@ -620,7 +620,8 @@ def document_single_project(os_command, output_dir):
         out_file.write("""
     <section xml:id=\"cinder_cli_v1\">
        <title>Block Storage API v1 commands</title>\n""")
-        generate_subcommands(os_command, out_file, subcommands, None, "", "")
+        discover_and_generate_subcommands(os_command, out_file, subcommands,
+                                          None, "", "")
     elif os_command == 'openstack':
         out_file.write("""
     <section xml:id=\"openstack_cli_identity_api_v2\">
@@ -640,7 +641,8 @@ def document_single_project(os_command, output_dir):
                                           ["--os-image-api-version", "1"],
                                           "_v1", " (v1)")
     else:
-        generate_subcommands(os_command, out_file, subcommands, None, "", "")
+        discover_and_generate_subcommands(os_command, out_file, subcommands,
+                                          None, "", "")
 
     # Print subcommands for different API versions
     if os_command == 'cinder':
