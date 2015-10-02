@@ -15,7 +15,7 @@ import time
 import urlparse
 
 from generator import items
-from scrapy.linkextractors import sgml
+from scrapy.linkextractors import LinkExtractor
 from scrapy import spiders
 
 
@@ -24,7 +24,7 @@ class SitemapSpider(spiders.CrawlSpider):
 
     rules = [
         spiders.Rule(
-            sgml.SgmlLinkExtractor(
+            LinkExtractor(
                 allow=[
                     r'.*\.html',
                     r'.*\.pdf',
