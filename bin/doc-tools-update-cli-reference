@@ -70,4 +70,4 @@ git branch --list $branch && git branch -D $branch
 git checkout -b $branch
 mv ../output/ch_cli_${project}_commands.xml doc/cli-reference/generated
 version=$($project --version 2>&1)
-git commit -a -m "Update CLI reference for python-${project}client $version"
+git commit -a -m "Update CLI reference for python-${project}client ${version##* }"
