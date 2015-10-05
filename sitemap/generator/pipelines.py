@@ -14,10 +14,10 @@ import os
 
 import lxml
 import scrapy
-from scrapy.contrib import exporter
+from scrapy import exporters
 
 
-class SitemapItemExporter(exporter.XmlItemExporter):
+class SitemapItemExporter(exporters.XmlItemExporter):
     '''XmlItemExporer with adjusted attributes for the root element.'''
 
     def start_exporting(self):
