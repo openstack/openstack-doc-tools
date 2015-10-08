@@ -7,16 +7,16 @@ neutron_radware_lbaas
 neutron_radware_lbaas_v2
 
 # for vmware
--e git://git.openstack.org/openstack/nova.git#egg=nova
+-e git+https://git.openstack.org/openstack/nova.git#egg=nova
 
 # for a bunch of plugins
--e git://git.openstack.org/openstack/neutron.git@master#egg=neutron
--e git://git.openstack.org/openstack/neutron-fwaas.git@master#egg=neutron-fwaas
--e git://git.openstack.org/openstack/neutron-lbaas.git@master#egg=neutron-lbaas
--e git://git.openstack.org/openstack/neutron-vpnaas.git@master#egg=neutron-vpnaas
+-e git+https://git.openstack.org/openstack/neutron.git@master#egg=neutron
+-e git+https://git.openstack.org/openstack/neutron-fwaas.git@master#egg=neutron-fwaas
+-e git+https://git.openstack.org/openstack/neutron-lbaas.git@master#egg=neutron-lbaas
+-e git+https://git.openstack.org/openstack/neutron-vpnaas.git@master#egg=neutron-vpnaas
 
 # for midonet
--e git://github.com/midonet/python-midonetclient.git@master#egg=midonetclient
+-e git+https://github.com/midonet/python-midonetclient.git@master#egg=midonetclient
 
 -e git+https://git.openstack.org/openstack/networking-arista.git#egg=networking-arista
 -e git+https://git.openstack.org/stackforge/networking-bagpipe-l2.git#egg=networking-bagpipe-l2
