@@ -44,6 +44,8 @@ usage() {
     echo "  -c:         Recreate the virtual environment"
     echo "  -f:         Work offline: Do not change environment or sources"
     echo "  -e PATH:    Create the virtualenv in PATH"
+    echo "  -v LEVEL:   Verbose message (1 or 2)"
+    echo "              (check various python modules imported or not)"
 }
 
 setup_venv() {
@@ -97,7 +99,7 @@ setup_tools() {
     pip install -rrequirements.txt
 }
 
-while getopts :b:g:e:cf opt; do
+while getopts :b:g:e:v:cf opt; do
     case $opt in
     b)
         BRANCH=$OPTARG
@@ -113,6 +115,12 @@ while getopts :b:g:e:cf opt; do
         ;;
     f)
         FAST=1
+        ;;
+    v)
+        AUTOOPT="-v"
+        if [ $OPTARG = 2 ]; then
+            AUTOOPT="-vv"
+        fi
         ;;
     \?)
         usage
@@ -211,18 +219,18 @@ for project in $PROJECTS; do
             echo "$project.flagmappings already exists, ignoring."
             continue
         fi
-        $AUTOHELP create $project -i $SOURCESDIR/$project/$project
+        $AUTOHELP create $project -i $SOURCESDIR/$project/$project $AUTOOPT
         ;;
     update)
         [ "$project" = "swift" ] && continue
-        $AUTOHELP update $project -i $SOURCESDIR/$project/$project $extra_flags
+        $AUTOHELP update $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
         mv $project.flagmappings.new $project.flagmappings
         ;;
     docbook)
         if [ "$project" = "swift" ]; then
             $EXTRACT_SWIFT docbook -m $MANUALSREPO -s $SOURCESDIR/swift
         else
-            $AUTOHELP docbook $project -i $SOURCESDIR/$project/$project $extra_flags
+            $AUTOHELP docbook $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
         fi
         ;;
     esac
