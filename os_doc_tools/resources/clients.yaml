@@ -15,6 +15,7 @@ glance:
     title: Image service
 gnocchi:
     name: A time series storage and resources index service
+    subcommands: complete
 heat:
     name: Orchestration
 ironic:
