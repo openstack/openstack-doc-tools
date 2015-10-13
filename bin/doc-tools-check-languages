@@ -14,6 +14,12 @@
 
 BUILD_FAIL=0
 
+if [ -x "$(command -v getconf)" ]; then
+    NUMBER_OF_CORES=$(getconf _NPROCESSORS_ONLN)
+else
+    NUMBER_OF_CORES=2
+fi
+
 function setup_directories {
     language=$1
     for directory in ${DIRECTORIES["$language"]} ; do
@@ -51,7 +57,7 @@ function build_rst {
     if [ ${book} = "install-guide" ] ; then
         TAG="-t obs -t rdo -t ubuntu -t debian"
     fi
-    tox -evenv "sphinx-build -q -E -W -b gettext $TAG ${DOC_DIR}${book}/source/ \
+    tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -W -b gettext $TAG ${DOC_DIR}${book}/source/ \
                 ${DOC_DIR}${book}/source/locale/"
 
     # Merge the common-rst po file in
@@ -82,7 +88,7 @@ function build_rst {
     if [ ${book} = "firstapp" ] ; then
         # Firstapp has several variations, build all of them
         for tag in libcloud dotnet fog pkgcloud shade; do
-            tox -evenv "sphinx-build -q -E -t $tag -D language=${language} \
+            tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag -D language=${language} \
                 ${DOC_DIR}${book}/source/ \
                 ${DOC_DIR}${book}/build-${tag}/html"
             mkdir -p publish-docs/${language}/${book}-${tag}
@@ -103,7 +109,7 @@ function build_rst {
                 sed -n 4p | sed -e 's/^ *//g')
             sed -i -e "s/\.\. title::.*/.. title:: ${title}/" \
                 ${DOC_DIR}${book}/source/index.rst
-            tox -evenv "sphinx-build -q -E -t $tag -D language=${language} \
+            tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag -D language=${language} \
                 ${DOC_DIR}${book}/source/ \
                 ${DOC_DIR}${book}/build-${tag}/html"
             mkdir -p publish-docs/${language}/${book}-${tag}
@@ -117,7 +123,7 @@ function build_rst {
                 ${INSTALL_DEBIAN}/index.html
         fi
     else
-        tox -evenv "sphinx-build -q -E -D language=${language} \
+        tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -D language=${language} \
             ${DOC_DIR}${book}/source/ \
             ${DOC_DIR}${book}/build/html"
         mkdir -p publish-docs/${language}/${book}/
