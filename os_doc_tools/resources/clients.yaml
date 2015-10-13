@@ -1,32 +1,28 @@
 ---
 barbican:
-    name: Key management service
+    name: Key Manager service
     subcommands: complete
 ceilometer:
-    name: Telemetry
+    name: Telemetry service
 cinder:
-    name: OpenStack Block Storage
-    title: Block Storage
+    name: Block Storage service
 cloudkitty:
     name: Rating service
 designate:
     name: DNS service
     subcommands: complete
 glance:
-    name: OpenStack Image service
-    title: Image service
+    name: Image service
 gnocchi:
     name: A time series storage and resources index service
 heat:
-    name: Orchestration
+    name: Orchestration service
 ironic:
-    name: Bare metal
+    name: Bare Metal service
 keystone:
-    name: OpenStack Identity
-    title: Identity service
+    name: Identity service
 neutron:
-    name: OpenStack Networking
-    title: Networking
+    name: Networking service
 magnum:
     name: Containers service
 manila:
@@ -38,12 +34,11 @@ nova:
     name: OpenStack Compute
     title: Compute
 murano:
-    name: Application catalog
+    name: Application Catalog service
 sahara:
-    name: Data processing
+    name: Data Processing service
 swift:
-    name: OpenStack Object Storage
-    title: Object Storage
+    name: Object Storage service
     subcommands:
       - capabilities
       - delete
@@ -54,7 +49,7 @@ swift:
       - tempurl
       - upload
 tuskar:
-    name: Deployment
+    name: Deployment service
     subcommands:
       - plan-add-role
       - plan-create
@@ -71,11 +66,9 @@ tuskar:
       - plan-update
       - role-list
 trove:
-    name: Database
-    title: Database service
+    name: Database service
 trove-manage:
-    name: Database Management Utility
-    title: Database service management
+    name: Database service management utility
     subcommands:
       - datastore_update
       - datastore_version_flavor_add
@@ -87,5 +80,5 @@ trove-manage:
       - db_sync
       - db_upgrade
 openstack:
-    title: OpenStack
+    name: OpenStack
     subcommands: complete
