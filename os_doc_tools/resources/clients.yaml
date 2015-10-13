@@ -35,8 +35,6 @@ mistral:
 nova:
     name: OpenStack Compute
     title: Compute
-manila:
-    name: Shared file systems
 murano:
     name: Application catalog
 sahara:
