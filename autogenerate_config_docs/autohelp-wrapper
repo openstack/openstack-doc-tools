@@ -21,6 +21,7 @@ AUTOHELP="python $HERE/autohelp.py"
 EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
 GITPROJ=git://git.openstack.org/openstack
+GITSTACKPROJ=git://git.openstack.org/stackforge
 PROJECTS="ceilometer cinder glance heat ironic keystone neutron nova sahara swift trove"
 MANUALS_PROJECTS="openstack-manuals oslo-incubator"
 BRANCH=master
@@ -68,6 +69,7 @@ activate_venv() {
 get_project() {
     project=$1
     git_url=$GITPROJ
+    git_url_stackforge=$GITSTACKPROJ
 
     if [ ! -e $SOURCESDIR/$project ]; then
         if [[ $MANUALS_PROJECTS =~ (^| )$project($| ) ]]; then
@@ -79,6 +81,12 @@ get_project() {
             while read extra; do
                 git clone $git_url/$extra $SOURCESDIR/$extra
             done < extra_repos/$project-$RELEASE
+        fi
+
+        if [ -e extra_repos/$project-$RELEASE-stackforge ]; then
+            while read extra; do
+                git clone $git_url_stackforge/$extra $SOURCESDIR/$extra
+            done < extra_repos/$project-$RELEASE-stackforge
         fi
 
     else
@@ -205,8 +213,30 @@ for project in $PROJECTS; do
         extra_flags=
         while read extra; do
             package=$(echo $extra | tr - _)
+            if [ $package = "networking_midonet" ]; then
+                package="midonet"
+            fi
             extra_flags="$extra_flags -i $SOURCESDIR/$extra/$package"
         done < extra_repos/$project-$RELEASE
+    fi
+
+    if [ -e extra_repos/$project-$RELEASE-stackforge ]; then
+        while read extra; do
+            package=$(echo $extra | tr - _)
+            if [ $package = "networking_hyperv" ]; then
+                package="hyperv"
+            fi
+            if [ $package = "networking_bigswitch" ]; then
+                package="bsnstacklib"
+            fi
+            if [ $package = "networking_edge_vpn" ]; then
+                package="networking-edge-vpn"
+            fi
+            if [ $package = "networking_zvm" ]; then
+                package="neutron"
+            fi
+            extra_flags="$extra_flags -i $SOURCESDIR/$extra/$package"
+        done < extra_repos/$project-$RELEASE-stackforge
     fi
 
     cd $MANUALSREPO/tools/autogenerate-config-flagmappings
