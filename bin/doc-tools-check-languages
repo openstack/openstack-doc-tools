@@ -52,7 +52,7 @@ function build_rst {
     TAG=""
     # We need to extract all strings, so add all supported tags
     if [ ${book} = "firstapp" ] ; then
-        TAG="-t libcloud -t fog -t dotnet -t pkgcloud -t shade"
+        TAG="-t libcloud -t fog -t dotnet -t openstacksdk -t pkgcloud -t shade"
     fi
     if [ ${book} = "install-guide" ] ; then
         TAG="-t obs -t rdo -t ubuntu -t debian"
@@ -87,7 +87,7 @@ function build_rst {
     # Build all books
     if [ ${book} = "firstapp" ] ; then
         # Firstapp has several variations, build all of them
-        for tag in libcloud dotnet fog pkgcloud shade; do
+        for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
             tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag -D language=${language} \
                 ${DOC_DIR}${book}/source/ \
                 ${DOC_DIR}${book}/build-${tag}/html"
@@ -202,7 +202,7 @@ function handle_draft_language {
                 rmdir publish-docs/$language/draft || true
                 ;;
             firstapp)
-                for tag in libcloud dotnet fog pkgcloud shade; do
+                for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
                     mv publish-docs/$language/$book-${tag} \
                         publish-docs/draft/$language/$book-${tag}
                 done
