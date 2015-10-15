@@ -114,8 +114,12 @@ def generate_heading(os_command, api_name, title, os_file):
         header_deprecation = """
     <warning>
         <para>The %(os_command)s CLI is deprecated in favor of
-            python-openstackclient. For a Python library, continue using
-            python-%(os_command)sclient.</para>
+            python-openstackclient. For more information on
+            python-openstackclient, please see
+            <xref linkend="openstack_cli_identity_api_v2" /> and
+            <xref linkend="openstack_cli_with_identity_api_v3" />.
+            For a Python library, continue
+            using python-%(os_command)sclient.</para>
     </warning>\n"""
     else:
         header_deprecation = None
