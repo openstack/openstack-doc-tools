@@ -511,6 +511,8 @@ def discover_subcommands(os_command, subcommands, extra_params):
     :return: the list of subcommands discovered
     :rtype: list(str)
     """
+    if extra_params is None:
+        extra_params = ''
     print(("Discovering subcommands of '%s' %s ..."
           % (os_command, extra_params)))
     blacklist = ['bash-completion', 'complete', 'help']
