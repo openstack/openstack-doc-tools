@@ -12,9 +12,6 @@
 
 # Configuration variables used inside Scrapy to enable modules/pipelines
 # and to affect the behavior of several parts.
-#
-# All available configuration variables are documente at
-# http://doc.scrapy.org/en/latest/topics/settings.html.
 
 from scrapy import linkextractors
 
