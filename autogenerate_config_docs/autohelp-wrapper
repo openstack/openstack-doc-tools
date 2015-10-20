@@ -211,9 +211,6 @@ for project in $PROJECTS; do
             if [ $package = "networking_hyperv" ]; then
                 package="hyperv"
             fi
-            if [ $package = "networking_bigswitch" ]; then
-                package="bsnstacklib"
-            fi
             if [ $package = "networking_edge_vpn" ]; then
                 package="networking-edge-vpn"
             fi
