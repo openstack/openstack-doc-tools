@@ -72,7 +72,10 @@ class SitemapSpider(spiders.CrawlSpider):
             if path.startswith("/%s" % entry):
                 item['changefreq'] = 'weekly'
 
-        lastmod = time.strptime(response.headers['Last-Modified'],
-                                "%a, %d %b %Y %H:%M:%S %Z")
+        if 'Last-Modified' in response.headers:
+            timestamp = response.headers['Last-Modified']
+        else:
+            timestamp = response.headers['Date']
+        lastmod = time.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %Z")
         item['lastmod'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", lastmod)
         return item
