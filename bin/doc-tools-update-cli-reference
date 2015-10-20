@@ -48,7 +48,12 @@ source .venv/bin/activate
 
 pip install --upgrade openstack-doc-tools
 pip install --upgrade pbr
-pip install --upgrade python-${project}client
+
+if [[ $project -eq 'gnocchi' ]]; then
+    pip install --upgrade ${project}client
+else
+    pip install --upgrade python-${project}client
+fi
 
 rm -rf output
 mkdir output
