@@ -42,13 +42,13 @@ class SitemapSpider(spiders.CrawlSpider):
         )
     ]
 
-    def __init__(self, domain='docs.openstack.org', *args, **kwargs):
+    def __init__(self, domain='docs.openstack.org', urls='', *args, **kwargs):
         super(SitemapSpider, self).__init__(*args, **kwargs)
         self.domain = domain
         self.allowed_domains = [domain]
-        self.start_urls = [
-            'http://%s/index.html' % domain,
-        ]
+        self.start_urls = ['http://%s/index.html' % domain]
+        for url in urls.split(','):
+            self.start_urls.append(url)
 
     def parse_item(self, response):
         item = items.SitemapItem()

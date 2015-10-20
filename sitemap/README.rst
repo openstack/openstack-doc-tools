@@ -24,6 +24,11 @@ The result will be available in the file ``sitemap_developer.openstack.org.xml``
 
 To write log messages into a file append the parameter ``-s LOG_FILE=scrapy.log``.
 
+It is possible to define a set of additional start URLs using the attribute
+``urls``. Separate multiple URLs with ``,``.
+
+    $ scrapy crawl sitemap -a domain=developer.openstack.org -a urls="http://developer.openstack.org/de/api-guide/quick-start/"
+
 Dependencies
 ============
 
