@@ -15,8 +15,17 @@ neutron_radware_lbaas_v2
 -e git+https://git.openstack.org/openstack/neutron-lbaas.git@master#egg=neutron-lbaas
 -e git+https://git.openstack.org/openstack/neutron-vpnaas.git@master#egg=neutron-vpnaas
 
+# for cisco
+apicapi
+pika
 # for midonet
 -e git+https://github.com/midonet/python-midonetclient.git@master#egg=midonetclient
+# for neutron
+-e git+https://github.com/nuagenetworks/nuage-openstack-neutron.git@master#egg=nuage
+# for powervm
+-e git+https://github.com/pypowervm/pypowervm.git@master#egg=pypowervm
+# for octavia
+pyroute2
 
 -e git+https://git.openstack.org/openstack/networking-6wind.git#egg=networking-6wind
 -e git+https://git.openstack.org/openstack/networking-ale-omniswitch.git#egg=networking-ale-omniswitch
