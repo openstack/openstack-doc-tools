@@ -16,7 +16,7 @@ neutron_radware_lbaas_v2
 -e git+https://git.openstack.org/openstack/neutron-vpnaas.git@master#egg=neutron-vpnaas
 
 # for cisco
-apicapi
+-e git+https://github.com/noironetworks/apicapi.git@master#egg=apicapi
 pika
 # for midonet
 -e git+https://github.com/midonet/python-midonetclient.git@master#egg=midonetclient
