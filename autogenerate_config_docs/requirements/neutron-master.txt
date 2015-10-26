@@ -1,7 +1,7 @@
 ryu
 
 # lbaas
-kemptech-openstack-lbaas
+kemptech-openstack-lbaas >= 1.0.2
 a10-neutron-lbaas
 neutron_radware_lbaas
 neutron_radware_lbaas_v2
