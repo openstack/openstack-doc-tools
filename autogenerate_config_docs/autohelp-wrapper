@@ -75,10 +75,10 @@ get_project() {
         fi
         git clone $git_url/$project $SOURCESDIR/$project
 
-        if [ -e extra_repos/$project-$RELEASE ]; then
+        if [ -e extra_repos/$project-$RELEASE.txt ]; then
             while read extra; do
                 git clone $git_url/$extra $SOURCESDIR/$extra
-            done < extra_repos/$project-$RELEASE
+            done < extra_repos/$project-$RELEASE.txt
         fi
 
     else
@@ -86,10 +86,10 @@ get_project() {
             (cd $SOURCESDIR/$project && git pull)
         fi
 
-        if [ -e extra_repos/$project-$RELEASE ]; then
+        if [ -e extra_repos/$project-$RELEASE.txt ]; then
             while read extra; do
                 (cd $SOURCESDIR/$extra && git pull)
-            done < extra_repos/$project-$RELEASE
+            done < extra_repos/$project-$RELEASE.txt
         fi
     fi
 }
@@ -180,7 +180,7 @@ if [ "$FAST" -eq 0 ] ; then
             pip install -rrequirements.txt -rtest-requirements.txt
             python setup.py install
 
-            if [ -e extra_repos/$project-$RELEASE ]; then
+            if [ -e extra_repos/$project-$RELEASE.txt ]; then
                 while read extra; do
                     (
                         cd $SOURCESDIR/$extra
@@ -188,7 +188,7 @@ if [ "$FAST" -eq 0 ] ; then
                             -rtest-requirements.txt
                         python setup.py install
                     )
-                done < extra_repos/$project-$RELEASE
+                done < extra_repos/$project-$RELEASE.txt
             fi
         )
     done
@@ -201,7 +201,7 @@ for project in $PROJECTS; do
         break
     fi
 
-    if [ -e extra_repos/$project-$RELEASE ]; then
+    if [ -e extra_repos/$project-$RELEASE.txt ]; then
         extra_flags=
         while read extra; do
             package=$(echo $extra | tr - _)
@@ -218,7 +218,7 @@ for project in $PROJECTS; do
                 package="neutron"
             fi
             extra_flags="$extra_flags -i $SOURCESDIR/$extra/$package"
-        done < extra_repos/$project-$RELEASE
+        done < extra_repos/$project-$RELEASE.txt
     fi
 
     cd $MANUALSREPO/tools/autogenerate-config-flagmappings
