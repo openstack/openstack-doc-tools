@@ -1,6 +1,11 @@
 Release notes
 =============
 
+0.32.0
+------
+
+* Removed a virtual build and test environment based on Vagrant.
+
 0.31.0
 ------
 
