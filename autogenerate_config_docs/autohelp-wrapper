@@ -29,12 +29,13 @@ FAST=0
 usage() {
     echo "Wrapper for autohelp.py"
     echo "Usage:"
-    echo "  $(basename $0) [ OPTIONS ] update|docbook|setup [ project1 ... ]"
+    echo "  $(basename $0) [ OPTIONS ] create|update|docbook|rst|setup [ project1 ... ]"
     echo
     echo "Subcommands:"
     echo "  create:     Create an initial flagmapping file"
     echo "  update:     Update the flagmapping files"
-    echo "  docbook:    Generate the options tables"
+    echo "  docbook:    Generate the options tables in docbook format"
+    echo "  rst:        Generate the options tables in RST format"
     echo "  setup:      Install the environment only"
     echo
     echo "Options:"
@@ -139,7 +140,7 @@ ACTION=$1
 shift
 
 case $ACTION in
-    create|update|docbook|setup) ;;
+    create|update|docbook|rst|setup) ;;
     *)
         usage
         exit 1
@@ -243,6 +244,13 @@ for project in $PROJECTS; do
             $EXTRACT_SWIFT docbook -m $MANUALSREPO -s $SOURCESDIR/swift
         else
             $AUTOHELP docbook $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
+        fi
+        ;;
+    rst)
+        if [ "$project" = "swift" ]; then
+            $EXTRACT_SWIFT rst -m $MANUALSREPO -s $SOURCESDIR/swift
+        else
+            $AUTOHELP rst $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
         fi
         ;;
     esac

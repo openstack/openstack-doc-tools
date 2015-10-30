@@ -5,6 +5,7 @@ Release notes
 ------
 
 * Removed a virtual build and test environment based on Vagrant.
+* Update ``autohelp-wrapper`` to support RST output.
 
 0.31.0
 ------
