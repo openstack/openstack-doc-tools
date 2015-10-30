@@ -61,7 +61,7 @@ def _get_packages(project, branch):
     release = branch if '/' not in branch else branch.split('/')[1]
     packages = [project]
     try:
-        with open('extra_repos/%s-%s' % (project, release)) as f:
+        with open('extra_repos/%s-%s.txt' % (project, release)) as f:
             packages.extend([p.strip() for p in f])
     except IOError:
         pass
