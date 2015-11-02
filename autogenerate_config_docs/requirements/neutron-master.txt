@@ -18,6 +18,8 @@ neutron_radware_lbaas_v2
 # for cisco
 -e git+https://github.com/noironetworks/apicapi.git@master#egg=apicapi
 pika
+# for dragonflow
+etcd
 # for midonet
 -e git+https://github.com/midonet/python-midonetclient.git@master#egg=midonetclient
 # for neutron
