@@ -4,6 +4,7 @@
 # Packages
 *.py[cod]
 *.egg
+/.eggs
 *.egg-info
 dist
 build
@@ -34,3 +35,6 @@ sitemap/sitemap_docs.openstack.org.xml
 # build and test environment
 build_environment/.vagrant/
 build_environment/repositories/
+
+# Files created by releasenotes build
+releasenotes/build
