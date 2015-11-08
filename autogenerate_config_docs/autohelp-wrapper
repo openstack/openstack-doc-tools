@@ -217,6 +217,8 @@ for project in $PROJECTS; do
             fi
             if [ $package = "networking_zvm" ]; then
                 package="neutron"
+                cp -r $SOURCESDIR/networking-zvm/neutron/plugins/zvm $SOURCESDIR/neutron/neutron/plugins
+                cp -r $SOURCESDIR/networking-zvm/neutron/plugins/ml2/drivers/zvm $SOURCESDIR/neutron/neutron/plugins/ml2/drivers
             fi
             extra_flags="$extra_flags -i $SOURCESDIR/$extra/$package"
         done < extra_repos/$project-$RELEASE.txt
