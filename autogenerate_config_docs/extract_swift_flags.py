@@ -18,6 +18,7 @@ import os
 import pickle
 import sys
 
+import jinja2
 from lxml import etree
 from oslo_config import cfg
 
@@ -139,65 +140,36 @@ def extract_descriptions_from_devref(swift_repo, options):
     return option_descs
 
 
-def write_xml(manuals_repo, section, xml):
-    """Write the XML to file."""
-    sample, section_name = section.split('|')
-    section_filename = (manuals_repo + '/doc/common/tables/' +
-                        'swift-' + sample + '-' + section_name + '.xml')
-    with open(section_filename, 'w') as fd:
-        fd.write(etree.tostring(xml, pretty_print=True,
-                                xml_declaration=True,
-                                encoding="UTF-8"))
-
-
-def new_section_xml(manuals_repo, section):
-    """Create a new XML tree."""
-
-    # The section holds 2 informations, the file in which the option was found,
-    # and the section name in that file.
-    sample, section_name = section.split('|')
-    parser = etree.XMLParser(remove_blank_text=True)
-    xml = etree.XML(BASE_XML % (section_name, sample), parser)
-    return xml
-
-
 def write_docbook(options, manuals_repo):
     """Create new DocBook tables.
 
     Writes a set of DocBook-formatted tables, one per section in swift
     configuration files.
     """
+    all_options = {}
     names = options.get_option_names()
-    current_section = None
-    xml = None
     for full_option in sorted(names, OptionsCache._cmpopts):
         section, optname = full_option.split('/')
-
-        if current_section != section:
-            if xml is not None:
-                write_xml(manuals_repo, current_section, xml)
-            current_section = section
-            xml = new_section_xml(manuals_repo, section)
-            tbody = xml.find(DBK_NS + "tbody")
-
         oslo_opt = options.get_option(full_option)[1]
+        all_options.setdefault(section, [])
 
-        tr = etree.Element('tr')
-        tbody.append(tr)
+        all_options[section].append((oslo_opt.name,
+                                     oslo_opt.default,
+                                     oslo_opt.help.strip()))
 
-        td = etree.Element('td')
-        option_xml = etree.SubElement(td, 'option')
-        option_xml.text = "%s" % oslo_opt.name
-        option_xml.tail = " = "
-        replaceable_xml = etree.SubElement(td, 'replaceable')
-        replaceable_xml.text = "%s" % oslo_opt.default
-        tr.append(td)
-
-        td = etree.Element('td')
-        td.text = oslo_opt.help.strip()
-        tr.append(td)
-
-    write_xml(manuals_repo, section, xml)
+    for full_section, options in all_options.items():
+        sample_filename, section = full_section.split('|')
+        tmpl_file = os.path.join(os.path.dirname(__file__),
+                                 'templates/swift.docbook.j2')
+        with open(tmpl_file) as fd:
+            template = jinja2.Template(fd.read(), trim_blocks=True)
+            output = template.render(filename=sample_filename,
+                                     section=section,
+                                     options=options)
+        tgt_filename = (manuals_repo + '/doc/common/tables/' +
+                        'swift-' + sample_filename + '-' + section + '.xml')
+        with open(tgt_filename, 'w') as fd:
+            fd.write(output)
 
 
 def read_options(swift_repo, manuals_repo, verbose):

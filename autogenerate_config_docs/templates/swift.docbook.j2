@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<para xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <!-- The tool that generated this table lives in the
+     openstack-doc-tools repository. The editions made in
+     this file will *not* be lost if you run the script again. -->
+  <table rules="all">
+    <caption>Description of configuration options for
+        <literal>[{{ section }}]</literal> in <filename>{{ filename }}.conf</filename>
+    </caption>
+    <col width="50%"/>
+    <col width="50%"/>
+    <thead>
+      <tr>
+        <th>Configuration option = Default value</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+{% for option in options %}
+      <tr>
+        <td><option>{{ option[0] }}</option> = <replaceable>{{ option[1] }}</replaceable></td>
+        <td>{{ option[2] }}</td>
+      </tr>
+{% endfor %}
+    </tbody>
+  </table>
+</para>
