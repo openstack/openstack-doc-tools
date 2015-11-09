@@ -53,7 +53,7 @@ def mergeback(folder, language, root):
         path = root
     else:
         outputFiles = mergeSingleDocument(folder, language, root)
-        if (outputFiles is not None) and (len(outputFiles) > 0):
+        if outputFiles:
             for outXML in outputFiles:
                 changeXMLLangSetting(outXML, language)
         return
@@ -65,7 +65,7 @@ def mergeback(folder, language, root):
     for aFile in files:
         if not (aFile in IGNORE_FOLDER):
             outputFiles = mergeSingleDocument(aFile, language, root)
-            if (outputFiles is not None) and (len(outputFiles) > 0):
+            if outputFiles:
                 for outXML in outputFiles:
                     changeXMLLangSetting(outXML, language)
 
@@ -79,7 +79,7 @@ def mergeSingleDocument(folder, language, root):
     else:
         return None
 
-    if len(xmlfiles) > 0:
+    if xmlfiles:
         popath = os.path.join(abspath, "locale", language + ".po")
         # generate MO file
         mofile_handler, mofile_tmppath = tempfile.mkstemp()
@@ -247,7 +247,7 @@ def generateSinglePoT(folder, root):
     else:
         return
 
-    if len(xmlfiles) > 0:
+    if xmlfiles:
         output = os.path.join(abspath, "locale")
         if not os.path.exists(output):
             os.mkdir(output)

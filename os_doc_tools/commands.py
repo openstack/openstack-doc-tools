@@ -217,13 +217,13 @@ def extract_options(line):
         w0 = words[0]
         del words[0]
         w1 = ''
-        if len(words) > 0:
+        if words:
             w1 = words[0]
             del words[0]
             for w in words:
                 w1 += " " + w
 
-        if len(w1) == 0:
+        if not w1:
             split_line = [w0]
         else:
             split_line = [w0, w1]
@@ -238,11 +238,11 @@ def format_table(title, lines, os_file):
 
     close_entry = False
     os_file.write("  <variablelist wordsize=\"10\">\n")
-    if len(title) > 0:
+    if title:
         os_file.write("    <title>%s</title>\n" % title)
 
     for line in lines:
-        if len(line) == 0 or line[0] != ' ':
+        if not line or line[0] != ' ':
             break
         # We have to handle these cases:
         # 1. command  Explanation
@@ -301,7 +301,7 @@ def generate_command(os_command, os_file):
     for line in help_lines:
         line_index += 1
         xline = quote_xml(line)
-        if len(line) > 0 and line[0] != ' ':
+        if line and line[0] != ' ':
             # XXX: Might have whitespace before!!
             if '<subcommands>' in line:
                 ignore_next_lines = False
@@ -381,7 +381,7 @@ def generate_command(os_command, os_file):
                 os_file.write("        <screen><computeroutput>%s" % xline)
                 next_line_screen = False
                 in_screen = True
-            elif len(line) > 0:
+            elif line:
                 os_file.write("\n%s" % xline.rstrip())
 
     if in_screen:
@@ -483,7 +483,7 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
                 break
         if skip_lines:
             continue
-        if len(line) == 0:
+        if not line:
             if not in_para:
                 os_file.write("</computeroutput></screen>")
                 os_file.write("\n        <para>")
