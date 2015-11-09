@@ -280,7 +280,7 @@ def _sanitize_default(opt):
     if isinstance(opt, cfg.StrOpt) and default.strip() != default:
         return '"%s"' % default
 
-    for pathelm in sys.path[1:]:
+    for pathelm in sys.path:
         if pathelm == '':
             continue
         if pathelm.endswith('/'):
