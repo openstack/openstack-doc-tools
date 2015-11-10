@@ -191,7 +191,7 @@ def verify_attribute_profiling(doc, attribute, known_values):
                         "profiling of %s on line %d." %
                         (p_tag[len_ns:], attribute, p_att_list,
                          attribute, c_tag[len_ns:], c_line))
-    if len(msg) > 0:
+    if msg:
         raise ValueError("\n     ".join(msg))
 
 
@@ -223,7 +223,7 @@ def verify_unicode_niceness(docfile):
         lc += 1
         any(c in line for c in invalid_characters)
 
-    if len(affected_lines):
+    if affected_lines:
         raise ValueError("unwanted unicode charaters (one of %s) "
                          "found in line(s): %" % (" ".join(invalid_characters),
                                                   ", ".join(affected_lines)))
@@ -321,7 +321,7 @@ def verify_valid_links(doc):
             msg.append("URL %s invalid at line %d, error %s" % (
                 url, e_line, e))
 
-    if len(msg) > 0:
+    if msg:
         raise ValueError("\n    ".join(msg))
 
 
@@ -1093,7 +1093,7 @@ def generate_affected_books(rootdir, book_bk, ignore_dirs, abs_ignore_dirs,
     # 3. Iterate over files that have includes on modified files
     # and build a closure - the set of all files (affected_files)
     # that have a path to a modified file via includes.
-    while len(new_files) > 0:
+    while new_files:
         new_files_to_check = new_files
         new_files = []
         for f in new_files_to_check:
