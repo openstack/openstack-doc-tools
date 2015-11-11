@@ -2,4 +2,7 @@
  OpenStack Doc Tools Release Notes
 ==================================
 
-Currently empty, more to come.
+.. toctree::
+   :maxdepth: 1
+
+   unreleased
