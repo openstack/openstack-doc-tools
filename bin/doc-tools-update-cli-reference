@@ -49,7 +49,7 @@ source .venv/bin/activate
 pip install --upgrade openstack-doc-tools
 pip install --upgrade pbr
 
-if [[ $project -eq 'gnocchi' ]]; then
+if [[ $project == 'gnocchi' ]]; then
     pip install --upgrade ${project}client
 else
     pip install --upgrade python-${project}client
