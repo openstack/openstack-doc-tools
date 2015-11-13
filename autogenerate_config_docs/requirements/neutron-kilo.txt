@@ -19,7 +19,7 @@ neutron_radware_lbaas_v2
 -e git://github.com/midonet/python-midonetclient.git#egg=midonetclient
 
 -e git+https://git.openstack.org/openstack/networking-arista.git@stable/kilo#egg=networking-arista
--e git+https://git.openstack.org/stackforge/networking-bagpipe-l2.git@stable/kilo#egg=networking-bagpipe-l2
+-e git+https://git.openstack.org/openstack/networking-bagpipe.git@stable/kilo#egg=networking-bagpipe
 -e git+https://git.openstack.org/openstack/networking-bgpvpn.git#egg=networking-bgpvpn
 -e git+https://git.openstack.org/stackforge/networking-bigswitch.git#egg=networking-bigswitch
 -e git+https://git.openstack.org/stackforge/networking-brocade.git#egg=networking-brocade

@@ -6,7 +6,7 @@ neutron-vpnaas
 networking-6wind
 networking-ale-omniswitch
 networking-arista
-networking-bagpipe-l2
+networking-bagpipe
 networking-bgpvpn
 networking-brocade
 networking-calico
