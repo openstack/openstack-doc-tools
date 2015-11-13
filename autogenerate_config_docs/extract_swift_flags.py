@@ -140,7 +140,7 @@ def extract_descriptions_from_devref(swift_repo, options):
     return option_descs
 
 
-def write_docbook(options, manuals_repo):
+def write_files(options, manuals_repo, output_format):
     """Create new DocBook tables.
 
     Writes a set of DocBook-formatted tables, one per section in swift
@@ -160,15 +160,21 @@ def write_docbook(options, manuals_repo):
     for full_section, options in all_options.items():
         sample_filename, section = full_section.split('|')
         tmpl_file = os.path.join(os.path.dirname(__file__),
-                                 'templates/swift.docbook.j2')
+                                 'templates/swift.%s.j2' % output_format)
         with open(tmpl_file) as fd:
             template = jinja2.Template(fd.read(), trim_blocks=True)
             output = template.render(filename=sample_filename,
                                      section=section,
                                      options=options)
-        tgt_filename = (manuals_repo + '/doc/common/tables/' +
-                        'swift-' + sample_filename + '-' + section + '.xml')
-        with open(tgt_filename, 'w') as fd:
+
+        if output_format == 'docbook':
+            tgt = (manuals_repo + '/doc/common/tables/' + 'swift-' +
+                   sample_filename + '-' + section + '.xml')
+        else:
+            tgt = (manuals_repo + '/doc/config-ref-rst/source/tables/' +
+                   'swift-' + sample_filename + '-' + section + '.rst')
+
+        with open(tgt, 'w') as fd:
             fd.write(output)
 
 
@@ -248,10 +254,11 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Update the swift options tables.",
-        usage="%(prog)s docbook|dump [-v] [-s swift_repo] [-m manuals_repo]")
+        usage=("%(prog)s docbook|rst|dump [-v] [-s swift_repo] "
+               "[-m manuals_repo]"))
     parser.add_argument('subcommand',
-                        help='Action (docbook, dump).',
-                        choices=['docbook', 'dump'])
+                        help='Action (docbook, rst, dump).',
+                        choices=['docbook', 'dump', 'rst'])
     parser.add_argument('-s', '--swift-repo',
                         dest='swift_repo',
                         help="Location of the swift git repository.",
@@ -276,8 +283,8 @@ def main():
     read_options(args.swift_repo, args.manuals_repo, args.verbose)
     options = OptionsCache()
 
-    if args.subcommand == 'docbook':
-        write_docbook(options, args.manuals_repo)
+    if args.subcommand in ('docbook', 'rst'):
+        write_files(options, args.manuals_repo, args.subcommand)
 
     elif args.subcommand == 'dump':
         options.dump()
