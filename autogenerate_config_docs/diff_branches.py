@@ -215,8 +215,9 @@ def get_env(project, new_branch, old_list, new_list):
         for name in sorted(new_opts, _cmpopts):
             opt = new_list[name][1]
             name = format_option_name(name)
-            cells = ("%(name)s = %(default)s" % {'name': name,
-                                                 'default': opt['default']},
+            cells = (("%(name)s = %(default)s" %
+                      {'name': name,
+                       'default': opt['default']}).strip(),
                      "(%(type)s) %(help)s" % {'type': opt['type'],
                                               'help': opt['help']})
             env['new_opts'].append(cells)
@@ -266,6 +267,13 @@ def main():
                         required=False,
                         default='.',
                         type=str,)
+    parser.add_argument('-f', '--format',
+                        dest='format',
+                        help='Output format (docbook or rst).',
+                        required=False,
+                        default='rst',
+                        type=str,
+                        choices=('docbook', 'rst'),)
     parser.add_argument('-n', '--no-venv-update',
                         dest='novenvupdate',
                         help='Don\'t update the virtual envs.',
@@ -288,9 +296,10 @@ def main():
 
         release = args.new_branch.replace('stable/', '')
         env = get_env(project, release, old_list, new_list)
-        filename = ("%(project)s-conf-changes.xml" %
-                    {'project': project, 'release': release})
-        tmpl_file = 'templates/changes.docbook.j2'
+        ext = 'rst' if args.format == 'rst' else 'xml'
+        filename = ("%(project)s-conf-changes.%(ext)s" %
+                    {'project': project, 'ext': ext})
+        tmpl_file = 'templates/changes.%s.j2' % args.format
         if not os.path.exists(args.target):
             os.makedirs(args.target)
         dest = os.path.join(args.target, filename)
