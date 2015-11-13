@@ -32,7 +32,7 @@ pyroute2
 -e git+https://git.openstack.org/openstack/networking-6wind.git#egg=networking-6wind
 -e git+https://git.openstack.org/openstack/networking-ale-omniswitch.git#egg=networking-ale-omniswitch
 -e git+https://git.openstack.org/openstack/networking-arista.git#egg=networking-arista
--e git+https://git.openstack.org/openstack/networking-bagpipe-l2.git#egg=networking-bagpipe-l2
+-e git+https://git.openstack.org/openstack/networking-bagpipe.git#egg=networking-bagpipe
 #-e git+https://git.openstack.org/openstack/networking-bgpvpn.git#egg=networking-bgpvpn
 -e git+https://git.openstack.org/openstack/networking-brocade.git#egg=networking-brocade
 -e git+https://git.openstack.org/openstack/networking-calico.git#egg=networking-calico
