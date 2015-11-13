@@ -526,7 +526,8 @@ def discover_subcommands(os_command, subcommands, extra_params):
             for line in [x.strip() for x in
                          subprocess.check_output(
                              args,
-                             universal_newlines=True).split('\n')
+                             universal_newlines=True,
+                             stderr=DEVNULL).split('\n')
                          if x.strip().startswith('cmds_') and '-' in x]:
                 subcommand, _ = line.split('=')
                 subcommand = subcommand.replace('cmds_', '').replace('_', ' ')
