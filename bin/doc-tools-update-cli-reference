@@ -21,20 +21,19 @@ fi
 
 project=$1
 
-if [[ ! -e /usr/bin/virtualenv ]]; then
-    echo "error: virtualenv not installed"
-    exit 1
-fi
+# checks command exist or not
+function does_exist {
+    which $@ > /dev/null 2>&1
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        echo "error: $1 not installed"
+        exit 1
+    fi
+}
 
-if [[ ! -e /usr/bin/pip ]]; then
-    echo "error: pip not installed"
-    exit 1
-fi
-
-if [[ ! -e /usr/bin/git ]]; then
-    echo "error: git not installed"
-    exit 1
-fi
+does_exist virtualenv
+does_exist pip
+does_exist git
 
 if [[ ! -e $HOME/.gitconfig ]]; then
     echo "note: ~/.gitconfig does not exist"
