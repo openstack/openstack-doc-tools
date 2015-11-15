@@ -1,6 +1,11 @@
 Release notes
 =============
 
+Note that this file is now obsolete, we use reno for release note
+management. Add notes to releasenotes/notes directory following the
+documentation in
+http://docs.openstack.org/developer/reno/usage.html#creating-new-release-notes.
+
 0.32.0
 ------
 
