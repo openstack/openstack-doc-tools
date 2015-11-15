@@ -298,6 +298,7 @@ def generate_command(os_command, os_file):
     next_line_screen = True
     line_index = -1
     in_screen = False
+    subcommands = 'complete'
     for line in help_lines:
         line_index += 1
         xline = quote_xml(line)
@@ -383,11 +384,15 @@ def generate_command(os_command, os_file):
                 in_screen = True
             elif line:
                 os_file.write("\n%s" % xline.rstrip())
+        # subcommands (select bash-completion, complete for bash-completion)
+        if 'bash-completion' in line:
+            subcommands = 'bash-completion'
 
     if in_screen:
         os_file.write("</computeroutput></screen>\n")
 
     os_file.write("    </section>\n")
+    return subcommands
 
 
 def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
@@ -616,12 +621,11 @@ def document_single_project(os_command, output_dir):
     else:
         api_name = ''
         title = data.get('title', '')
-    subcommands = data.get('subcommands', 'bash-completion')
 
     out_filename = "ch_cli_" + os_command + "_commands.xml"
     out_file = open(os.path.join(output_dir, out_filename), 'w')
     generate_heading(os_command, api_name, title, out_file)
-    generate_command(os_command, out_file)
+    subcommands = generate_command(os_command, out_file)
 
     if os_command == 'cinder':
         out_file.write("""
