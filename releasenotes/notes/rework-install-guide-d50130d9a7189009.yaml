@@ -1,0 +1,4 @@
+---
+fixes:
+  - Rework install guide translation build tool
+    to process toctree for each distribution dynamically.
