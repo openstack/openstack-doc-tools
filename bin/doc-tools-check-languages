@@ -88,9 +88,12 @@ function build_rst {
     if [ ${book} = "firstapp" ] ; then
         # Firstapp has several variations, build all of them
         for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
+            BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
+            DOCTREES="${BUILD_DIR}.doctrees"
             tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag -D language=${language} \
+                -d ${DOCTREES}
                 ${DOC_DIR}${book}/source/ \
-                ${DOC_DIR}${book}/build-${tag}/html"
+                ${BUILD_DIR}"
             mkdir -p publish-docs/${language}/${book}-${tag}
             rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
                 publish-docs/${language}/${book}-${tag}
@@ -146,9 +149,13 @@ function build_rst {
             fi
 
             # Build the guide
+            BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
+            DOCTREES="${BUILD_DIR}.doctrees"
             tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag \
-                -D language=${language} ${DOC_DIR}${book}/source/ \
-                ${DOC_DIR}${book}/build-${tag}/html"
+                -D language=${language}
+                -d ${DOCTREES}
+                ${DOC_DIR}${book}/source/ \
+                ${BUILD_DIR}"
             mkdir -p publish-docs/${language}/${book}-${tag}
             rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
                 publish-docs/${language}/${book}-${tag}
@@ -162,9 +169,12 @@ function build_rst {
             fi
         done
     else
+        BUILD_DIR="${DOC_DIR}${book}/build/html"
+        DOCTREES="${BUILD_DIR}.doctrees"
         tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -D language=${language} \
+            -d ${DOCTREES} \
             ${DOC_DIR}${book}/source/ \
-            ${DOC_DIR}${book}/build/html"
+            ${BUILD_DIR}"
         mkdir -p publish-docs/${language}/${book}/
         rsync -a ${DOC_DIR}${book}/build/html/ publish-docs/${language}/${book}/
     fi
