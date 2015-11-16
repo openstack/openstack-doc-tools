@@ -18,6 +18,9 @@ import os
 import pickle
 import sys
 
+from docutils import core
+from docutils import io
+from docutils import nodes
 import jinja2
 from lxml import etree
 from oslo_config import cfg
@@ -77,6 +80,32 @@ def parse_line(line):
     if len(config) < 2 or '.' in config or '<' in config or '>' in config:
         return None
     return config, default.strip()
+
+
+def get_existing_options_from_rst(optfiles):
+    """Parse an existing RST table to compile a list of existing options."""
+    options = {}
+    for optfile in optfiles:
+        input_string = open(optfile).read()
+        output, pub = core.publish_programmatically(
+            source_class=io.StringInput, source=input_string,
+            source_path=optfile, destination_class=io.NullOutput,
+            destination=None, destination_path='/dev/null', reader=None,
+            reader_name='standalone', parser=None,
+            parser_name='restructuredtext', writer=None, writer_name='null',
+            settings=None, settings_spec=None, settings_overrides=None,
+            config_section=None, enable_exit_status=None)
+        doc = pub.writer.document
+        data = dict(doc.traverse(nodes.row, include_self=False)[1:])
+        for a, b in data.items():
+            option = str(a.traverse(nodes.literal)[0].children[0])
+            helptext = str(b.traverse(nodes.paragraph)[0].children[0])
+
+            if option not in options or 'No help text' in options[option]:
+                # options[option.split('=',1)[0]] = helptext
+                options[option] = helptext.strip()
+
+    return options
 
 
 def get_existing_options(optfiles):
@@ -153,9 +182,11 @@ def write_files(options, manuals_repo, output_format):
         oslo_opt = options.get_option(full_option)[1]
         all_options.setdefault(section, [])
 
+        helptext = oslo_opt.help.strip().replace('\n', ' ')
+        helptext = ' '.join(helptext.split())
         all_options[section].append((oslo_opt.name,
                                      oslo_opt.default,
-                                     oslo_opt.help.strip()))
+                                     helptext))
 
     for full_section, options in all_options.items():
         sample_filename, section = full_section.split('|')
@@ -178,17 +209,23 @@ def write_files(options, manuals_repo, output_format):
             fd.write(output)
 
 
-def read_options(swift_repo, manuals_repo, verbose):
+def read_options(swift_repo, manuals_repo, read_from, verbose):
     """Find swift configuration options.
 
     Uses existing tables and swift devref as a source of truth in that order to
     determine helptext for options found in sample config files.
     """
 
-    existing_tables = glob.glob(manuals_repo + '/doc/common/tables/swift*xml')
-    options = {}
-    # use the existing tables to get a list of option names
-    options = get_existing_options(existing_tables)
+    if read_from == 'rst':
+        options = get_existing_options_from_rst(
+            glob.glob(manuals_repo +
+                      '/doc/config-ref-rst/source/tables/swift*rst'))
+    else:
+        options = get_existing_options(
+            glob.glob(manuals_repo + '/doc/common/tables/swift*xml'))
+
+    sys.exit(0)
+
     option_descs = extract_descriptions_from_devref(swift_repo, options)
     conf_samples = glob.glob(swift_repo + '/etc/*conf-sample')
     for sample in conf_samples:
@@ -269,6 +306,12 @@ def main():
                         help="Location of the manuals git repository.",
                         required=False,
                         default="./sources/openstack-manuals")
+    parser.add_argument('-f', '--from',
+                        dest='read_from',
+                        help="Source to get defined options (rst or docbook)",
+                        required=False,
+                        default='rst',
+                        choices=['rst', 'docbook'])
     parser.add_argument('-v', '--verbose',
                         action='count',
                         default=0,
@@ -280,7 +323,10 @@ def main():
     if args.subcommand == 'dump':
         args.verbose = 0
 
-    read_options(args.swift_repo, args.manuals_repo, args.verbose)
+    read_options(args.swift_repo,
+                 args.manuals_repo,
+                 args.read_from,
+                 args.verbose)
     options = OptionsCache()
 
     if args.subcommand in ('docbook', 'rst'):
