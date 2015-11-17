@@ -1,5 +1,0 @@
-==================
-Unreleased Changes
-==================
-
-.. release-notes::
