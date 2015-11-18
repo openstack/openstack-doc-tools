@@ -18,7 +18,7 @@
    * - **[{{ group }}]**
      -
 {% for item in items[loop.index0] %}
-   * - ``{{ item[0] }}`` = ``{{ item[1]|default(' ') }}``
+   * - ``{{ item[0] }}`` = ``{{ item[1]|default(' ', true) }}``
      - {{ item[2] }}
 {% endfor %}
 {% endfor %}
