@@ -237,7 +237,8 @@ def get_env(project, new_branch, old_list, new_list):
 
     # Deprecated options
     if deprecated_opts:
-        for deprecated, new in deprecated_opts:
+        for deprecated, new in sorted(deprecated_opts, cmp=_cmpopts,
+                                      key=lambda tup: tup[0]):
             deprecated = format_option_name(deprecated)
             new = format_option_name(new)
             env['deprecated_opts'].append((deprecated, new))
