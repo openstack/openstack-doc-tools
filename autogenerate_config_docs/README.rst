@@ -32,7 +32,7 @@ The workflow is:
     $ pip install -rrequirements.txt
     $ ./autohelp-wrapper update
     $ $EDITOR sources/openstack-manuals/tools/autogenerate-config-flagmappings/*.flagmappings
-    $ ./autohelp-wrapper docbook
+    $ ./autohelp-wrapper rst
     $ # check the results in sources/openstack-manuals
 
 This will generate the tables for all the known projects.
@@ -48,7 +48,7 @@ names as arguments:
 
     $ ./autohelp-wrapper update cinder heat
     $ # edit the mappings files
-    $ ./autohelp-wrapper docbook cinder heat
+    $ ./autohelp-wrapper rst cinder heat
 
 
 Creating mappings for a new project
@@ -90,7 +90,7 @@ to work on another branch:
 
 .. code-block:: console
 
-    $ ./autohelp-wrapper update -b stable/icehouse
+    $ ./autohelp-wrapper update -b stable/liberty
 
 .. note::
    The ``-b`` switch doesn't apply to the ``openstack-manuals`` repository
