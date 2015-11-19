@@ -53,6 +53,12 @@ if [[ $project == 'gnocchi' ]]; then
 else
     pip install --upgrade python-${project}client
 fi
+# python-openstackclient has plugin interface.
+# It needs to install plugin package
+# (i.e. python-ironicclient).
+if [[ $project == 'openstack' ]]; then
+    pip install --upgrade python-ironicclient
+fi
 
 rm -rf output
 mkdir output
