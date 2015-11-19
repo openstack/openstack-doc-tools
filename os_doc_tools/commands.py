@@ -289,9 +289,14 @@ def generate_command(os_command, os_file):
     :param os_file:    open filehandle for output of DocBook file
     """
 
-    help_lines = subprocess.check_output([os_command, "--help"],
-                                         universal_newlines=True,
-                                         stderr=DEVNULL).split('\n')
+    if os_command == "glance":
+        help_lines = subprocess.check_output([os_command, "help"],
+                                             universal_newlines=True,
+                                             stderr=DEVNULL).split('\n')
+    else:
+        help_lines = subprocess.check_output([os_command, "--help"],
+                                             universal_newlines=True,
+                                             stderr=DEVNULL).split('\n')
 
     ignore_next_lines = False
     next_line_screen = True
@@ -312,8 +317,9 @@ def generate_command(os_command, os_file):
                 next_line_screen = True
                 os_file.write("</computeroutput></screen>\n")
                 in_screen = False
-                format_table('Subcommands', help_lines[line_index + 2:],
-                             os_file)
+                if os_command != "glance":
+                    format_table('Subcommands',
+                                 help_lines[line_index + 2:], os_file)
                 continue
             if line.startswith(('Optional arguments:', 'Optional:',
                                 'Options:', 'optional arguments')):
