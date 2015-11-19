@@ -28,7 +28,7 @@ import jinja2
 
 PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'ironic', 'keystone',
             'manila', 'neutron', 'nova', 'sahara', 'swift', 'trove']
-MASTER_RELEASE = 'Liberty'
+MASTER_RELEASE = 'Mitaka'
 CODENAME_TITLE = {'ceilometer': 'Telemetry',
                   'cinder': 'OpenStack Block Storage',
                   'glance': 'OpenStack Image service',
