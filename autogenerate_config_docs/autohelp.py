@@ -397,9 +397,11 @@ def write_files(package_name, options, target, output_format):
 
             if not option.help:
                 option.help = "No help text available for this option."
+            helptext = option.help.strip().replace('\n', ' ')
+            helptext = ' '.join(helptext.split())
             item = (option.dest,
                     _sanitize_default(option),
-                    "(%s) %s" % (type(option).__name__, option.help.strip()))
+                    "(%s) %s" % (type(option).__name__, helptext))
             items.append(item)
 
         env['items'].append(items)
