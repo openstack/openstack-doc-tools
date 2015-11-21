@@ -403,6 +403,7 @@ def write_files(package_name, options, target, output_format):
             items.append(item)
 
         env['items'].append(items)
+        env['table_label'] = package_name + '-' + cat
 
         ext = 'rst' if output_format == 'rst' else 'xml'
         file_path = ("%(target)s/%(package_name)s-%(cat)s.%(ext)s" %
