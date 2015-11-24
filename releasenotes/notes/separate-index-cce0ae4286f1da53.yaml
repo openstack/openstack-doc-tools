@@ -1,0 +1,4 @@
+---
+features:
+  - New command ``openstack-indexpage`` to only generate the HTML
+    index page. The index page layout has also been improved.

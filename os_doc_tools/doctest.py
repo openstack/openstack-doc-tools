@@ -50,6 +50,7 @@ from lxml import etree
 from oslo_config import cfg
 
 import os_doc_tools
+from os_doc_tools import index
 from os_doc_tools import jsoncheck
 from os_doc_tools.openstack.common import log
 
@@ -1241,67 +1242,6 @@ def find_affected_books(rootdir, book_exceptions, file_exceptions,
     return books
 
 
-def generate_index_file():
-    """Generate index.html file in publish_path."""
-
-    publish_path = get_publish_path()
-    if not os.path.isdir(publish_path):
-        os.mkdir(publish_path)
-
-    index_file = open(os.path.join(get_publish_path(), 'index.html'), 'w')
-
-    index_file.write(
-        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n'
-        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
-        '<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">\n'
-        '<body>\n'
-        '<h1>Results of checkbuild</h1>\n')
-
-    links = {}
-    for root, dirs, files in os.walk(publish_path):
-
-        dirs[:] = [d for d in dirs if d not in ['common', 'webapp', 'content',
-                                                'www']]
-
-        # Ignore top-level index.html files
-        if root == publish_path:
-            continue
-
-        if os.path.isfile(os.path.join(root, 'content/index.html')):
-            path = os.path.relpath(root, publish_path)
-            links[path] = ('<a href="%s/content/index.html">%s</a>\n' %
-                           (path, path))
-        elif os.path.isfile(os.path.join(root, 'index.html')):
-            path = os.path.relpath(root, publish_path)
-            links[path] = ('<a href="%s/index.html">%s</a>\n' %
-                           (path, path))
-
-        if os.path.isfile(os.path.join(root, 'api-ref.html')):
-            path = os.path.relpath(root, publish_path)
-            links[path] = ('<a href="%s/api-ref.html">%s</a>\n' %
-                           (path, path))
-
-        # List PDF files for api-site that have from "bk-api-ref*.pdf"
-        # as well since they have no corresponding html file.
-        for f in files:
-            if f.startswith('bk-api-ref') and f.endswith('.pdf'):
-                path = os.path.relpath(root, publish_path)
-                links[f] = ('<a href="%s/%s">%s</a>\n' %
-                            (path, f, f))
-
-    for entry in sorted(links):
-        index_file.write(links[entry])
-        index_file.write('<br/>\n')
-
-    if os.path.isfile(os.path.join(get_publish_path(), 'www-index.html')):
-        index_file.write('<br/>\n')
-        index_file.write('<a href="www-index.html">list of generated '
-                         'WWW pages</a>\n')
-    index_file.write('</body>\n'
-                     '</html>\n')
-    index_file.close()
-
-
 def build_affected_books(rootdir, book_exceptions, file_exceptions,
                          force=False, ignore_dirs=None,
                          ignore_books=None):
@@ -1379,7 +1319,7 @@ def build_affected_books(rootdir, book_exceptions, file_exceptions,
             any_failures = True
 
     if cfg.CONF.create_index:
-        generate_index_file()
+        index.generate_index_file(get_publish_path())
 
     if any_failures:
         for book, result, output, returncode in RESULTS_OF_BUILDS:
@@ -1633,7 +1573,7 @@ def doctest():
 
     if check_no_building():
         if CONF.create_index:
-            generate_index_file()
+            index.generate_index_file(get_publish_path())
         return
 
     if CONF.check_syntax or CONF.check_niceness or CONF.check_links:
