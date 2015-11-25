@@ -86,7 +86,7 @@ def get_existing_options_from_rst(optfiles):
     """Parse an existing RST table to compile a list of existing options."""
     options = {}
     for optfile in optfiles:
-        input_string = open(optfile).read()
+        input_string = open(optfile).read().replace(':ref:', '')
         output, pub = core.publish_programmatically(
             source_class=io.StringInput, source=input_string,
             source_path=optfile, destination_class=io.NullOutput,
@@ -114,7 +114,7 @@ def get_existing_options(optfiles):
     for optfile in optfiles:
         if optfile.endswith('/swift-conf-changes.xml'):
             continue
-        xml = etree.fromstring(open(optfile).read())
+        xml = etree.fromstring(open(optfile).read().replace(':ref:', ''))
         tbody = xml.find(DBK_NS + "tbody")
         trlist = tbody.findall(DBK_NS + "tr")
         for tr in trlist:
@@ -223,8 +223,6 @@ def read_options(swift_repo, manuals_repo, read_from, verbose):
     else:
         options = get_existing_options(
             glob.glob(manuals_repo + '/doc/common/tables/swift*xml'))
-
-    sys.exit(0)
 
     option_descs = extract_descriptions_from_devref(swift_repo, options)
     conf_samples = glob.glob(swift_repo + '/etc/*conf-sample')
