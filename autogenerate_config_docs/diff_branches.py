@@ -83,6 +83,8 @@ def get_options(project, branch, args):
         cmd = ("python extract_swift_flags.py dump "
                "-s %(sources)s/swift -m %(sources)s/openstack-manuals" %
                {'sources': args.sources})
+        if branch == 'stable/liberty':
+            cmd += " -f docbook"
         repo_path = args.sources
     else:
         packages = _get_packages(project, branch)
@@ -215,11 +217,13 @@ def get_env(project, new_branch, old_list, new_list):
         for name in sorted(new_opts, _cmpopts):
             opt = new_list[name][1]
             name = format_option_name(name)
+            helptext = opt['help'].strip().replace('\n', ' ')
+            helptext = ' '.join(helptext.split())
             cells = (("%(name)s = %(default)s" %
                       {'name': name,
                        'default': opt['default']}).strip(),
                      "(%(type)s) %(help)s" % {'type': opt['type'],
-                                              'help': opt['help']})
+                                              'help': helptext})
             env['new_opts'].append(cells)
 
     # New defaults

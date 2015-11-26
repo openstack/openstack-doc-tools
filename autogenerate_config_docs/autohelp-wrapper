@@ -63,7 +63,7 @@ activate_venv() {
     project=$1
 
     . $VENVDIR/$project/bin/activate
-    pip install --upgrade pip
+    pip install --upgrade pip setuptools
 }
 
 get_project() {
