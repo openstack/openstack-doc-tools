@@ -20,7 +20,11 @@
    * - **[{{ group }}]**
      -
 {% for item in items[loop.index0] %}
-   * - ``{{ item[0] }}`` = ``{{ item[1]|default(' ', true) }}``
+{% if item[1] is equalto '' %}
+   * - ``{{ item[0] }}`` =
+{% else %}
+   * - ``{{ item[0] }}`` = ``{{ item[1] }}``
+{% endif %}
      - {{ item[2] }}
 {% endfor %}
 {% endfor %}
