@@ -247,24 +247,21 @@ function handle_draft_language {
         case "${book}" in
             config-reference)
                 mv publish-docs/$language/draft/$book publish-docs/draft/$language/$book
-                # Remove directory if it's empty and do not fail if it's non-empty
-                rmdir publish-docs/$language/draft || true
+                rmdir --ignore-fail-on-non-empty publish-docs/$language/draft
                 ;;
             firstapp)
                 for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
                     mv publish-docs/$language/$book-${tag} \
                         publish-docs/draft/$language/$book-${tag}
                 done
-                # Remove directory if it's empty and do not fail if it's non-empty
-                rmdir publish-docs/$language/ || true
+                rmdir --ignore-fail-on-non-empty publish-docs/$language/
                 ;;
             install-guide)
                 for tag in obs rdo ubuntu debian; do
                     mv publish-docs/$language/$book-${tag} \
                         publish-docs/draft/$language/$book-${tag}
                 done
-                # Remove directory if it's empty and do not fail if it's non-empty
-                rmdir publish-docs/$language/ || true
+                rmdir --ignore-fail-on-non-empty publish-docs/$language/
                 ;;
             *)
                 mv publish-docs/$language/$book publish-docs/draft/$language/$book
