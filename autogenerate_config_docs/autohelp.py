@@ -209,11 +209,32 @@ def _sanitize_default(opt):
     return default
 
 
+def _get_overrides(package_name):
+    overrides_file = '%s.overrides' % package_name
+    if not os.path.exists(overrides_file):
+        return {}
+    overrides = {}
+    with open(overrides_file) as fd:
+        for line in fd:
+            if line == '#':
+                continue
+            try:
+                opt, sections = line.strip().split(' ', 1)
+                sections = [x.strip() for x in sections.split(' ')]
+            except ValueError:
+                continue
+
+            overrides[opt] = sections
+
+    return overrides
+
+
 class OptionsCache(object):
-    def __init__(self, verbose=0):
+    def __init__(self, overrides={}, verbose=0):
         self._verbose = verbose
         self._opts_by_name = {}
         self._opt_names = []
+        self._overrides = overrides
 
         for optname in cfg.CONF._opts:
             opt = cfg.CONF._opts[optname]['opt']
@@ -232,11 +253,24 @@ class OptionsCache(object):
         if optname in self._opts_by_name:
             if self._verbose >= 2:
                 print ("Duplicate option name %s" % optname)
-        else:
-            opt.default = _sanitize_default(opt)
+            return
 
+        opt.default = _sanitize_default(opt)
+
+        def fill(optname, group, opt):
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
+
+        if optname in self._overrides:
+            for new_group in self._overrides[optname]:
+                if new_group == 'DEFAULT':
+                    new_optname = opt.name
+                else:
+                    new_optname = new_group + '/' + opt.name
+                fill(new_optname, new_group, opt)
+
+        else:
+            fill(optname, group, opt)
 
     def __len__(self):
         return len(self._opt_names)
@@ -526,7 +560,8 @@ def main():
         import_modules(base_path, package_name, verbose=args.verbose)
         sys.path.pop(0)
 
-    options = OptionsCache(verbose=args.verbose)
+    overrides = _get_overrides(package_name)
+    options = OptionsCache(overrides, verbose=args.verbose)
     options.maybe_load_extensions(args.repos)
 
     if args.verbose > 0:
