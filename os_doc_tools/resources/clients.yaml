@@ -8,6 +8,10 @@ cinder:
     name: Block Storage service
 cloudkitty:
     name: Rating service
+congress:
+    name: Governance service
+cue:
+    name: Message Broker service
 designate:
     name: DNS service
     subcommands: complete
@@ -22,8 +26,8 @@ ironic:
     name: Bare Metal service
 keystone:
     name: Identity service
-neutron:
-    name: Networking service
+kite:
+    name: A service for managing and distributing message encryption keys
 magnum:
     name: Containers service
 manila:
@@ -31,13 +35,21 @@ manila:
 mistral:
     name: Workflow service
     subcommands: complete
+monasca:
+    name: Monitoring
+murano:
+    name: Application Catalog service
+neutron:
+    name: Networking service
 nova:
     name: OpenStack Compute
     title: Compute
-murano:
-    name: Application Catalog service
 sahara:
     name: Data Processing service
+senlin:
+    name: Clustering service
+solum:
+    name: Software Development Lifecycle Automation service
 swift:
     name: Object Storage service
     subcommands:
@@ -49,6 +61,22 @@ swift:
       - stat
       - tempurl
       - upload
+tripleo:
+    name: Deployment service
+trove:
+    name: Database service
+trove-manage:
+    name: Database service management utility
+    subcommands:
+      - datastore_update
+      - datastore_version_flavor_add
+      - datastore_version_flavor_delete
+      - datastore_version_update
+      - db_downgrade
+      - db_load_datastore_config_parameters
+      - db_recreate
+      - db_sync
+      - db_upgrade
 tuskar:
     name: Deployment service
     subcommands:
@@ -66,20 +94,8 @@ tuskar:
       - plan-templates
       - plan-update
       - role-list
-trove:
-    name: Database service
-trove-manage:
-    name: Database service management utility
-    subcommands:
-      - datastore_update
-      - datastore_version_flavor_add
-      - datastore_version_flavor_delete
-      - datastore_version_update
-      - db_downgrade
-      - db_load_datastore_config_parameters
-      - db_recreate
-      - db_sync
-      - db_upgrade
+zaqar:
+    name: Message service
 openstack:
     name: OpenStack
     subcommands: complete
