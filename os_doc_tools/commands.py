@@ -726,6 +726,10 @@ def document_single_project(os_command, output_dir):
                                           "_v2", " (v2)")
         out_file.write("    </section>\n")
 
+    if os_command == 'glance':
+        out_file.write("    <xi:include "
+                       "href=\"../section_cli_glance_property_keys.xml\"/>\n")
+
     generate_end(out_file)
     out_file.close()
 
