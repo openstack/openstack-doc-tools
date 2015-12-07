@@ -43,7 +43,7 @@ CODENAME_TITLE = {'ceilometer': 'Telemetry',
                   'trove': 'Database service'}
 
 
-def setup_venv(branch, novenvupdate):
+def setup_venv(projects, branch, novenvupdate):
     """Setup a virtual environment for `branch`."""
     dirname = os.path.join('venv', branch.replace('/', '_'))
     if novenvupdate and os.path.exists(dirname):
@@ -51,7 +51,7 @@ def setup_venv(branch, novenvupdate):
     if not os.path.exists('venv'):
         os.mkdir('venv')
     args = ["./autohelp-wrapper", "-b", branch, "-e", dirname, "setup"]
-    args.extend(PROJECTS)
+    args.extend(projects)
     if subprocess.call(args) != 0:
         print("Impossible to create the %s environment." % branch)
         sys.exit(1)
@@ -253,11 +253,15 @@ def get_env(project, new_branch, old_list, new_list):
 def main():
     parser = argparse.ArgumentParser(
         description='Generate a summary of configuration option changes.',
-        usage='%(prog)s <old_branch> <new_branch> [options]')
+        usage='%(prog)s [options] <old_branch> <new_branch> [projects]')
     parser.add_argument('old_branch',
                         help='Name of the old branch.')
     parser.add_argument('new_branch',
                         help='Name of the new branch.')
+    parser.add_argument('projects',
+                        help='List of projects to work on.',
+                        nargs='*',
+                        default=PROJECTS)
     parser.add_argument('-i', '--input',
                         dest='sources',
                         help='Path to a folder containing the git '
@@ -287,15 +291,10 @@ def main():
                         default=False,)
     args = parser.parse_args()
 
-    # Blacklist trove if we diff between havana and icehouse: autohelp.py fails
-    # with trove on havana
-    if args.old_branch == "stable/havana":
-        PROJECTS.remove('trove')
+    setup_venv(args.projects, args.old_branch, args.novenvupdate)
+    setup_venv(args.projects, args.new_branch, args.novenvupdate)
 
-    setup_venv(args.old_branch, args.novenvupdate)
-    setup_venv(args.new_branch, args.novenvupdate)
-
-    for project in PROJECTS:
+    for project in args.projects:
         old_list = get_options(project, args.old_branch, args)
         new_list = get_options(project, args.new_branch, args)
 
