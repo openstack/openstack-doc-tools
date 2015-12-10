@@ -1,0 +1,3 @@
+---
+other:
+  - "``autohelp.py`` now allows overrides of sections, defined in ``<project>.overrides`` configuration files."
