@@ -54,10 +54,14 @@ else
     pip install --upgrade python-${project}client
 fi
 # python-openstackclient has plugin interface.
-# It needs to install plugin package
+# It needs to install plugin packages
 # (i.e. python-ironicclient).
+osc_plugins = (congress cue designate ironic heat mistral sahara tuskar)
 if [[ $project == 'openstack' ]]; then
-    pip install --upgrade python-ironicclient
+    for p in "${osc_plugins[@]}"
+    do
+        pip install --upgrade python-${p}client
+    done
 fi
 
 rm -rf output
