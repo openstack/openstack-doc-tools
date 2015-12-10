@@ -29,8 +29,16 @@ New, updated, and deprecated options in {{ release }} for {{ codename }}
      - New default value
 {% for cells in new_defaults %}
    * - ``{{ cells[0] }}``
+{% if cells[1] is equalto '' %}
+     -
+{% else %}
      - ``{{ cells[1] }}``
-     - ``{{ cells[2]|default(' ', true) }}``
+{% endif %}
+{% if cells[2] is equalto '' %}
+     -
+{% else %}
+     - ``{{ cells[2] }}``
+{% endif %}
 {% endfor %}
 {% endif %}
 
