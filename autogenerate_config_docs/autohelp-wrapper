@@ -170,8 +170,9 @@ if [ "$FAST" -eq 0 ] ; then
         get_project $project
 
         (
-            cd $SOURCESDIR/$project
-            find $project -name "*.pyc" -delete
+            pushd $SOURCESDIR/$project
+            module=$(echo $project | tr - _ )
+            find $module -name "*.pyc" -delete
             GIT_CMD="git show-ref --verify --quiet refs/heads/$BRANCH"
             if $GIT_CMD; then
                 git checkout $BRANCH
@@ -180,6 +181,7 @@ if [ "$FAST" -eq 0 ] ; then
             fi
             pip install -rrequirements.txt -rtest-requirements.txt
             python setup.py install
+            popd
 
             if [ -e extra_repos/$project-$RELEASE.txt ]; then
                 while read extra; do
