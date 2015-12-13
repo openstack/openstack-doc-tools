@@ -84,6 +84,20 @@ function build_rst {
             -o ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.mo
     done
 
+    # Set the bug project to I18n project
+    grep 'bug_project' ${DOC_DIR}${book}/source/conf.py > /dev/null
+    if [ "$?" -eq 0 ] ; then
+        # Replace the existing "bug_project" html context
+        sed -i -e \
+            's/"bug_project" *: *[^ ,}]*/"bug_project": "openstack-i18n"/' \
+            ${DOC_DIR}${book}/source/conf.py
+    else
+        # Add the "bug_project" html context
+        sed -i -e \
+            's/html_context *= *{/html_context = {"bug_project": "openstack-i18n", /' \
+            ${DOC_DIR}${book}/source/conf.py
+    fi
+
     # Build all books
     if [ ${book} = "firstapp" ] ; then
         # Firstapp has several variations, build all of them
@@ -185,6 +199,9 @@ function build_rst {
     # Revert changes to po file
     git reset -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
     git checkout -- ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+    # Revert changes to conf.py
+    git reset -q ${DOC_DIR}${book}/source/conf.py
+    git checkout -- ${DOC_DIR}${book}/source/conf.py
 }
 
 
