@@ -636,7 +636,7 @@ def document_single_project(os_command, output_dir):
     if os_command == 'cinder':
         out_file.write("""
     <section xml:id=\"cinder_cli_v1\">
-       <title>Block Storage API v1 commands</title>\n""")
+       <title>Block Storage API v1 commands (DEPRECATED)</title>\n""")
         discover_and_generate_subcommands(os_command, out_file, subcommands,
                                           None, "", "")
     elif os_command == 'openstack':
