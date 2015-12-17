@@ -56,7 +56,7 @@ fi
 # python-openstackclient has plugin interface.
 # It needs to install plugin packages
 # (i.e. python-ironicclient).
-osc_plugins = (congress cue designate ironic heat mistral sahara tuskar)
+osc_plugins=(congress cue designate ironic heat ironic-inspector- tuskar zaqar)
 if [[ $project == 'openstack' ]]; then
     for p in "${osc_plugins[@]}"
     do
