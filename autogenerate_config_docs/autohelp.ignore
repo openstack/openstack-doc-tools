@@ -5,6 +5,8 @@ designate.api.v1.extensions.sync
 designate.api.v1.extensions.touch
 glance.contrib.plugins.artifacts_sample.setup
 glance.contrib.plugins.image_artifact.setup
+keystone.assignment.role_backends.sql
+keystone.assignment.V8_backends.sql
 manila.db.migrations.alembic.env
 trove.guestagent.datastore.experimental.postgresql.manager
 trove.guestagent.datastore.experimental.postgresql.service.database
