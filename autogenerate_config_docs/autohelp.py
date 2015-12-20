@@ -397,7 +397,7 @@ def write_files(package_name, options, target, output_format):
     """
     if not target:
         if output_format == 'rst':
-            target = '../../doc/config-ref-rst/source/tables'
+            target = '../../doc/config-reference/source/tables'
         else:
             target = '../../doc/common/tables/'
     options_by_cat = _get_options_by_cat(package_name)

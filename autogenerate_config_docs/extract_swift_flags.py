@@ -202,7 +202,7 @@ def write_files(options, manuals_repo, output_format):
             tgt = (manuals_repo + '/doc/common/tables/' + 'swift-' +
                    sample_filename + '-' + section + '.xml')
         else:
-            tgt = (manuals_repo + '/doc/config-ref-rst/source/tables/' +
+            tgt = (manuals_repo + '/doc/config-reference/source/tables/' +
                    'swift-' + sample_filename + '-' + section + '.rst')
 
         with open(tgt, 'w') as fd:
@@ -219,7 +219,7 @@ def read_options(swift_repo, manuals_repo, read_from, verbose):
     if read_from == 'rst':
         options = get_existing_options_from_rst(
             glob.glob(manuals_repo +
-                      '/doc/config-ref-rst/source/tables/swift*rst'))
+                      '/doc/config-reference/source/tables/swift*rst'))
     else:
         options = get_existing_options(
             glob.glob(manuals_repo + '/doc/common/tables/swift*xml'))
