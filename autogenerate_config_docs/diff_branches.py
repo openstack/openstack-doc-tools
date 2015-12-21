@@ -30,16 +30,16 @@ PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'ironic', 'keystone',
             'manila', 'neutron', 'nova', 'sahara', 'swift', 'trove']
 MASTER_RELEASE = 'Mitaka'
 CODENAME_TITLE = {'ceilometer': 'Telemetry',
-                  'cinder': 'OpenStack Block Storage',
-                  'glance': 'OpenStack Image service',
+                  'cinder': 'Block Storage',
+                  'glance': 'Image service',
                   'heat': 'Orchestration',
-                  'ironic': 'Bare metal service',
-                  'keystone': 'OpenStack Identity',
+                  'ironic': 'Bare Metal service',
+                  'keystone': 'Identity service',
                   'manila': 'Shared File Systems service',
-                  'neutron': 'OpenStack Networking',
-                  'nova': 'OpenStack Compute',
+                  'neutron': 'Networking',
+                  'nova': 'Compute',
                   'sahara': 'Data Processing service',
-                  'swift': 'OpenStack Object Storage',
+                  'swift': 'Object Storage service',
                   'trove': 'Database service'}
 
 
