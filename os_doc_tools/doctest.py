@@ -36,15 +36,12 @@ import operator
 import os
 import re
 import shutil
-import six
 import subprocess
 import sys
 import time
 
-if six.PY3:
-    from urllib import request as urllib2
-else:
-    import urllib2
+from six.moves.urllib import error as urlerr
+from six.moves.urllib import request as urlreq
 
 from lxml import etree
 from oslo_config import cfg
@@ -307,8 +304,8 @@ def verify_valid_links(doc):
             continue
 
         try:
-            urllib2.urlopen(url)
-        except urllib2.HTTPError as e:
+            urlreq.urlopen(url)
+        except urlerr.HTTPError as e:
             # Ignore some error codes:
             # 403 (Forbidden) since it often means that the user-agent
             # is wrong.
@@ -317,7 +314,7 @@ def verify_valid_links(doc):
                 e_line = node.sourceline
                 msg.append("URL %s not reachable at line %d, error %s" % (
                     url, e_line, e))
-        except urllib2.URLError as e:
+        except urlerr.URLError as e:
             e_line = node.sourceline
             msg.append("URL %s invalid at line %d, error %s" % (
                 url, e_line, e))
