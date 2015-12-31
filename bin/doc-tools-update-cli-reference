@@ -48,6 +48,9 @@ source .venv/bin/activate
 pip install --upgrade openstack-doc-tools
 pip install --upgrade pbr
 
+# Cliff can optionally output HTML - if cliff-tablib is installed.
+pip install --upgrade cliff-tablib
+
 if [[ $project == 'gnocchi' ]]; then
     pip install --upgrade ${project}client
 else
