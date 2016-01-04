@@ -190,7 +190,6 @@ if [ "$FAST" -eq 0 ] ; then
                         cd $SOURCESDIR/$extra
                         pip install -rrequirements.txt
                         [ -e "test-requirements.txt" ] && pip install -rtest-requirements.txt
-                        fi
                         python setup.py install
                     )
                 done < extra_repos/$project-$RELEASE.txt
