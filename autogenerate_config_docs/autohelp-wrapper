@@ -179,7 +179,8 @@ if [ "$FAST" -eq 0 ] ; then
             else
                 git checkout -b $BRANCH remotes/origin/$BRANCH
             fi
-            pip install -rrequirements.txt -rtest-requirements.txt
+            pip install -rrequirements.txt
+            [ -e "test-requirements.txt" ] && pip install -rtest-requirements.txt
             python setup.py install
             popd
 
@@ -187,8 +188,9 @@ if [ "$FAST" -eq 0 ] ; then
                 while read extra; do
                     (
                         cd $SOURCESDIR/$extra
-                        pip install -rrequirements.txt \
-                            -rtest-requirements.txt
+                        pip install -rrequirements.txt
+                        [ -e "test-requirements.txt" ] && pip install -rtest-requirements.txt
+                        fi
                         python setup.py install
                     )
                 done < extra_repos/$project-$RELEASE.txt
