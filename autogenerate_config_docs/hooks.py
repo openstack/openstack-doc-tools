@@ -74,8 +74,33 @@ def nova_spice():
     import nova.cmd.spicehtml5proxy  # noqa
 
 
+def zaqar_config():
+    # Zaqar registers most of it's options in lazy way
+    # Let's find all these options and manually register them
+    from oslo_config import cfg
+    import pkg_resources
+
+    zaqar_opts_sets = []
+    for p in pkg_resources.iter_entry_points(group='oslo.config.opts'):
+        if p.name.startswith('zaqar'):
+            zaqar_opts_sets.append(p.load())
+
+    for opts_set in zaqar_opts_sets:
+        for group, options in opts_set():
+            for opt in options:
+                try:
+                    cfg.CONF.register_opt(opt, group=group)
+                except cfg.DuplicateOptError:
+                    pass
+
+    # Let's unregister options that were automatically registered from embedded
+    # zaqar-bench tool during import of Zaqar's modules
+    from zaqar.bench import config as bench_config
+    cfg.CONF.unregister_opts(bench_config._CLI_OPTIONS)
+
 HOOKS = {'aodh': aodh_config,
          'glance.common.config': glance_store_config,
          'keystone.common.config': keystone_config,
          'neutron': neutron_misc,
-         'nova.spice': nova_spice}
+         'nova.spice': nova_spice,
+         'zaqar': zaqar_config}
