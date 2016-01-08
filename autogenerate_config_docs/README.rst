@@ -51,16 +51,6 @@ names as arguments:
     $ ./autohelp-wrapper rst cinder heat
 
 
-Creating mappings for a new project
------------------------------------
-
-Run the wrapper with the create subcommand:
-
-.. code-block:: console
-
-    $ ./autohelp-wrapper create zaqar
-
-
 Flagmappings files
 ------------------
 
