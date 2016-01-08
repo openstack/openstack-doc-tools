@@ -17,6 +17,7 @@ HERE=$(pwd)
 VENVDIR=$HERE/venv
 SOURCESDIR=$HERE/sources
 MANUALSREPO=$SOURCESDIR/openstack-manuals
+MAPPINGS_DIR=$MANUALSREPO/tools/autogenerate-config-flagmappings
 AUTOHELP="python $HERE/autohelp.py"
 EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
@@ -75,10 +76,10 @@ get_project() {
         fi
         git clone $git_url/$project $SOURCESDIR/$project
 
-        if [ -e extra_repos/$project-$RELEASE.txt ]; then
+        if [ -e $MAPPINGS_DIR/$project.extra_repos ]; then
             while read extra; do
                 git clone $git_url/$extra $SOURCESDIR/$extra
-            done < extra_repos/$project-$RELEASE.txt
+            done < $MAPPINGS_DIR/$project.extra_repos
         fi
 
     else
@@ -86,10 +87,10 @@ get_project() {
             (cd $SOURCESDIR/$project && git pull)
         fi
 
-        if [ -e extra_repos/$project-$RELEASE.txt ]; then
+        if [ -e $MAPPINGS_DIR/$project.extra_repos ]; then
             while read extra; do
                 (cd $SOURCESDIR/$extra && git pull)
-            done < extra_repos/$project-$RELEASE.txt
+            done < $MAPPINGS_DIR/$project.extra_repos
         fi
     fi
 }
@@ -162,8 +163,8 @@ if [ "$FAST" -eq 0 ] ; then
     for project in $PROJECTS; do
         setup_venv $project
         setup_tools
-        if [ -e requirements/$project-$RELEASE.txt ]; then
-            pip install -r requirements/$project-$RELEASE.txt \
+        if [ -e $MAPPINGS_DIR/$project.requirements ]; then
+            pip install -r $MAPPINGS_DIR/$project.requirements \
                 --allow-all-external
         fi
         get_project $project
@@ -183,7 +184,7 @@ if [ "$FAST" -eq 0 ] ; then
             python setup.py install
             popd
 
-            if [ -e extra_repos/$project-$RELEASE.txt ]; then
+            if [ -e $MAPPINGS_DIR/$project.extra_repos ]; then
                 while read extra; do
                     (
                         cd $SOURCESDIR/$extra
@@ -191,7 +192,7 @@ if [ "$FAST" -eq 0 ] ; then
                         [ -e "test-requirements.txt" ] && pip install -rtest-requirements.txt
                         python setup.py install
                     )
-                done < extra_repos/$project-$RELEASE.txt
+                done < $MAPPINGS_DIR/$project.extra_repos
             fi
         )
     done
@@ -204,7 +205,7 @@ for project in $PROJECTS; do
         break
     fi
 
-    if [ -e extra_repos/$project-$RELEASE.txt ]; then
+    if [ -e $MAPPINGS_DIR/$project.extra_repos ]; then
         extra_flags=
         while read extra; do
             package=$(echo $extra | tr - _)
@@ -223,10 +224,10 @@ for project in $PROJECTS; do
                 cp -r $SOURCESDIR/networking-zvm/neutron/plugins/ml2/drivers/zvm $SOURCESDIR/neutron/neutron/plugins/ml2/drivers
             fi
             extra_flags="$extra_flags -i $SOURCESDIR/$extra/$package"
-        done < extra_repos/$project-$RELEASE.txt
+        done < $MAPPINGS_DIR/$project.extra_repos
     fi
 
-    cd $MANUALSREPO/tools/autogenerate-config-flagmappings
+    cd $MAPPINGS_DIR
 
     case $ACTION in
     update)
