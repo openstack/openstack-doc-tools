@@ -459,17 +459,6 @@ def write_files(package_name, options, target, output_format):
             fd.write(output)
 
 
-def create_flagmappings(package_name, options, verbose=0):
-    """Create a flagmappings file.
-
-    Create a flagmappings file. This will create a new file called
-    $package_name.flagmappings with all the categories set to Unknown.
-    """
-    with open(package_name + '.flagmappings', 'w') as f:
-        for opt in options.get_option_names():
-            f.write(opt + ' Unknown\n')
-
-
 def update_flagmappings(package_name, options, verbose=0):
     """Update flagmappings file.
 
@@ -478,14 +467,18 @@ def update_flagmappings(package_name, options, verbose=0):
     category information merged from the existing $package_name.flagmappings.
     """
     original_flags = {}
-    with open(package_name + '.flagmappings') as f:
-        for line in f:
-            try:
-                flag, category = line.split(' ', 1)
-            except ValueError:
-                flag = line.strip()
-                category = "Unknown"
-            original_flags.setdefault(flag, []).append(category.strip())
+    try:
+        with open(package_name + '.flagmappings') as f:
+            for line in f:
+                try:
+                    flag, category = line.split(' ', 1)
+                except ValueError:
+                    flag = line.strip()
+                    category = "Unknown"
+                original_flags.setdefault(flag, []).append(category.strip())
+    except IOError:
+        # If the flags file doesn't exist we'll create it
+        pass
 
     updated_flags = []
     for opt in options.get_option_names():
@@ -519,8 +512,8 @@ def main():
         description='Manage flag files, to aid in updating documentation.',
         usage='%(prog)s <cmd> <package> [options]')
     parser.add_argument('subcommand',
-                        help='Action (create, update, verify, dump).',
-                        choices=['create', 'update', 'docbook', 'rst', 'dump'])
+                        help='Action (update, docbook, rst, dump).',
+                        choices=['update', 'docbook', 'rst', 'dump'])
     parser.add_argument('package',
                         help='Name of the top-level package.')
     parser.add_argument('-v', '--verbose',
@@ -572,10 +565,7 @@ def main():
         print("%s options imported from package %s." % (len(options),
                                                         str(package_name)))
 
-    if args.subcommand == 'create':
-        create_flagmappings(args.package, options, verbose=args.verbose)
-
-    elif args.subcommand == 'update':
+    if args.subcommand == 'update':
         update_flagmappings(args.package, options, verbose=args.verbose)
 
     elif args.subcommand in ('docbook', 'rst'):
