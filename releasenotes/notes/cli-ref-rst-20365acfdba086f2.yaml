@@ -1,0 +1,6 @@
+---
+features:
+  - Update CLI Reference generation tool for RST.
+    To migrate CLI Reference from DocBook to RST,
+    output the documentation in RST format,
+    with a few work arounds for RST/Sphinx specific issues.
