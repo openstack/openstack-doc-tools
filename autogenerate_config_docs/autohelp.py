@@ -30,6 +30,7 @@ import sys
 import jinja2
 import stevedore
 
+sys.path.insert(0, '.')
 from hooks import HOOKS  # noqa
 
 
@@ -42,10 +43,6 @@ EXTENSIONS = ['oslo.cache',
               'oslo.policy',
               'oslo.service']
 
-IGNORE = open(os.path.join(os.path.dirname(__file__),
-                           'autohelp.ignore')).read().split('\n')
-
-
 register_re = re.compile(r'''^ +.*\.register_opts\((?P<opts>[^,)]+)'''
                          r'''(, (group=)?["'](?P<group>.*)["'])?\)''')
 
@@ -56,6 +53,10 @@ def import_modules(repo_location, package_name, verbose=0):
     Loops through the repository, importing module by module to
     populate the configuration object (cfg.CONF) created from Oslo.
     """
+
+    with open('ignore.list') as fd:
+        ignore_list = [l for l in fd.read().split('\n')
+                       if l and (l[0] != '#')]
 
     pkg_location = os.path.join(repo_location, package_name)
     for root, dirs, files in os.walk(pkg_location):
@@ -77,7 +78,7 @@ def import_modules(repo_location, package_name, verbose=0):
                 modname = '.'.join(modname)
                 if modname.endswith('.__init__'):
                     modname = modname[:modname.rfind(".")]
-                if modname in IGNORE:
+                if modname in ignore_list:
                     continue
                 try:
                     module = importlib.import_module(modname)
