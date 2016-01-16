@@ -4,7 +4,7 @@
 
 bashate>=0.2 # Apache-2.0
 doc8 # Apache-2.0
-testrepository>=0.0.18
+testrepository>=0.0.18 # Apache-2.0/BSD
 
 # Hacking already pins down pep8, pyflakes and flake8
 hacking<0.11,>=0.10.0
