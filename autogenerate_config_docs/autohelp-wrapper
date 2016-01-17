@@ -22,7 +22,8 @@ AUTOHELP="python $HERE/autohelp.py"
 EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=git://git.openstack.org/openstack
 GITPROJ=git://git.openstack.org/openstack
-PROJECTS="aodh ceilometer cinder glance heat ironic keystone manila neutron nova sahara swift trove"
+PROJECTS="aodh ceilometer cinder glance heat ironic keystone manila \
+            neutron nova sahara swift trove"
 MANUALS_PROJECTS="openstack-manuals oslo-incubator"
 BRANCH=master
 FAST=0
@@ -30,7 +31,7 @@ FAST=0
 usage() {
     echo "Wrapper for autohelp.py"
     echo "Usage:"
-    echo "  $(basename $0) [ OPTIONS ] update|docbook|rst|setup [ project1 ... ]"
+    echo "  $(basename $0) [ OPTIONS ] update|docbook|rst|setup [ project... ]"
     echo
     echo "Subcommands:"
     echo "  update:     Update or create the flagmapping files"
@@ -180,7 +181,8 @@ if [ "$FAST" -eq 0 ] ; then
                 git checkout -b $BRANCH remotes/origin/$BRANCH
             fi
             pip install -rrequirements.txt
-            [ -e "test-requirements.txt" ] && pip install -rtest-requirements.txt
+            [ -e "test-requirements.txt" ] && \
+                pip install -rtest-requirements.txt
             python setup.py install
             popd
 
@@ -189,7 +191,8 @@ if [ "$FAST" -eq 0 ] ; then
                     (
                         cd $SOURCESDIR/$extra
                         pip install -rrequirements.txt
-                        [ -e "test-requirements.txt" ] && pip install -rtest-requirements.txt
+                        [ -e "test-requirements.txt" ] && \
+                            pip install -rtest-requirements.txt
                         python setup.py install
                     )
                 done < $MAPPINGS_DIR/$project.extra_repos
@@ -220,8 +223,11 @@ for project in $PROJECTS; do
             fi
             if [ $package = "networking_zvm" ]; then
                 package="neutron"
-                cp -r $SOURCESDIR/networking-zvm/neutron/plugins/zvm $SOURCESDIR/neutron/neutron/plugins
-                cp -r $SOURCESDIR/networking-zvm/neutron/plugins/ml2/drivers/zvm $SOURCESDIR/neutron/neutron/plugins/ml2/drivers
+                cp -r $SOURCESDIR/networking-zvm/neutron/plugins/zvm \
+                    $SOURCESDIR/neutron/neutron/plugins
+                cp -r \
+                    $SOURCESDIR/networking-zvm/neutron/plugins/ml2/drivers/zvm\
+                    $SOURCESDIR/neutron/neutron/plugins/ml2/drivers
             fi
             extra_flags="$extra_flags -i $SOURCESDIR/$extra/$package"
         done < $MAPPINGS_DIR/$project.extra_repos
@@ -232,21 +238,24 @@ for project in $PROJECTS; do
     case $ACTION in
     update)
         [ "$project" = "swift" ] && continue
-        $AUTOHELP update $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
+        $AUTOHELP update $project -i $SOURCESDIR/$project/$project \
+            $extra_flags $AUTOOPT
         mv $project.flagmappings.new $project.flagmappings
         ;;
     docbook)
         if [ "$project" = "swift" ]; then
             $EXTRACT_SWIFT docbook -m $MANUALSREPO -s $SOURCESDIR/swift
         else
-            $AUTOHELP docbook $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
+            $AUTOHELP docbook $project -i $SOURCESDIR/$project/$project \
+                $extra_flags $AUTOOPT
         fi
         ;;
     rst)
         if [ "$project" = "swift" ]; then
             $EXTRACT_SWIFT rst -m $MANUALSREPO -s $SOURCESDIR/swift
         else
-            $AUTOHELP rst $project -i $SOURCESDIR/$project/$project $extra_flags $AUTOOPT
+            $AUTOHELP rst $project -i $SOURCESDIR/$project/$project \
+                $extra_flags $AUTOOPT
         fi
         ;;
     esac
