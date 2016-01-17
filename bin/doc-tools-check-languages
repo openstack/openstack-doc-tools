@@ -57,31 +57,34 @@ function build_rst {
     if [ ${book} = "install-guide" ] ; then
         TAG="-t obs -t rdo -t ubuntu -t debian"
     fi
-    tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -W -b gettext $TAG ${DOC_DIR}${book}/source/ \
-                ${DOC_DIR}${book}/source/locale/"
+    LOCALE_DIR="${DOC_DIR}${book}/source/locale/"
+    COMMON_DIR="${DOC_DIR}common-rst/source/locale/"
+    tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -W -b gettext $TAG \
+                ${DOC_DIR}${book}/source/ ${LOCALE_DIR}"
 
     # Merge the common-rst po file in
-    if [[ -e ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po ]] ; then
-        msgcat --use-first -o ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
-            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po \
-            ${DOC_DIR}common-rst/source/locale/${language}/LC_MESSAGES/common-rst.po
-        mv -f ${DOC_DIR}${book}/source/locale/${language}/${book}.po \
-            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+    if [[ -e ${COMMON_DIR}${language}/LC_MESSAGES/common-rst.po ]] ; then
+        msgcat --use-first -o ${LOCALE_DIR}${language}/${book}.po \
+            ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po \
+            ${COMMON_DIR}${language}/LC_MESSAGES/common-rst.po
+        mv -f ${LOCALE_DIR}${language}/${book}.po \
+            ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po
     fi
     # Now run msgmerge on all files
-    for f in ${DOC_DIR}${book}/source/locale/*.pot ; do
+    for f in ${LOCALE_DIR}*.pot ; do
         # Skip the master file
-        if [ $f = "${DOC_DIR}${book}/source/locale/${book}.pot" ] ; then
+        if [ $f = "${LOCALE_DIR}${book}.pot" ] ; then
             continue
         fi
         bf=$(basename $f)
         # Remove .pot
         bfname=${bf%.pot}
-        msgmerge --silent -o ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
-            ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po \
-            ${DOC_DIR}${book}/source/locale/${bf}
-        msgfmt ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.po \
-            -o ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${bfname}.mo
+        msgmerge --silent \
+            -o ${LOCALE_DIR}${language}/LC_MESSAGES/${bfname}.po \
+            ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po \
+            ${LOCALE_DIR}${bf}
+        msgfmt ${LOCALE_DIR}${language}/LC_MESSAGES/${bfname}.po \
+            -o ${LOCALE_DIR}${language}/LC_MESSAGES/${bfname}.mo
     done
 
     # Set the bug project to I18n project
@@ -94,7 +97,8 @@ function build_rst {
     else
         # Add the "bug_project" html context
         sed -i -e \
-            's/html_context *= *{/html_context = {"bug_project": "openstack-i18n", /' \
+            's/html_context *= *{/html_context = { \
+            "bug_project": "openstack-i18n", /' \
             ${DOC_DIR}${book}/source/conf.py
     fi
 
@@ -104,7 +108,8 @@ function build_rst {
         for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
             BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
             DOCTREES="${BUILD_DIR}.doctrees"
-            tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag -D language=${language} \
+            tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E \
+                -t $tag -D language=${language} \
                 -d ${DOCTREES}
                 ${DOC_DIR}${book}/source/ \
                 ${BUILD_DIR}"
@@ -144,14 +149,16 @@ function build_rst {
 
             # Get line number of each tag
             lineno_start=$(grep -n "^Contents" ${INDEX} | sed -e 's/:.*//')
-            lineno_end=$(grep -n "^.. end of contents" ${INDEX} | sed -e 's/:.*//')
+            lineno_end=$(grep -n "^.. end of contents" ${INDEX} \
+                | sed -e 's/:.*//')
             lineno_debian=$(grep -n "^.. only:: debian" ${INDEX} \
                 | tail -1 | sed -e 's/:.*//')
             lineno_notdebian=$(grep -n "^.. only:: [^d]" ${INDEX} \
                 | tail -1 | sed -e 's/:.*//')
 
             # Remove indent for pseudo only directive
-            sed -i "${lineno_start},${lineno_end} s/^  *\.\. toctree/.. toctree/" ${INDEX}
+            sed -i "${lineno_start},${lineno_end} \
+                s/^  *\.\. toctree/.. toctree/" ${INDEX}
             sed -i "${lineno_start},${lineno_end} s/^  */   /" ${INDEX}
 
             # Remove unnecessary toctree for each distribution
@@ -185,20 +192,22 @@ function build_rst {
     else
         BUILD_DIR="${DOC_DIR}${book}/build/html"
         DOCTREES="${BUILD_DIR}.doctrees"
-        tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -D language=${language} \
+        tox -evenv "sphinx-build -j $NUMBER_OF_CORES \
+            -q -E -D language=${language} \
             -d ${DOCTREES} \
             ${DOC_DIR}${book}/source/ \
             ${BUILD_DIR}"
         mkdir -p publish-docs/${language}/${book}/
-        rsync -a ${DOC_DIR}${book}/build/html/ publish-docs/${language}/${book}/
+        rsync -a ${DOC_DIR}${book}/build/html/ \
+            publish-docs/${language}/${book}/
     fi
     # Remove newly created files
-    git clean -f -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/*.po
-    git clean -f -x -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/*.mo
-    git clean -f -q ${DOC_DIR}${book}/source/locale/*.pot
+    git clean -f -q ${LOCALE_DIR}${language}/LC_MESSAGES/*.po
+    git clean -f -x -q ${LOCALE_DIR}${language}/LC_MESSAGES/*.mo
+    git clean -f -q ${LOCALE_DIR}*.pot
     # Revert changes to po file
-    git reset -q ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
-    git checkout -- ${DOC_DIR}${book}/source/locale/${language}/LC_MESSAGES/${book}.po
+    git reset -q ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po
+    git checkout -- ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po
     # Revert changes to conf.py
     git reset -q ${DOC_DIR}${book}/source/conf.py
     git checkout -- ${DOC_DIR}${book}/source/conf.py
@@ -263,7 +272,8 @@ function handle_draft_language {
     for book in ${DRAFTS["$language"]}; do
         case "${book}" in
             config-reference)
-                mv publish-docs/$language/draft/$book publish-docs/draft/$language/$book
+                mv publish-docs/$language/draft/$book \
+                    publish-docs/draft/$language/$book
                 rmdir --ignore-fail-on-non-empty publish-docs/$language/draft
                 ;;
             firstapp)
@@ -281,7 +291,8 @@ function handle_draft_language {
                 rmdir --ignore-fail-on-non-empty publish-docs/$language/
                 ;;
             *)
-                mv publish-docs/$language/$book publish-docs/draft/$language/$book
+                mv publish-docs/$language/$book \
+                    publish-docs/draft/$language/$book
                 ;;
         esac
     done
@@ -320,7 +331,8 @@ fi
 source $CONF_FILE
 
 if [[ -z $(declare -p BOOKS 2> /dev/null | grep 'declare -A BOOKS') || \
-    -z $(declare -p DIRECTORIES 2> /dev/null | grep 'declare -A DIRECTORIES') || \
+    -z $(declare -p DIRECTORIES 2> /dev/null | \
+    grep 'declare -A DIRECTORIES') || \
     -z $DOC_DIR ]]; then
     echo "Error: the configuration file '$CONF_FILE' is invalid"
     exit 1
