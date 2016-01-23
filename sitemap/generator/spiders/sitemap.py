@@ -58,8 +58,10 @@ class SitemapSpider(spiders.CrawlSpider):
         super(SitemapSpider, self).__init__(*args, **kwargs)
         self.domain = domain
         self.allowed_domains = [domain]
-        self.start_urls = ['http://%s/index.html' % domain]
+        self.start_urls = ['http://%s' % domain]
         for url in urls.split(','):
+            if not url:
+                continue
             self.start_urls.append(url)
 
     def parse_item(self, response):
