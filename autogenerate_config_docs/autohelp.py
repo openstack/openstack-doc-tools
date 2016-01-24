@@ -263,6 +263,8 @@ class OptionsCache(object):
         opt.default = _sanitize_default(opt)
 
         def fill(optname, group, opt):
+            if optname in self._opts_by_name:
+                return
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
 
