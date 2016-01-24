@@ -77,23 +77,6 @@ trove-manage:
       - db_recreate
       - db_sync
       - db_upgrade
-tuskar:
-    name: Deployment service
-    subcommands:
-      - plan-add-role
-      - plan-create
-      - plan-delete
-      - plan-flavor
-      - plan-list
-      - plan-patch
-      - plan-remove-role
-      - plan-scale
-      - plan-show
-      - plan-show-flavors
-      - plan-show-scale
-      - plan-templates
-      - plan-update
-      - role-list
 zaqar:
     name: Message service
 openstack:
