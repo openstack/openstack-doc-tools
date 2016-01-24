@@ -607,7 +607,7 @@ def get_clients():
 
 
 def document_single_project(os_command, output_dir):
-    """Create documenation for os_command."""
+    """Create documentation for os_command."""
 
     clients = get_clients()
 
