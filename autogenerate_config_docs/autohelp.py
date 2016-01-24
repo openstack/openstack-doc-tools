@@ -203,7 +203,7 @@ def _sanitize_default(opt):
         return '"%s"' % default
 
     for pathelm in sys.path:
-        if pathelm == '':
+        if pathelm in ('.', ''):
             continue
         if pathelm.endswith('/'):
             pathelm = pathelm[:-1]
