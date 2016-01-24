@@ -91,4 +91,4 @@ git branch --list $branch && git branch -D $branch
 git checkout -b $branch
 mv ../output/${project}.rst "doc/cli-reference/source"
 version=$($project --version 2>&1)
-git commit -a -m "Update CLI reference for python-${project}client ${version##* }"
+git commit -a -m "[cli-ref] Update CLI reference for python-${project}client ${version##* }"
