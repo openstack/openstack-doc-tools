@@ -67,7 +67,13 @@ done
 
 if [ "$GLOSSARY" -eq "1" ] ; then
     echo "Generating Glossary"
-    tools/glossary2rst.py doc/common-rst/glossary.rst
+    # Use "common" directory as common if exists while migration
+    if [[ -e doc/common/conventions.rst ]] ; then
+        COMMON="common"
+    else
+        COMMON="common-rst"
+    fi
+    tools/glossary2rst.py doc/${COMMON}/glossary.rst
 fi
 
 if [ -z "$BUILD" ] ; then

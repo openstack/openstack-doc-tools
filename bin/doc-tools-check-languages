@@ -57,16 +57,25 @@ function build_rst {
     if [ ${book} = "install-guide" ] ; then
         TAG="-t obs -t rdo -t ubuntu -t debian"
     fi
+
+    # Use "common" directory as common if exists while migration
+    if [[ -e ${DOC_DIR}common/conventions.rst ]] ; then
+        COMMON="common"
+    else
+        COMMON="common-rst"
+    fi
     LOCALE_DIR="${DOC_DIR}${book}/source/locale/"
-    COMMON_DIR="${DOC_DIR}common-rst/source/locale/"
+    COMMON_DIR="${DOC_DIR}${COMMON}/source/locale/"
+
     tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -W -b gettext $TAG \
                 ${DOC_DIR}${book}/source/ ${LOCALE_DIR}"
 
+
     # Merge the common-rst po file in
-    if [[ -e ${COMMON_DIR}${language}/LC_MESSAGES/common-rst.po ]] ; then
+    if [[ -e ${COMMON_DIR}${language}/LC_MESSAGES/${COMMON}.po ]] ; then
         msgcat --use-first -o ${LOCALE_DIR}${language}/${book}.po \
             ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po \
-            ${COMMON_DIR}${language}/LC_MESSAGES/common-rst.po
+            ${COMMON_DIR}${language}/LC_MESSAGES/${COMMON}.po
         mv -f ${LOCALE_DIR}${language}/${book}.po \
             ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po
     fi
