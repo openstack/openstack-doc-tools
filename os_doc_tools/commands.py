@@ -143,6 +143,7 @@ def extract_options(line):
     #  8.   <NAME or ID>  Name or ID of stack to resume.
     #  9. --json JSON  JSON representation of node group template.
     # 10. --id <cluster_id> ID of the cluster to show.
+    # 11. --instance "<opt=value,opt=value,...>"
 
     split_line = line.split(None, 2)
 
@@ -176,7 +177,7 @@ def extract_options(line):
             if words[1].startswith('DEPRECATED'):
                 break
             if last_was_option:
-                if (words[1].startswith(("-", '<', '{', '[')) or
+                if (words[1].startswith(("-", '<', '{', '[', '"')) or
                    (is_option(words[1]) and skip_is_option is False)):
                     skip_is_option = False
                     if words[1].isupper() or words[1].startswith('<'):
