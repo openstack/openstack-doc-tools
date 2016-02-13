@@ -86,9 +86,9 @@ cd openstack-manuals
 
 git checkout master
 git pull
-branch=update_client_$project
+branch=cli-reference
 git branch --list $branch && git branch -D $branch
 git checkout -b $branch
 mv ../output/${project}.rst "doc/cli-reference/source"
 version=$($project --version 2>&1)
-git commit -a -m "[cli-ref] Update CLI reference for python-${project}client ${version##* }"
+git commit -a -m "[cli-ref] Update python-${project}client to ${version##* }"
