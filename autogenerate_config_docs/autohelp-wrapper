@@ -24,7 +24,7 @@ GITBASE=git://git.openstack.org/openstack
 GITPROJ=git://git.openstack.org/openstack
 PROJECTS="aodh ceilometer cinder glance heat ironic keystone manila \
             neutron nova sahara swift trove"
-MANUALS_PROJECTS="openstack-manuals oslo-incubator"
+MANUALS_PROJECTS="openstack-manuals"
 BRANCH=master
 FAST=0
 
@@ -97,7 +97,6 @@ get_project() {
 }
 
 setup_tools() {
-    (cd $SOURCESDIR/oslo-incubator && python setup.py install)
     pip install -rrequirements.txt
 }
 
@@ -158,7 +157,6 @@ fi
 RELEASE=$(echo $BRANCH | sed 's,^stable.,,')
 
 if [ "$FAST" -eq 0 ] ; then
-    get_project oslo-incubator
     get_project openstack-manuals
 
     for project in $PROJECTS; do
