@@ -973,36 +973,6 @@ def build_book(book, publish_path, log_path):
                 ["mvn", "generate-sources", comments, release, "-B"],
                 stderr=subprocess.STDOUT
             )
-        # Repository: identity-api
-        elif (cfg.CONF.repo_name == "identity-api"
-              and book.endswith("v3")):
-            output = subprocess.check_output(
-                ["bash", os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
-                 "identity-api-v3"],
-                stderr=subprocess.STDOUT
-            )
-            out_file.write(output)
-            # File gets generated at wrong directory, we need to move it
-            # around
-            if os.path.isfile('identity-api-v3.xml'):
-                os.remove('identity-api-v3.xml')
-            shutil.move("src/markdown/identity-api-v3.xml", ".")
-            output = subprocess.check_output(
-                ["mvn", "generate-sources", comments, release, "-B"],
-                stderr=subprocess.STDOUT
-            )
-        # Repository: image-api
-        elif base_book == 'image-api-v2':
-            output = subprocess.check_output(
-                ["bash", os.path.join(SCRIPTS_DIR, "markdown-docbook.sh"),
-                 "image-api-v2.0"],
-                stderr=subprocess.STDOUT
-            )
-            out_file.write(output)
-            output = subprocess.check_output(
-                ["mvn", "generate-sources", comments, release, "-B"],
-                stderr=subprocess.STDOUT
-            )
         else:
             output = subprocess.check_output(
                 ["mvn", "generate-sources", comments, release, "-B"],
