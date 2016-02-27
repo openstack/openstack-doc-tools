@@ -247,7 +247,7 @@ def format_help(title, lines, os_file):
 
     close_entry = False
     if title:
-        format_heading(title, 3, os_file)
+        os_file.write("**" + title + ":**" + "\n\n")
 
     for line in lines:
         if not line or line[0] != ' ':
