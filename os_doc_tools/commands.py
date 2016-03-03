@@ -290,6 +290,10 @@ def format_help(title, lines, os_file):
         xline = xline.replace('--sort-key {name,status,container',
                               '--sort-key {name,status,``\n\n``container')
 
+        # check niceness work around for long option name, nova
+        xline = xline.replace('--nic <net-id=net-uuid,net-name',
+                              '--nic <net-id=net-uuid,``\n\n``net-name')
+
         os_file.write("``" + xline + "``\n")
 
         if len(split_line) > 1:
