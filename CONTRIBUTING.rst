@@ -24,3 +24,9 @@ Pull requests submitted through GitHub will be ignored.
 Bugs should be filed on Launchpad, not GitHub:
 
    https://bugs.launchpad.net/openstack-manuals
+
+.. note::
+
+   To be able to run ``"tox -e py27"`` successfully locally, add
+   ``jinja2`` and ``markupsafe`` to your local ``test-requirements.txt``
+   file so the two get installed in your local virtual environment.
