@@ -419,12 +419,15 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
                                          universal_newlines=True,
                                          stderr=DEVNULL)
 
-    if 'positional arguments' in help_lines.lower():
-        index = help_lines.lower().index('positional arguments')
+    help_lines_lower = help_lines.lower()
+    if 'positional arguments' in help_lines_lower:
+        index = help_lines_lower.index('positional arguments')
+    elif 'optional arguments' in help_lines_lower:
+        index = help_lines_lower.index('optional arguments')
     else:
-        index = len(help_lines)
+        index = len(help_lines_lower)
 
-    if 'deprecated' in (help_lines[0:index].lower()):
+    if 'deprecated' in (help_lines_lower[0:index]):
         print("Subcommand '%s' is deprecated, skipping." % os_subcommand)
         return
 
