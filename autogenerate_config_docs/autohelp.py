@@ -461,6 +461,12 @@ def write_files(package_name, options, target, output_format):
                 option.help = "No help text available for this option."
             helptext = option.help.strip().replace('\n', ' ')
             helptext = ' '.join(helptext.split())
+            if option.deprecated_for_removal:
+                if not option.help.strip().startswith('DEPRECATED'):
+                    helptext = 'DEPRECATED: ' + helptext
+                if option.deprecated_reason:
+                    helptext += ' ' + option.deprecated_reason
+
             opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
             item = (option.dest,
                     _sanitize_default(option),
