@@ -48,6 +48,18 @@ EXTENSIONS = ['oslo.cache',
               'oslo.policy',
               'oslo.service']
 
+_TYPE_DESCRIPTIONS = {
+    cfg.StrOpt: 'String',
+    cfg.BoolOpt: 'Boolean',
+    cfg.IntOpt: 'Integer',
+    cfg.FloatOpt: 'Floating point',
+    cfg.ListOpt: 'List',
+    cfg.DictOpt: 'Dict',
+    cfg.MultiStrOpt: 'Multi-valued',
+    cfg._ConfigFileOpt: 'List of filenames',
+    cfg._ConfigDirOpt: 'List of directory names',
+}
+
 register_re = re.compile(r'''^ +.*\.register_opts\((?P<opts>[^,)]+)'''
                          r'''(, (group=)?["'](?P<group>.*)["'])?\)''')
 
@@ -449,9 +461,10 @@ def write_files(package_name, options, target, output_format):
                 option.help = "No help text available for this option."
             helptext = option.help.strip().replace('\n', ' ')
             helptext = ' '.join(helptext.split())
+            opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
             item = (option.dest,
                     _sanitize_default(option),
-                    "(%s) %s" % (type(option).__name__, helptext))
+                    "(%s) %s" % (opt_type, helptext))
             items.append(item)
 
         env['items'].append(items)
