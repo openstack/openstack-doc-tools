@@ -30,6 +30,11 @@ import sys
 import jinja2
 import stevedore
 
+try:
+    from sqlalchemy import exc
+except Exception:
+    pass
+
 sys.path.insert(0, '.')
 from hooks import HOOKS  # noqa
 
@@ -105,6 +110,10 @@ def import_modules(repo_location, package_name, verbose=0):
                     """
                     If a group doesn't exist, we ignore the import.
                     """
+                    if verbose >= 2:
+                        print(e)
+                    continue
+                except exc.InvalidRequestError as e:
                     if verbose >= 2:
                         print(e)
                     continue
