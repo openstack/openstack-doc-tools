@@ -14,12 +14,6 @@
 
 BUILD_FAIL=0
 
-if [ -x "$(command -v getconf)" ]; then
-    NUMBER_OF_CORES=$(getconf _NPROCESSORS_ONLN)
-else
-    NUMBER_OF_CORES=2
-fi
-
 function setup_directories {
     language=$1
     for directory in ${DIRECTORIES["$language"]} ; do
@@ -67,7 +61,7 @@ function build_rst {
     LOCALE_DIR="${DOC_DIR}${book}/source/locale/"
     COMMON_DIR="${DOC_DIR}${COMMON}/source/locale/"
 
-    tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -W -b gettext $TAG \
+    tox -evenv "sphinx-build -q -E -W -b gettext $TAG \
                 ${DOC_DIR}${book}/source/ ${LOCALE_DIR}"
 
 
@@ -117,7 +111,7 @@ function build_rst {
         for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
             BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
             DOCTREES="${BUILD_DIR}.doctrees"
-            tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E \
+            tox -evenv "sphinx-build -q -E \
                 -t $tag -D language=${language} \
                 -d ${DOCTREES}
                 ${DOC_DIR}${book}/source/ \
@@ -181,7 +175,7 @@ function build_rst {
             # Build the guide
             BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
             DOCTREES="${BUILD_DIR}.doctrees"
-            tox -evenv "sphinx-build -j $NUMBER_OF_CORES -q -E -t $tag \
+            tox -evenv "sphinx-build -q -E -t $tag \
                 -D language=${language}
                 -d ${DOCTREES}
                 ${DOC_DIR}${book}/source/ \
@@ -201,7 +195,7 @@ function build_rst {
     else
         BUILD_DIR="${DOC_DIR}${book}/build/html"
         DOCTREES="${BUILD_DIR}.doctrees"
-        tox -evenv "sphinx-build -j $NUMBER_OF_CORES \
+        tox -evenv "sphinx-build \
             -q -E -D language=${language} \
             -d ${DOCTREES} \
             ${DOC_DIR}${book}/source/ \
