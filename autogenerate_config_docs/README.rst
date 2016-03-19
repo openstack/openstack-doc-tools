@@ -86,7 +86,7 @@ to work on another branch:
 
 .. code-block:: console
 
-    $ ./autohelp-wrapper update -b stable/liberty
+    $ ./autohelp-wrapper -b stable/liberty update
 
 .. note::
    The ``-b`` switch doesn't apply to the ``openstack-manuals`` repository
