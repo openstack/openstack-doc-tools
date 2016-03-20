@@ -22,14 +22,15 @@ import pickle
 import subprocess
 import sys
 
-import git
 import jinja2
 
 
-PROJECTS = ['ceilometer', 'cinder', 'glance', 'heat', 'ironic', 'keystone',
-            'manila', 'neutron', 'nova', 'sahara', 'swift', 'trove']
+PROJECTS = ['aodh', 'ceilometer', 'cinder', 'glance', 'heat', 'ironic',
+            'keystone', 'manila', 'neutron', 'nova', 'sahara', 'swift',
+            'trove']
 MASTER_RELEASE = 'Mitaka'
-CODENAME_TITLE = {'ceilometer': 'Telemetry',
+CODENAME_TITLE = {'aodh': 'Alarming',
+                  'ceilometer': 'Telemetry',
                   'cinder': 'Block Storage',
                   'glance': 'Image service',
                   'heat': 'Orchestration',
@@ -69,43 +70,23 @@ def _get_packages(project, branch):
     return packages
 
 
-def get_options(project, branch, args):
+def get_options(project, branch):
     """Get the list of known options for a project."""
     print("Working on %(project)s (%(branch)s)" % {'project': project,
                                                    'branch': branch})
     # And run autohelp script to get a serialized dict of the discovered
     # options
-    dirname = os.path.abspath(os.path.join('venv',
-                                           branch.replace('/', '_'),
-                                           project))
+    dirname = os.path.join('venv', branch.replace('/', '_'))
+    args = ["./autohelp-wrapper", "-q", "-b", branch, "-e", dirname,
+            "dump", project]
 
-    if project == 'swift':
-        cmd = ("python extract_swift_flags.py dump "
-               "-s %(sources)s/swift -m %(sources)s/openstack-manuals" %
-               {'sources': args.sources})
-        if branch == 'stable/liberty':
-            cmd += " -f docbook"
-        repo_path = args.sources
-    else:
-        packages = _get_packages(project, branch)
-        autohelp_args = ""
-        for package in packages:
-            repo_path = os.path.join(args.sources, project)
-            repo = git.Repo(repo_path)
-            repo.heads[branch].checkout()
-            autohelp_args += (" -i %s/%s" %
-                              (repo_path, package.replace('-', '_')))
-        cmd = ("python autohelp.py dump %(project)s %(args)s" %
-               {'project': project, 'args': autohelp_args})
     path = os.environ.get("PATH")
     bin_path = os.path.abspath(os.path.join(dirname, "bin"))
     path = "%s:%s" % (bin_path, path)
-    serialized = subprocess.check_output(cmd, shell=True,
+    serialized = subprocess.check_output(args,
                                          env={'VIRTUAL_ENV': dirname,
                                               'PATH': path})
-    sys.path.insert(0, repo_path)
     ret = pickle.loads(serialized)
-    sys.path.pop(0)
     return ret
 
 
@@ -295,8 +276,8 @@ def main():
     setup_venv(args.projects, args.new_branch, args.novenvupdate)
 
     for project in args.projects:
-        old_list = get_options(project, args.old_branch, args)
-        new_list = get_options(project, args.new_branch, args)
+        old_list = get_options(project, args.old_branch)
+        new_list = get_options(project, args.new_branch)
 
         release = args.new_branch.replace('stable/', '')
         env = get_env(project, release, old_list, new_list)
