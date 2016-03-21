@@ -122,7 +122,7 @@ function build_rst {
         done
     elif [ ${book} = "install-guide" ] ; then
         # Install Guide has several variations, build all of them
-        TAGS="obs rdo ubuntu debian"
+        TAGS="obs rdo ubuntu"
         INDEX=${DOC_DIR}${book}/source/index.rst
 
         # For translation work, we should have only one index file,
@@ -287,7 +287,7 @@ function handle_draft_language {
                 rmdir --ignore-fail-on-non-empty publish-docs/$language/
                 ;;
             install-guide)
-                for tag in obs rdo ubuntu debian; do
+                for tag in obs rdo ubuntu ; do
                     mv publish-docs/$language/$book-${tag} \
                         publish-docs/draft/$language/$book-${tag}
                 done
