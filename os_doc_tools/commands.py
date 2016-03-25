@@ -449,7 +449,7 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
     os_subcommandid = os_subcommand.replace(' ', '_')
     os_file.write(".. _" + os_command + "_" + os_subcommandid + suffix)
     os_file.write(":\n\n")
-    format_heading(os_command + " " + os_subcommand + title_suffix, 2, os_file)
+    format_heading(os_command + " " + os_subcommand + title_suffix, 3, os_file)
 
     if os_command == "swift":
         next_line_screen = False
