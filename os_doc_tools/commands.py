@@ -636,10 +636,18 @@ def document_single_project(os_command, output_dir):
     subcommands = generate_command(os_command, out_file)
 
     if os_command == 'cinder':
-        format_heading("Block Storage API v1 commands (DEPRECATED)",
-                       2, out_file)
+        format_heading("Block Storage API v2 commands", 2, out_file)
+
+        out_file.write("You can select an API version to use by adding the\n")
+        out_file.write(":option:`--os-volume-api-version` parameter or by\n")
+        out_file.write("setting the corresponding environment variable:\n\n")
+
+        out_file.write(".. code-block:: console\n\n")
+        out_file.write("   export OS_VOLUME_API_VERSION=2\n\n")
+
         discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          None, "", "")
+                                          ["--os-volume-api-version", "2"],
+                                          "", "")
     elif os_command == 'openstack':
         format_heading("OpenStack with Identity API v2 commands", 2, out_file)
         auth_type_token = ["--os-auth-type", "token"]
@@ -661,18 +669,11 @@ def document_single_project(os_command, output_dir):
     # Print subcommands for different API versions
     if os_command == 'cinder':
         out_file.write("\n")
-        format_heading("Block Storage API v2 commands", 2, out_file)
-
-        out_file.write("You can select an API version to use by adding the\n")
-        out_file.write(":option:`--os-volume-api-version` parameter or by\n")
-        out_file.write("setting the corresponding environment variable:\n\n")
-
-        out_file.write(".. code-block:: console\n\n")
-        out_file.write("   export OS_VOLUME_API_VERSION=2\n\n")
+        format_heading("Block Storage API v1 commands (DEPRECATED)",
+                       2, out_file)
 
         discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          ["--os-volume-api-version", "2"],
-                                          "_v2", " (v2)")
+                                          None, "_v1", " (v1)")
     if os_command == 'openstack':
         # Print the additional subcommands possible by using v3 of identity API
         out_file.write("\n")
