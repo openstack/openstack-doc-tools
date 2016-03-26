@@ -668,14 +668,25 @@ def document_single_project(os_command, output_dir, continue_on_error):
                                           ["--os-volume-api-version", "2"],
                                           "", "")
     elif os_command == 'openstack':
-        format_heading("OpenStack with Identity API v2 commands", 2, out_file)
-        auth_type_token = ["--os-auth-type", "token"]
-        identity_api_v2 = ["--os-identity-api-version", "2"]
-        extra_params = auth_type_token + identity_api_v2
-        subcommands_v2 = discover_subcommands(os_command, subcommands,
-                                              extra_params)
-        generate_subcommands(os_command, out_file, subcommands_v2,
-                             extra_params, "_with_identity_api_v2", "")
+        format_heading("OpenStack with Identity API v3 commands", 2, out_file)
+
+        out_file.write(".. important::\n\n")
+        out_file.write("   OpenStack Identity API v2 is deprecated in\n")
+        out_file.write("   the Mitaka release and later.\n\n")
+        out_file.write("   You can select the Identity API version to use\n")
+        out_file.write("   by adding the\n")
+        out_file.write("   :option:`--os-identity-api-version`\n")
+        out_file.write("   parameter or by setting the corresponding\n")
+        out_file.write("   environment variable:\n\n")
+
+        out_file.write("   .. code-block:: console\n\n")
+        out_file.write("      export OS_IDENTITY_API_VERSION=3\n\n")
+
+        extra_params = ["--os-auth-type", "token"]
+        subcommands = discover_subcommands(os_command, subcommands,
+                                           extra_params)
+        generate_subcommands(os_command, out_file, subcommands,
+                             extra_params, "", "")
     elif os_command == 'glance':
         format_heading("Image service API v2 commands", 2, out_file)
         out_file.write("You can select an API version to use by adding the\n")
@@ -700,34 +711,6 @@ def document_single_project(os_command, output_dir, continue_on_error):
 
         discover_and_generate_subcommands(os_command, out_file, subcommands,
                                           None, "_v1", " (v1)")
-    if os_command == 'openstack':
-        # Print the additional subcommands possible by using v3 of identity API
-        out_file.write("\n")
-        format_heading("OpenStack with Identity API v3 commands (diff)",
-                       2, out_file)
-
-        out_file.write("You can select the Identity API version to use by\n")
-        out_file.write("adding the :option:`--os-identity-api-version`\n")
-        out_file.write("parameter or by setting the corresponding\n")
-        out_file.write("environment variable:\n\n")
-
-        out_file.write(".. code-block:: console\n\n")
-        out_file.write("   export OS_IDENTITY_API_VERSION=3\n\n")
-
-        out_file.write("This section documents only the difference in\n")
-        out_file.write("subcommands available for the openstack client\n")
-        out_file.write("when the Identity API version is changed from\n")
-        out_file.write("v2 to v3.\n\n")
-
-        identity_api_v3 = ["--os-identity-api-version", "3"]
-        extra_params = auth_type_token + identity_api_v3
-        subcommands_v3 = discover_subcommands(os_command, subcommands,
-                                              extra_params)
-        subcommands_delta = sorted(list(set(subcommands_v3) -
-                                        set(subcommands_v2)))
-        generate_subcommands(os_command, out_file, subcommands_delta,
-                             extra_params, "_with_identity_api_v3",
-                             " (Identity API v3)")
     if os_command == 'glance':
         out_file.write("\n")
         format_heading("Image service API v1 commands", 2, out_file)
