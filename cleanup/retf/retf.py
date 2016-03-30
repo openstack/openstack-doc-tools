@@ -24,7 +24,9 @@ import logging
 import os
 import shutil
 import sys
-import urllib2
+
+from six.moves.urllib import error as urlerr
+from six.moves.urllib import request as urlreq
 
 from bs4 import BeautifulSoup
 import glob2
@@ -52,12 +54,12 @@ def download_listing(dest):
                'Typos?action=raw')
         logger.debug("Downloading latest RETF listing from %s into %s.",
                      url, dest)
-        response = urllib2.urlopen(url)
+        response = urlreq.urlopen(url)
         data = response.read()
         logger.info("Downloading latest RETF listing from %s succeeded.", url)
-    except urllib2.HTTPError as ex:
+    except urlerr.HTTPError as ex:
         raise DownloadRetfListingFailed(six.text_type(ex))
-    except urllib2.URLError as ex:
+    except urlerr.URLError as ex:
         raise DownloadRetfListingFailed(six.text_type(ex))
 
     try:
