@@ -31,7 +31,8 @@ class SitemapSpider(spiders.CrawlSpider):
         'havana',
         'icehouse',
         'juno',
-        'kilo'
+        'kilo',
+        'liberty'
     ]])
 
     rules = [
