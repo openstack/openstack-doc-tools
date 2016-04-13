@@ -278,22 +278,6 @@ def format_help(title, lines, os_file):
 
         xline = split_line[0]
 
-        # check niceness work around for long option name
-        if len(xline) > (MAXLINELENGTH - 4):
-            xline = xline.replace(', -', ',``\n\n``-')
-
-        # check niceness work around for long option name, openstack
-        xline = xline.replace('--nic <net-id=net-uuid,v4-fixed-ip',
-                              '--nic <net-id=net-uuid,``\n\n``v4-fixed-ip')
-
-        # check niceness work around for long option name, glance
-        xline = xline.replace('--sort-key {name,status,container',
-                              '--sort-key {name,status,``\n\n``container')
-
-        # check niceness work around for long option name, nova
-        xline = xline.replace('--nic <net-id=net-uuid,net-name',
-                              '--nic <net-id=net-uuid,``\n\n``net-name')
-
         os_file.write("``" + xline + "``\n")
 
         if len(split_line) > 1:
