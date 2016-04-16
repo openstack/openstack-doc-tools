@@ -84,14 +84,6 @@ def generate_heading(os_command, api_name, title, os_file):
     os_file.write(".. #################################################\n\n")
     format_heading(title, 1, os_file)
 
-    if os_command == "keystone":
-        os_file.write(".. warning::\n\n")
-        os_file.write("   The " + os_command + " CLI is deprecated\n")
-        os_file.write("   in favor of python-openstackclient.\n")
-        os_file.write("   For more information, see :doc:`openstack`.\n")
-        os_file.write("   For a Python library, continue using\n")
-        os_file.write("   python-" + os_command + "client.\n\n")
-
     if os_command == "openstack":
         os_file.write("The openstack client is a common OpenStack")
         os_file.write("command-line interface (CLI).\n\n")

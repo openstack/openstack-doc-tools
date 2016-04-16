@@ -15,7 +15,7 @@
 if [[ $# -ne 1 ]]; then
     echo "usage: $0 PROJECT"
     echo
-    echo "PROJECT = something like keystone, glance, or nova"
+    echo "PROJECT = something like openstack, nova, or neutron"
     exit 1
 fi
 
