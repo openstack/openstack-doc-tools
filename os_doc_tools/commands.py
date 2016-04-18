@@ -308,12 +308,12 @@ def generate_command(os_command, os_file):
     :param os_file:    open filehandle for output of RST file
     """
 
-    if os_command == "glance":
-        help_lines = subprocess.check_output([os_command, "help"],
+    if use_help_flag(os_command):
+        help_lines = subprocess.check_output([os_command, "--help"],
                                              universal_newlines=True,
                                              stderr=DEVNULL).split('\n')
     else:
-        help_lines = subprocess.check_output([os_command, "--help"],
+        help_lines = subprocess.check_output([os_command, "help"],
                                              universal_newlines=True,
                                              stderr=DEVNULL).split('\n')
 
@@ -381,6 +381,7 @@ def generate_command(os_command, os_file):
                 next_line_screen = True
                 ignore_next_lines = False
                 continue
+            # all
             if not line.startswith('usage'):
                 continue
         if not ignore_next_lines:
@@ -760,6 +761,9 @@ def main():
                         help="Continue with remaining clients even if an "
                         "error occurs generating a client file.",
                         action="store_true")
+    parser.add_argument("--version", default=False,
+                        help="Show program's version number and exit.",
+                        action="store_true")
     prog_args = parser.parse_args()
 
     client_list = []
@@ -770,6 +774,13 @@ def main():
             client_list.extend(manage_clients)
     elif prog_args.clients:
         client_list = prog_args.clients
+
+    if not prog_args or 'help' in [client.lower() for client in client_list]:
+        parser.print_help()
+        sys.exit(0)
+    elif prog_args.version:
+        print(os_doc_tools.__version__)
+        sys.exit(0)
 
     if not client_list:
         parser.print_help()

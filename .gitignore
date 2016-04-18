@@ -38,3 +38,6 @@ build_environment/repositories/
 
 # Files created by releasenotes build
 releasenotes/build
+
+# repo pulled down by doc-tools-update-cli-reference
+openstack-manuals
