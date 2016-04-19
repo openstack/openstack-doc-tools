@@ -543,14 +543,19 @@ def discover_subcommands(os_command, subcommands, extra_params):
         if subcommands == 'complete':
             subcommands = []
             args.append('complete')
-            for line in [x.strip() for x in
-                         subprocess.check_output(
-                             args,
-                             universal_newlines=True,
-                             stderr=DEVNULL).split('\n')
+            lines = subprocess.check_output(
+                args, universal_newlines=True, stderr=DEVNULL).split('\n')
+            delim = ' '
+            # if the cmds= line contains '-' then use that as a delim
+            for line in lines:
+                if '-' in line and 'cmds=' in line:
+                    delim = '-'
+                    break
+            for line in [x.strip() for x in lines
                          if x.strip().startswith('cmds_') and '-' in x]:
                 subcommand, _ = line.split('=')
-                subcommand = subcommand.replace('cmds_', '').replace('_', ' ')
+                subcommand = subcommand.replace(
+                    'cmds_', '').replace('_', delim)
                 subcommands.append(subcommand)
         else:
             args.append('bash-completion')
@@ -646,6 +651,8 @@ def document_single_project(os_command, output_dir, continue_on_error):
             sys.exit(-1)
 
     subcommands = generate_command(os_command, out_file)
+    if subcommands == 'complete' and data.get('subcommands'):
+        subcommands = data.get('subcommands')
 
     if os_command == 'cinder':
         format_heading("Block Storage API v2 commands", 2, out_file)

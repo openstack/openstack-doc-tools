@@ -53,6 +53,7 @@ solum:
 swift:
     name: Object Storage service
     subcommands:
+      - auth
       - capabilities
       - delete
       - download
