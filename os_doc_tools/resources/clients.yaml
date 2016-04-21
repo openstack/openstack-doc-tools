@@ -24,8 +24,6 @@ heat:
     name: Orchestration service
 ironic:
     name: Bare Metal service
-keystone:
-    name: Identity service
 kite:
     name: A service for managing and distributing message encryption keys
 magnum:
