@@ -1,0 +1,6 @@
+---
+prelude: >
+    The most important change in this release is the removal
+    of DocBook XML support. Support for checking, building, and
+    translation of DocBook XML files has been removed. The tools now
+    only handle RST files.
