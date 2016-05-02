@@ -14,26 +14,6 @@
 
 BUILD_FAIL=0
 
-function setup_directories {
-    language=$1
-    for directory in ${DIRECTORIES["$language"]} ; do
-        echo "   $directory"
-        openstack-generate-docbook -l $language -b $directory -r $DOC_DIR
-    done
-}
-
-
-function setup_language {
-    language=$1
-    echo "Setting up files for $language"
-    echo "======================="
-    echo "  Directories:"
-    setup_directories $language
-    if [ -n "$POM_FILE" ] ; then
-        cp $POM_FILE generated/$language/pom.xml
-    fi
-}
-
 function build_rst {
     language=$1
     book=$2
@@ -229,7 +209,6 @@ function test_language {
         args+=("--publish")
     fi
     args+=("--check-build" "-l $language")
-    BUILD_XML=0
     for book in ${BOOKS["$language"]}; do
         if [ ${SPECIAL_BOOKS[$book]+_} ] ; then
             if [ ${SPECIAL_BOOKS[$book]} = "RST" ] ; then
@@ -244,23 +223,7 @@ function test_language {
                 continue
             fi
         fi
-        args+=("--only-book $book")
-        BUILD_XML=1
     done
-
-    if [ "$BUILD_XML" -eq "1" ] ; then
-
-        setup_language $language
-
-        openstack-doc-test ${args[@]}
-
-        if [[ $? -eq 0 ]] ; then
-            echo "... succeeded"
-        else
-            echo "... failed"
-            BUILD_FAIL=1
-        fi
-    fi
 }
 
 
