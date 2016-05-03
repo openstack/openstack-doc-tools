@@ -10,5 +10,5 @@ hacking<0.11,>=0.10.0
 pylint==1.4.5 # GNU GPL v2
 
 reno>=1.6.2 # Apache2
-oslosphinx>=2.5.0,!=3.4.0  # Apache-2.0
-sphinx>=1.1.2,!=1.2.0,!=1.3b1,<1.3  # BSD
+oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
+sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2 # BSD
