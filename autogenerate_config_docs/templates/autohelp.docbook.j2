@@ -39,7 +39,16 @@
 {% for item in items[loop.index0] %}
       <tr>
         <td><option>{{ item[0] }}</option> = <replaceable>{{ item[1] }}</replaceable></td>
-        <td>{{ item[2]|replace('<', '&lt;')|replace('>', '&gt;') }}</td>
+        <td>
+            <p>{{ item[2] | replace('<', '&lt;') | replace('>', '&gt;') }}</p>
+{% if len(item) >= 4 %}
+            <dl>
+{% for flagname, flagdesc in item[3] %}
+                <dt>{{ flagname }}</dt><dd>{{ flagdesc }}</dd>
+{% endfor %}
+            </dl>
+{% endif %}
+        </td>
       </tr>
 {% endfor %}
 {% endfor %}

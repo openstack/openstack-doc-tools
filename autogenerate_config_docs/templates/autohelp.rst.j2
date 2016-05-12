@@ -26,5 +26,9 @@
    * - ``{{ item[0] }}`` = ``{{ item[1] }}``
 {% endif %}
      - {{ item[2] }}
+{% for flagname, flagdesc in item[3] %}
+     - **{{ flagname }}**
+         {{ flagdesc }}
+{% endfor %}
 {% endfor %}
 {% endfor %}

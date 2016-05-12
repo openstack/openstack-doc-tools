@@ -468,9 +468,14 @@ def write_files(package_name, options, target, output_format):
                     helptext += ' ' + option.deprecated_reason
 
             opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
+            flags = []
+            if option.mutable:
+                flags.append(('Mutable', 'This option can be changed without'
+                              ' restarting.'))
             item = (option.dest,
                     _sanitize_default(option),
-                    "(%s) %s" % (opt_type, helptext))
+                    "(%s) %s" % (opt_type, helptext),
+                    flags)
             items.append(item)
 
         env['items'].append(items)
