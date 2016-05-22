@@ -12,15 +12,15 @@ Running tests
 So far there are no tests included with the package but a test suite
 would be welcome!
 
-Since the openstack-doc-test tool is used for gating of the OpenStack
+The openstack-indexpage tool is used while building the OpenStack
 documentation repositories, test building of these repositories with
 any changes done here.
 
 Testing can be done with simply a local install of
-openstack-doc-tools, then checking out the gated repositories and
+openstack-doc-tools, then checking out the repositories and
 running: ``tox`` inside of each.
 
-The repositories gated by openstack-doc-tools are:
-* api-guide
+The repositories using openstack-doc-tools include:
+* api-site
 * openstack-manuals
-* operations-guide
+* security-doc
