@@ -27,7 +27,7 @@ ironic:
 kite:
     name: A service for managing and distributing message encryption keys
 magnum:
-    name: Containers service
+    name: Container Infrastructure Management service
 manila:
     name: Shared file systems
 mistral:
