@@ -677,10 +677,17 @@ def document_single_project(os_command, output_dir, continue_on_error):
         generate_subcommands(os_command, out_file, subcommands_v2,
                              extra_params, "_with_identity_api_v2", "")
     elif os_command == 'glance':
-        format_heading("Image service API v1 commands", 2, out_file)
+        format_heading("Image service API v2 commands", 2, out_file)
+        out_file.write("You can select an API version to use by adding the\n")
+        out_file.write(":option:`--os-image-api-version` parameter or by\n")
+        out_file.write("setting the corresponding environment variable:\n\n")
+
+        out_file.write(".. code-block:: console\n\n")
+        out_file.write("   export OS_IMAGE_API_VERSION=2\n\n")
+
         discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          ["--os-image-api-version", "1"],
-                                          "_v1", " (v1)")
+                                          ["--os-image-api-version", "2"],
+                                          "_v2", " (v2)")
     else:
         discover_and_generate_subcommands(os_command, out_file, subcommands,
                                           None, "", "")
@@ -723,17 +730,10 @@ def document_single_project(os_command, output_dir, continue_on_error):
                              " (Identity API v3)")
     if os_command == 'glance':
         out_file.write("\n")
-        format_heading("Image service API v2 commands", 2, out_file)
-        out_file.write("You can select an API version to use by adding the\n")
-        out_file.write(":option:`--os-image-api-version` parameter or by\n")
-        out_file.write("setting the corresponding environment variable:\n\n")
-
-        out_file.write(".. code-block:: console\n\n")
-        out_file.write("   export OS_IMAGE_API_VERSION=2\n\n")
-
+        format_heading("Image service API v1 commands", 2, out_file)
         discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          ["--os-image-api-version", "2"],
-                                          "_v2", " (v2)")
+                                          ["--os-image-api-version", "1"],
+                                          "_v1", " (v1)")
 
     if os_command == 'glance':
         out_file.write(".. include:: glance_property_keys.rst\n")
