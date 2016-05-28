@@ -102,7 +102,7 @@ function build_rst {
         done
     elif [ ${book} = "install-guide" ] ; then
         # Install Guide has several variations, build all of them
-        TAGS="obs rdo ubuntu"
+        TAGS="obs rdo ubuntu debian debconf"
         INDEX=${DOC_DIR}${book}/source/index.rst
 
         # For translation work, we should have only one index file,
@@ -116,60 +116,45 @@ function build_rst {
         trap "mv -f ${INDEX}.save ${INDEX}" EXIT
 
         for tag in $TAGS; do
-            ##
-            # Because Sphinx uses the first heading as title regardless of
-            # only directive, replace title directive with the proper title
-            # for each distribution to set the title explicitly.
-            title=$(grep -m 1 -A 5 "^.. only:: ${tag}" ${INDEX} | \
-                sed -n 4p | sed -e 's/^ *//g')
-            sed -i -e "s/\.\. title::.*/.. title:: ${title}/" ${INDEX}
-
-            ##
-            # Sphinx builds the navigation before processing directives,
-            # so the conditional toctree does not work.
-            # We need to prepare toctree depending on distribution
-            # only with one toctree before exectuing sphinx-build.
-
-            # Get line number of each tag
-            lineno_start=$(grep -n "^Contents" ${INDEX} | sed -e 's/:.*//')
-            lineno_end=$(grep -n "^.. end of contents" ${INDEX} \
-                | sed -e 's/:.*//')
-            lineno_debian=$(grep -n "^.. only:: debian" ${INDEX} \
-                | tail -1 | sed -e 's/:.*//')
-            lineno_notdebian=$(grep -n "^.. only:: [^d]" ${INDEX} \
-                | tail -1 | sed -e 's/:.*//')
-
-            # Remove indent for pseudo only directive
-            sed -i "${lineno_start},${lineno_end} \
-                s/^  *\.\. toctree/.. toctree/" ${INDEX}
-            sed -i "${lineno_start},${lineno_end} s/^  */   /" ${INDEX}
-
-            # Remove unnecessary toctree for each distribution
-            if [[ "$tag" == "debian" ]]; then
-                sed -i "${lineno_notdebian},${lineno_debian}d" ${INDEX}
+            if [[ "$tag" == "debconf" ]]; then
+                # Build the guide with debconf
+                # To use debian only contents, use "debian" tag.
+                BUILD_DIR="${DOC_DIR}${book}-${tag}/build-${tag}/html"
+                DOCTREES="${BUILD_DIR}.doctrees"
+                tox -evenv "sphinx-build -q -E -t debian \
+                    -D language=${language}
+                    -d ${DOCTREES}
+                    ${DOC_DIR}${book}-${tag}/source/ \
+                    ${BUILD_DIR}"
+                mkdir -p publish-docs/${language}/${book}-${tag}
+                rsync -a ${DOC_DIR}${book}-${tag}/build-${tag}/html/ \
+                    publish-docs/${language}/${book}-${tag}
             else
-                sed -i "${lineno_debian},$((${lineno_end}-1))d" ${INDEX}
-                sed -i "${lineno_notdebian}d" ${INDEX}
-            fi
+                ##
+                # Because Sphinx uses the first heading as title regardless of
+                # only directive, replace title directive with the proper title
+                # for each distribution to set the title explicitly.
+                title=$(grep -m 1 -A 5 "^.. only:: ${tag}" ${INDEX} | \
+                    sed -n 4p | sed -e 's/^ *//g')
+                sed -i -e "s/\.\. title::.*/.. title:: ${title}/" ${INDEX}
 
-            # Build the guide
-            BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
-            DOCTREES="${BUILD_DIR}.doctrees"
-            tox -evenv "sphinx-build -q -E -t $tag \
-                -D language=${language}
-                -d ${DOCTREES}
-                ${DOC_DIR}${book}/source/ \
-                ${BUILD_DIR}"
-            mkdir -p publish-docs/${language}/${book}-${tag}
-            rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
-                publish-docs/${language}/${book}-${tag}
+                ##
+                # Sphinx builds the navigation before processing directives,
+                # so the conditional toctree does not work.
+                # We need to prepare toctree depending on distribution
+                # only with one toctree before exectuing sphinx-build.
 
-            # Restore the index file
-            cp -f ${INDEX}.save ${INDEX}
-
-            # Remove Debian specific content from other guides
-            if [[ "$tag" != "debian" ]]; then
-                rm -rf publish-docs/${language}/{book}-$tag/debconf
+                # Build the guide
+                BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
+                DOCTREES="${BUILD_DIR}.doctrees"
+                tox -evenv "sphinx-build -q -E -t $tag \
+                    -D language=${language}
+                    -d ${DOCTREES}
+                    ${DOC_DIR}${book}/source/ \
+                    ${BUILD_DIR}"
+                mkdir -p publish-docs/${language}/${book}-${tag}
+                rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
+                    publish-docs/${language}/${book}-${tag}
             fi
         done
     else
