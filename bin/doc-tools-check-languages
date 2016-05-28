@@ -32,12 +32,7 @@ function build_rst {
         TAG="-t obs -t rdo -t ubuntu -t debian"
     fi
 
-    # Use "common" directory as common if exists while migration
-    if [[ -e ${DOC_DIR}common/conventions.rst ]] ; then
-        COMMON="common"
-    else
-        COMMON="common-rst"
-    fi
+    COMMON="common"
     LOCALE_DIR="${DOC_DIR}${book}/source/locale/"
     COMMON_DIR="${DOC_DIR}${COMMON}/source/locale/"
 
@@ -45,7 +40,7 @@ function build_rst {
                 ${DOC_DIR}${book}/source/ ${LOCALE_DIR}"
 
 
-    # Merge the common-rst po file in
+    # Merge the common po file
     if [[ -e ${COMMON_DIR}${language}/LC_MESSAGES/${COMMON}.po ]] ; then
         msgcat --use-first -o ${LOCALE_DIR}${language}/${book}.po \
             ${LOCALE_DIR}${language}/LC_MESSAGES/${book}.po \
