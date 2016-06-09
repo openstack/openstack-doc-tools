@@ -62,7 +62,7 @@ fi
 # python-openstackclient has plugin interface.
 # It needs to install plugin packages
 # (i.e. python-ironicclient).
-osc_plugins=(barbican congress cue designate heat ironic ironic-inspector- sahara zaqar)
+osc_plugins=(barbican congress designate heat ironic ironic-inspector- sahara zaqar)
 if [[ $project == 'openstack' ]]; then
     # sahara misses oslo.log dependency.
     # This is fixed in git repository and can be removed again after

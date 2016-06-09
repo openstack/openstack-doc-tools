@@ -10,8 +10,6 @@ cloudkitty:
     name: Rating service
 congress:
     name: Governance service
-cue:
-    name: Message Broker service
 designate:
     name: DNS service
     subcommands: complete
