@@ -64,10 +64,6 @@ fi
 # (i.e. python-ironicclient).
 osc_plugins=(barbican congress designate heat ironic ironic-inspector- sahara zaqar)
 if [[ $project == 'openstack' ]]; then
-    # sahara misses oslo.log dependency.
-    # This is fixed in git repository and can be removed again after
-    # next python-saharaclient release.
-    pip install --upgrade oslo.log
     for p in "${osc_plugins[@]}"
     do
         pip install --upgrade python-${p}client
