@@ -459,8 +459,15 @@ def write_files(package_name, options, target, output_format):
 
             if not option.help:
                 option.help = "No help text available for this option."
-            helptext = option.help.strip().replace('\n', ' ')
+
+            helptext = option.help.strip()
+            helptext = helptext.replace('\n\n', '$sentinal$')
+            helptext = helptext.replace('\n*', '$sentinal$*')
+            helptext = helptext.replace('\n', ' ')
             helptext = ' '.join(helptext.split())
+            # TODO(johngarbutt) space matches only the current template :(
+            helptext = helptext.replace('$sentinal$', '\n\n       ')
+
             if option.deprecated_for_removal:
                 if not option.help.strip().startswith('DEPRECATED'):
                     helptext = 'DEPRECATED: ' + helptext
