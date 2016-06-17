@@ -21,7 +21,8 @@ packages. For Ubuntu install the required packages with the following command:
 
 .. code-block:: console
 
-    $ sudo apt-get install python-dev libxml2-dev libxslt1-dev zlib1g-dev \
+    $ sudo apt-get install python-dev python-pip python-virtualenv \
+                           libxml2-dev libxslt1-dev zlib1g-dev \
                            libmysqlclient-dev libpq-dev libffi-dev \
                            libsqlite3-dev libldap2-dev libsasl2-dev \
                            libjpeg-dev liberasurecode-dev
