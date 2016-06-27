@@ -27,7 +27,7 @@ kite:
 magnum:
     name: Container Infrastructure Management service
 manila:
-    name: Shared file systems
+    name: Shared File Systems service
 mistral:
     name: Workflow service
     subcommands: complete
@@ -38,8 +38,7 @@ murano:
 neutron:
     name: Networking service
 nova:
-    name: OpenStack Compute
-    title: Compute
+    name: Compute service
 sahara:
     name: Data Processing service
 senlin:
