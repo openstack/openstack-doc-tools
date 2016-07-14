@@ -48,7 +48,9 @@ class SitemapSpider(spiders.CrawlSpider):
                 deny=[
                     r'/trunk/',
                     r'/draft/',
-                    r'/api/'
+                    r'/api/',
+                    r'/juno/',
+                    r'/icehouse/'
                 ]
             ),
             follow=True, callback='parse_item'
