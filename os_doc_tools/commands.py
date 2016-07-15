@@ -296,6 +296,10 @@ def format_help(title, lines, os_file):
 
         xline = split_line[0]
 
+        # check niceness work around for long option name, glance
+        xline = xline.replace('[<RESOURCE_TYPE_ASSOCIATIONS> ...]',
+                              '[...]')
+
         os_file.write("``" + xline + "``\n")
 
         if len(split_line) > 1:
