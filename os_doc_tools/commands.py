@@ -258,6 +258,7 @@ def format_help(title, lines, os_file):
     if title:
         os_file.write("**" + title + ":**" + "\n\n")
 
+    continued_line = ''
     for line in lines:
         if not line or line[0] != ' ':
             break
@@ -271,9 +272,17 @@ def format_help(title, lines, os_file):
         # explanation.
         if line.startswith('       '):
             # Explanation
-            xline = quote_rst(line.lstrip(' '))
+            xline = continued_line + quote_rst(line.lstrip(' '))
+            continued_line = ''
+            # Concatenate the command options with "-"
+            # For example:
+            #     see 'glance image-
+            #     show'
+            if xline.endswith('-'):
+                continued_line = xline
+                continue
+            # check niceness
             if len(xline) > (MAXLINELENGTH - 2):
-                # check niceness
                 xline = xline.replace(' ', '\n  ')
             os_file.write("  " + xline + "\n")
             continue
@@ -290,7 +299,17 @@ def format_help(title, lines, os_file):
         os_file.write("``" + xline + "``\n")
 
         if len(split_line) > 1:
-            xline = quote_rst(split_line[1])
+            # Explanation
+            xline = continued_line + quote_rst(split_line[1])
+            continued_line = ''
+            # Concatenate the command options with "-"
+            # For example:
+            #     see 'glance image-
+            #     show'
+            if xline.endswith('-'):
+                continued_line = xline
+                continue
+            # check niceness
             if len(xline) > (MAXLINELENGTH - 2):
                 # check niceness
                 xline = xline.replace(' ', '\n  ')
