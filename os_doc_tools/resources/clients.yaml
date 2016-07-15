@@ -73,6 +73,8 @@ trove-manage:
       - db_recreate
       - db_sync
       - db_upgrade
+watcher:
+    name: Infrastructure Optimization service
 zaqar:
     name: Message service
 openstack:
