@@ -36,7 +36,7 @@ def generate_index_file(publish_path):
     for root, dirs, files in os.walk(publish_path):
 
         dirs[:] = [d for d in dirs if d not in ['common', 'webapp', 'content',
-                                                'www']]
+                                                'www', 'samples']]
 
         # Ignore top-level index.html files
         if root == publish_path:
