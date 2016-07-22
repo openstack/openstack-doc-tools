@@ -741,9 +741,6 @@ def document_single_project(os_command, output_dir, continue_on_error):
                                           ["--os-image-api-version", "1"],
                                           "_v1", " (v1)")
 
-    if os_command == 'glance':
-        out_file.write(".. include:: glance_property_keys.rst\n")
-
     print("Finished.\n")
     out_file.close()
     return True
