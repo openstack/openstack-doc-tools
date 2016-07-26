@@ -438,6 +438,11 @@ def write_files(package_name, options, target, output_format):
             'items': [],
         }
 
+        # Skip the options that is explicitly marked as disabled,
+        # which is used for common configuration options.
+        if cat == 'disable':
+            continue
+
         if cat in category_names:
             env['nice_cat'] = category_names[cat]
         else:
