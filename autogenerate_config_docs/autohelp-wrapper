@@ -23,7 +23,7 @@ EXTRACT_SWIFT="python $HERE/extract_swift_flags.py"
 GITBASE=${GITBASE:-git://git.openstack.org/openstack}
 GITPROJ=${GITPROJ:-git://git.openstack.org/openstack}
 PROJECTS="aodh ceilometer cinder glance heat ironic keystone manila \
-            neutron nova sahara swift trove zaqar"
+            murano neutron nova sahara senlin swift trove zaqar"
 MANUALS_PROJECTS="openstack-manuals"
 BRANCH=master
 FAST=0
