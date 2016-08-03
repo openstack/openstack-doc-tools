@@ -55,6 +55,7 @@ _TYPE_DESCRIPTIONS = {
     cfg.FloatOpt: 'Floating point',
     cfg.ListOpt: 'List',
     cfg.DictOpt: 'Dict',
+    cfg.PortOpt: 'Port number',
     cfg.MultiStrOpt: 'Multi-valued',
     cfg._ConfigFileOpt: 'List of filenames',
     cfg._ConfigDirOpt: 'List of directory names',
