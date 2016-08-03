@@ -712,19 +712,9 @@ def document_single_project(os_command, output_dir, continue_on_error):
                              extra_params, "", "")
     elif os_command == 'glance':
         format_heading("Image service API v2 commands", 2, out_file)
-        out_file.write("You can select an API version to use by adding the\n")
-        out_file.write(":option:`--os-image-api-version` parameter or by\n")
-        out_file.write("setting the corresponding environment variable:\n\n")
 
-        out_file.write(".. code-block:: console\n\n")
-        out_file.write("   export OS_IMAGE_API_VERSION=2\n\n")
-
-        discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          ["--os-image-api-version", "2"],
-                                          "_v2", " (v2)")
-    else:
-        discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          None, "", "")
+    discover_and_generate_subcommands(os_command, out_file, subcommands,
+                                      None, "", "")
 
     # Print subcommands for different API versions
     if os_command == 'cinder':
@@ -737,6 +727,13 @@ def document_single_project(os_command, output_dir, continue_on_error):
     if os_command == 'glance':
         out_file.write("\n")
         format_heading("Image service API v1 commands", 2, out_file)
+        out_file.write("As of this version, the default API version is 2.\n")
+        out_file.write("You can select an API version to use by adding the\n")
+        out_file.write(":option:`--os-image-api-version` parameter or by\n")
+        out_file.write("setting the corresponding environment variable:\n\n")
+
+        out_file.write(".. code-block:: console\n\n")
+        out_file.write("   export OS_IMAGE_API_VERSION=1\n\n")
         discover_and_generate_subcommands(os_command, out_file, subcommands,
                                           ["--os-image-api-version", "1"],
                                           "_v1", " (v1)")
