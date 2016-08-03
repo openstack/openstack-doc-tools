@@ -9,8 +9,7 @@ openstack-doc-tools style commandments
 Running tests
 -------------
 
-So far there are no tests included with the package but a test suite
-would be welcome!
+So far there are some tests included with the package.
 
 The openstack-indexpage tool is used while building the OpenStack
 documentation repositories, test building of these repositories with

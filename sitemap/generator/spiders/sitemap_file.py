@@ -13,9 +13,9 @@
 import time
 import urlparse
 
-from generator import items
 from scrapy.linkextractors import LinkExtractor
 from scrapy import spiders
+from sitemap.generator import items
 
 
 class SitemapSpider(spiders.CrawlSpider):
