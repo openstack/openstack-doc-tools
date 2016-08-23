@@ -17,7 +17,42 @@ glance:
     name: Image service
 gnocchi:
     name: A time series storage and resources index service
-    subcommands: complete
+    subcommands:
+      - archive-policy create
+      - archive-policy delete
+      - archive-policy list
+      - archive-policy show
+      - archive-policy update
+      - archive-policy-rule create
+      - archive-policy-rule delete
+      - archive-policy-rule list
+      - archive-policy-rule show
+      - benchmark measures add
+      - benchmark measures show
+      - benchmark metric create
+      - benchmark metric show
+      - capabilities list
+      - complete
+      - help
+      - measures add
+      - measures batch-metrics
+      - measures batch-resources-metrics
+      - measures show
+      - metric create
+      - metric delete
+      - metric list
+      - metric show
+      - resource create
+      - resource delete
+      - resource history
+      - resource list
+      - resource show
+      - resource update
+      - resource-type create
+      - resource-type delete
+      - resource-type list
+      - resource-type show
+      - status
 heat:
     name: Orchestration service
 ironic:
