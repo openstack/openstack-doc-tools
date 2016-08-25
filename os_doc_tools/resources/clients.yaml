@@ -92,6 +92,8 @@ swift:
       - stat
       - tempurl
       - upload
+tacker:
+    name: NFV Orchestration service
 tripleo:
     name: Deployment service
 trove:
