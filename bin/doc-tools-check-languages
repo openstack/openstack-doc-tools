@@ -13,6 +13,8 @@
 # under the License.
 
 BUILD_FAIL=0
+INSTALL_TAGS="obs rdo ubuntu debian debconf"
+FIRSTAPP_TAGS="libcloud dotnet fog openstacksdk pkgcloud shade"
 
 function build_rst {
     language=$1
@@ -83,7 +85,7 @@ function build_rst {
     # Build all books
     if [ ${book} = "firstapp" ] ; then
         # Firstapp has several variations, build all of them
-        for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
+        for tag in $FIRSTAPP_TAGS ; do
             BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
             DOCTREES="${BUILD_DIR}.doctrees"
             tox -evenv "sphinx-build -q -E \
@@ -97,7 +99,6 @@ function build_rst {
         done
     elif [ ${book} = "install-guide" ] ; then
         # Install Guide has several variations, build all of them
-        TAGS="obs rdo ubuntu debian debconf"
         INDEX=${DOC_DIR}${book}/source/index.rst
 
         # For translation work, we should have only one index file,
@@ -110,7 +111,7 @@ function build_rst {
         cp -f ${INDEX} ${INDEX}.save
         trap "mv -f ${INDEX}.save ${INDEX}" EXIT
 
-        for tag in $TAGS; do
+        for tag in $INSTALL_TAGS; do
             if [[ "$tag" == "debconf" ]]; then
                 # Build the guide with debconf
                 # To use debian only contents, use "debian" tag.
@@ -223,14 +224,14 @@ function handle_draft_language {
                 rmdir --ignore-fail-on-non-empty publish-docs/$language/draft
                 ;;
             firstapp)
-                for tag in libcloud dotnet fog openstacksdk pkgcloud shade; do
+                for tag in $FIRSTAPP_TAGS; do
                     mv publish-docs/$language/$book-${tag} \
                         publish-docs/draft/$language/$book-${tag}
                 done
                 rmdir --ignore-fail-on-non-empty publish-docs/$language/
                 ;;
             install-guide)
-                for tag in obs rdo ubuntu ; do
+                for tag in $INSTALL_TAGS ; do
                     mv publish-docs/$language/$book-${tag} \
                         publish-docs/draft/$language/$book-${tag}
                 done
