@@ -13,6 +13,37 @@ congress:
 designate:
     name: DNS service
     subcommands: complete
+freezer:
+    name: Backup, Restore, and Disaster Recovery service
+    subcommands:
+      - job-show
+      - job-list
+      - job-create
+      - job-get
+      - job-delete
+      - job-start
+      - job-stop
+      - job-abort
+      - job-update
+      - client-list
+      - client-show
+      - client-register
+      - client-delete
+      - backup-list
+      - backup-show
+      - session-list
+      - session-show
+      - session-create
+      - session-add-job
+      - session-remove-job
+      - session-start
+      - session-end
+      - session-update
+      - action-show
+      - action-list
+      - action-delete
+      - action-create
+      - action-update
 glance:
     name: Image service
 gnocchi:
