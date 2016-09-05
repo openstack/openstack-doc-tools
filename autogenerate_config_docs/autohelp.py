@@ -132,7 +132,7 @@ def import_modules(repo_location, package_name, verbose=0):
                     continue
                 except Exception as e:
                     print("Impossible to import module %s" % modname)
-                    raise e
+                    raise
 
                 _register_runtime_opts(module, abs_path, verbose)
                 _run_hook(modname)
