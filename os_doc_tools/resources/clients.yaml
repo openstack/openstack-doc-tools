@@ -145,6 +145,3 @@ watcher:
     name: Infrastructure Optimization service
 zaqar:
     name: Message service
-openstack:
-    name: OpenStack
-    subcommands: complete
