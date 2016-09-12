@@ -678,18 +678,14 @@ def document_single_project(os_command, output_dir, continue_on_error):
         subcommands = data.get('subcommands')
 
     if os_command == 'cinder':
-        format_heading("Block Storage API v2 commands", 2, out_file)
-
         out_file.write("You can select an API version to use by adding the\n")
         out_file.write(":option:`--os-volume-api-version` parameter or by\n")
         out_file.write("setting the corresponding environment variable:\n\n")
 
         out_file.write(".. code-block:: console\n\n")
-        out_file.write("   export OS_VOLUME_API_VERSION=2\n\n")
+        out_file.write("   export OS_VOLUME_API_VERSION=1\n\n")
 
-        discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          ["--os-volume-api-version", "2"],
-                                          "", "")
+        out_file.write("This chapter describes the commands with API v2.\n\n")
     elif os_command == 'openstack':
         format_heading("OpenStack with Identity API v3 commands", 2, out_file)
 
@@ -717,13 +713,6 @@ def document_single_project(os_command, output_dir, continue_on_error):
                                       None, "", "")
 
     # Print subcommands for different API versions
-    if os_command == 'cinder':
-        out_file.write("\n")
-        format_heading("Block Storage API v1 commands (DEPRECATED)",
-                       2, out_file)
-
-        discover_and_generate_subcommands(os_command, out_file, subcommands,
-                                          None, "_v1", " (v1)")
     if os_command == 'glance':
         out_file.write("\n")
         format_heading("Image service API v1 commands", 2, out_file)
