@@ -1,0 +1,7 @@
+other:
+  - |
+    For translated manuals, the command ``doc-tools-check-languages``
+    now places a marker file in the root of each directory. This
+    marker file is needed for proper publishing in the OpenStack CI
+    environment. For details, see
+    http://specs.openstack.org/openstack-infra/infra-specs/specs/doc-publishing.html.

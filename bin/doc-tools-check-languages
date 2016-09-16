@@ -16,6 +16,10 @@ BUILD_FAIL=0
 INSTALL_TAGS="obs rdo ubuntu debian debconf"
 FIRSTAPP_TAGS="libcloud dotnet fog openstacksdk pkgcloud shade"
 
+# This marker is needed for Infra publishing and needs to go into the
+# root directory of each translated manual as file ".root-marker".
+MARKER_TEXT="Project: $ZUUL_PROJECT Ref: $ZUUL_REFNAME Build: $ZUUL_UUID"
+
 function build_rst {
     language=$1
     book=$2
@@ -93,9 +97,10 @@ function build_rst {
                 -d ${DOCTREES}
                 ${DOC_DIR}${book}/source/ \
                 ${BUILD_DIR}"
-            mkdir -p publish-docs/${language}/${book}-${tag}
-            rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
-                publish-docs/${language}/${book}-${tag}
+            PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
+            mkdir -p ${PUBLISH_DIR}
+            rsync -a ${DOC_DIR}${book}/build-${tag}/html/ ${PUBLISH_DIR}
+            echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
         done
     elif [ ${book} = "install-guide" ] ; then
         # Install Guide has several variations, build all of them
@@ -122,9 +127,11 @@ function build_rst {
                     -d ${DOCTREES}
                     ${DOC_DIR}${book}-${tag}/source/ \
                     ${BUILD_DIR}"
-                mkdir -p publish-docs/${language}/${book}-${tag}
+                PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
+                mkdir -p ${PUBLISH_DIR}
                 rsync -a ${DOC_DIR}${book}-${tag}/build-${tag}/html/ \
-                    publish-docs/${language}/${book}-${tag}
+                    ${PUBLISH_DIR}
+                echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
             else
                 ##
                 # Because Sphinx uses the first heading as title regardless of
@@ -148,9 +155,11 @@ function build_rst {
                     -d ${DOCTREES}
                     ${DOC_DIR}${book}/source/ \
                     ${BUILD_DIR}"
-                mkdir -p publish-docs/${language}/${book}-${tag}
+                PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
+                mkdir -p ${PUBLISH_DIR}
                 rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
-                    publish-docs/${language}/${book}-${tag}
+                    ${PUBLISH_DIR}
+                echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
             fi
         done
     else
@@ -161,9 +170,10 @@ function build_rst {
             -d ${DOCTREES} \
             ${DOC_DIR}${book}/source/ \
             ${BUILD_DIR}"
-        mkdir -p publish-docs/${language}/${book}/
-        rsync -a ${DOC_DIR}${book}/build/html/ \
-            publish-docs/${language}/${book}/
+        PUBLISH_DIR=publish-docs/${language}/${book}/
+        mkdir -p ${PUBLISH_DIR}
+        rsync -a ${DOC_DIR}${book}/build/html/ ${PUBLISH_DIR}
+        echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
     fi
     # Remove newly created files
     git clean -f -q ${LOCALE_DIR}${language}/LC_MESSAGES/*.po
