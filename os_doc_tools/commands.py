@@ -100,13 +100,9 @@ def generate_heading(os_command, api_name, title,
         os_file.write("   For a Python library, continue using\n")
         os_file.write("   python-" + os_command + "client.\n\n")
 
-    if os_command == "openstack":
-        os_file.write("The openstack client is a common OpenStack")
-        os_file.write("command-line interface (CLI).\n\n")
-    else:
-        os_file.write("The " + os_command + " client is the command-line ")
-        os_file.write("interface (CLI) for\n")
-        os_file.write("the " + api_name + " and its extensions.\n\n")
+    os_file.write("The " + os_command + " client is the command-line ")
+    os_file.write("interface (CLI) for\n")
+    os_file.write("the " + api_name + " and its extensions.\n\n")
 
     os_file.write("This chapter documents :command:`" + os_command + "` ")
     os_file.write("version ``" + version + "``.\n\n")
@@ -686,26 +682,6 @@ def document_single_project(os_command, output_dir, continue_on_error):
         out_file.write("   export OS_VOLUME_API_VERSION=1\n\n")
 
         out_file.write("This chapter describes the commands with API v2.\n\n")
-    elif os_command == 'openstack':
-        format_heading("OpenStack with Identity API v3 commands", 2, out_file)
-
-        out_file.write(".. important::\n\n")
-        out_file.write("   OpenStack Identity API v2 is deprecated in\n")
-        out_file.write("   the Mitaka release and later.\n\n")
-        out_file.write("   You can select the Identity API version to use\n")
-        out_file.write("   by adding the\n")
-        out_file.write("   :option:`--os-identity-api-version`\n")
-        out_file.write("   parameter or by setting the corresponding\n")
-        out_file.write("   environment variable:\n\n")
-
-        out_file.write("   .. code-block:: console\n\n")
-        out_file.write("      export OS_IDENTITY_API_VERSION=3\n\n")
-
-        extra_params = ["--os-auth-type", "token"]
-        subcommands = discover_subcommands(os_command, subcommands,
-                                           extra_params)
-        generate_subcommands(os_command, out_file, subcommands,
-                             extra_params, "", "")
     elif os_command == 'glance':
         format_heading("Image service API v2 commands", 2, out_file)
 

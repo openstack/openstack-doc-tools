@@ -1,0 +1,4 @@
+---
+other:
+  - Unsupport OpenStackClient in CLI Reference
+    in favor of docs in the OSC project itself.
