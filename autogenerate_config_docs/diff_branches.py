@@ -37,11 +37,14 @@ CODENAME_TITLE = {'aodh': 'Alarming',
                   'ironic': 'Bare Metal service',
                   'keystone': 'Identity service',
                   'manila': 'Shared File Systems service',
+                  'murano': 'Application Catalog service',
                   'neutron': 'Networking',
                   'nova': 'Compute',
                   'sahara': 'Data Processing service',
+                  'senlin': 'Clustering service',
                   'swift': 'Object Storage service',
-                  'trove': 'Database service'}
+                  'trove': 'Database service',
+                  'zaqar': 'Message service'}
 
 
 def setup_venv(projects, branch, novenvupdate):
