@@ -37,7 +37,7 @@ class TestIgnoreDuplicateUrls(unittest.TestCase):
         self.ignore_urls = pipelines.IgnoreDuplicateUrls()
 
     def test_set_is_set_at_init(self):
-        self.assertTrue(isinstance(self.ignore_urls.processed, set))
+        self.assertIsInstance(self.ignore_urls.processed, set)
 
     def test_set_is_empty_at_init(self):
         self.assertEqual(len(self.ignore_urls.processed), 0)
@@ -72,7 +72,7 @@ class TestExportSitemap(unittest.TestCase):
         self.spider = mock.MagicMock()
 
     def test_variables_set_at_init(self):
-        self.assertTrue(isinstance(self.export_sitemap.files, dict))
+        self.assertIsInstance(self.export_sitemap.files, dict)
         self.assertTrue(self.export_sitemap.exporter is None)
 
     def test_spider_opened_calls_open(self):
