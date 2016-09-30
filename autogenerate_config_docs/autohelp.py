@@ -279,7 +279,7 @@ class OptionsCache(object):
     def _add_opt(self, optname, group, opt):
         if optname in self._opts_by_name:
             if self._verbose >= 2:
-                print ("Duplicate option name %s" % optname)
+                print("Duplicate option name %s" % optname)
             return
 
         opt.default = _sanitize_default(opt)
