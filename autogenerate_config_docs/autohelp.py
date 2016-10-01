@@ -478,7 +478,8 @@ def write_files(package_name, options, target, output_format):
                 if not option.help.strip().startswith('DEPRECATED'):
                     helptext = 'DEPRECATED: ' + helptext
                 if getattr(option, 'deprecated_reason', None):
-                    helptext += ' ' + option.deprecated_reason
+                    helptext += ' '
+                    helptext += option.deprecated_reason.lstrip().rstrip()
 
             opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
             flags = []
