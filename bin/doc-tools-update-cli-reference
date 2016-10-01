@@ -15,7 +15,7 @@
 if [[ $# -ne 1 ]]; then
     echo "usage: $0 PROJECT"
     echo
-    echo "PROJECT = something like openstack, nova, or neutron"
+    echo "PROJECT = something like nova, neutron or glance"
     exit 1
 fi
 
@@ -58,16 +58,6 @@ if [[ $project == 'gnocchi' ]]; then
     pip install --upgrade ${project}client
 else
     pip install --upgrade python-${project}client
-fi
-# python-openstackclient has plugin interface.
-# It needs to install plugin packages
-# (i.e. python-ironicclient).
-osc_plugins=(barbican congress designate heat ironic ironic-inspector- sahara zaqar)
-if [[ $project == 'openstack' ]]; then
-    for p in "${osc_plugins[@]}"
-    do
-        pip install --upgrade python-${p}client
-    done
 fi
 
 rm -rf output
