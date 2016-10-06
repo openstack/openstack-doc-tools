@@ -1,9 +1,26 @@
+=================
 Sitemap Generator
-*****************
+=================
 
 This script crawls all available sites on http://docs.openstack.org and extracts
 all URLs. Based on the URLs the script generates a sitemap for search engines
 according to the protocol described at http://www.sitemaps.org/protocol.html.
+
+Installation
+============
+
+To install the needed modules you can use pip or the package management system included
+in your distribution. When using the package management system maybe the name of the
+packages differ. Installation in a virtual environment is recommended.
+
+    $ virtualenv venv
+    $ source venv/bin/activate
+    $ pip install -r requirements.txt
+
+When using pip it's maybe necessary to install some development packages.
+For example on Ubuntu 16.04 install the following packages.
+
+    $ sudo apt install gcc libssl-dev python-dev python-virtualenv
 
 Usage
 =====
@@ -28,14 +45,3 @@ It is possible to define a set of additional start URLs using the attribute
 ``urls``. Separate multiple URLs with ``,``.
 
     $ scrapy crawl sitemap -a domain=developer.openstack.org -a urls="http://developer.openstack.org/de/api-guide/quick-start/"
-
-Dependencies
-============
-
-* `Scrapy <https://pypi.python.org/pypi/Scrapy>`_
-
-To install the needed modules you can use pip or the package management system included
-in your distribution. When using the package management system maybe the name of the
-packages differ. When using pip it's maybe necessary to install some development packages.
-
-    $ pip install -r requirements.txt
