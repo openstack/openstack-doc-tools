@@ -13,9 +13,17 @@
 import time
 import urlparse
 
+from scrapy import item
 from scrapy.linkextractors import LinkExtractor
 from scrapy import spiders
-from sitemap.generator import items
+
+
+class SitemapItem(item.Item):
+    '''Class to represent an item in the sitemap.'''
+    loc = item.Field()
+    lastmod = item.Field()
+    priority = item.Field()
+    changefreq = item.Field()
 
 
 class SitemapSpider(spiders.CrawlSpider):
@@ -68,7 +76,7 @@ class SitemapSpider(spiders.CrawlSpider):
             self.start_urls.append(url)
 
     def parse_item(self, response):
-        item = items.SitemapItem()
+        item = SitemapItem()
         item['loc'] = response.url
 
         path = urlparse.urlsplit(response.url).path
