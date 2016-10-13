@@ -54,10 +54,12 @@ _TYPE_DESCRIPTIONS = {
     cfg.IntOpt: 'Integer',
     cfg.IPOpt: 'IP',
     cfg.FloatOpt: 'Floating point',
+    cfg.HostnameOpt: 'Hostname',
     cfg.ListOpt: 'List',
     cfg.DictOpt: 'Dict',
     cfg.PortOpt: 'Port number',
     cfg.MultiStrOpt: 'Multi-valued',
+    cfg.URIOpt: 'URI',
     cfg._ConfigFileOpt: 'List of filenames',
     cfg._ConfigDirOpt: 'List of directory names',
 }
