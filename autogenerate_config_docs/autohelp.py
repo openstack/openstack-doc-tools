@@ -52,6 +52,7 @@ _TYPE_DESCRIPTIONS = {
     cfg.StrOpt: 'String',
     cfg.BoolOpt: 'Boolean',
     cfg.IntOpt: 'Integer',
+    cfg.IPOpt: 'IP',
     cfg.FloatOpt: 'Floating point',
     cfg.ListOpt: 'List',
     cfg.DictOpt: 'Dict',
