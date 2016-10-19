@@ -23,29 +23,29 @@ distribution.
 
 On Fedora::
 
-    yum install python-lxml
+    $ yum install python-lxml
 
 On openSUSE::
 
-    zypper in python-lxml
+    $ zypper in python-lxml
 
 On Ubuntu::
 
-    apt-get install python-lxml
+    $ apt-get install python-lxml
 
 For building from source,  install the dependencies of lxml.
 
 On Fedora::
 
-    yum install python-devel libxml2-devel libxslt-devel
+    $ yum install python-devel libxml2-devel libxslt-devel
 
 On openSUSE::
 
-    zypper in libxslt-devel
+    $ zypper in libxslt-devel
 
 On Ubuntu::
 
-    apt-get install libxml2-dev libxslt-dev
+    $ apt-get install libxml2-dev libxslt-dev
 
 
 * License: Apache License, Version 2.0
