@@ -105,8 +105,6 @@ neutron:
     name: Networking service
 nova:
     name: Compute service
-sahara:
-    name: Data Processing service
 senlin:
     name: Clustering service
 solum:

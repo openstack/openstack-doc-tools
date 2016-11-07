@@ -368,7 +368,7 @@ def generate_command(os_command, os_file):
                 next_line_screen = True
                 ignore_next_lines = True
                 continue
-            # magnum and sahara
+            # magnum
             if line.startswith('Common auth options'):
                 if in_screen:
                     os_file.write("\n\n")
