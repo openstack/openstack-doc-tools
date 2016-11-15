@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 2
 
    readme
+   autogenerate_config_docs
    release_notes
    installation
    usage
