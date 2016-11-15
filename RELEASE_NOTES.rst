@@ -264,7 +264,7 @@ Fixes for openstack-doc-test:
 * Create proper chapter title for markdown files.
 * Ignore publish-docs directory completely.
 * Do not check for xml:ids in wadl resource.
-* New option build_file_excepetion to ignore invalid XML files for
+* New option build_file_exception to ignore invalid XML files for
   dependency checking in build and syntax checks.
 
 Fixes for autodoc-tools to sanitize values and handle projects.
