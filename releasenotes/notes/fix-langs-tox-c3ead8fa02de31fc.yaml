@@ -1,0 +1,5 @@
+---
+fixes:
+  - Fix doc-tools-check-languages, it used a wrong way
+    of passing arguments to tox and failed therefore with
+    tox 2.5.0.

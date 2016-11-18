@@ -42,8 +42,8 @@ function build_rst {
     LOCALE_DIR="${DOC_DIR}${book}/source/locale/"
     COMMON_DIR="${DOC_DIR}${COMMON}/source/locale/"
 
-    tox -evenv "sphinx-build -q -E -W -b gettext $TAG \
-                ${DOC_DIR}${book}/source/ ${LOCALE_DIR}"
+    tox -evenv -- sphinx-build -q -E -W -b gettext $TAG \
+                ${DOC_DIR}${book}/source/ ${LOCALE_DIR}
 
 
     # Merge the common po file
@@ -92,11 +92,11 @@ function build_rst {
         for tag in $FIRSTAPP_TAGS ; do
             BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
             DOCTREES="${BUILD_DIR}.doctrees"
-            tox -evenv "sphinx-build -q -E \
+            tox -evenv -- sphinx-build -q -E \
                 -t $tag -D language=${language} \
                 -d ${DOCTREES}
                 ${DOC_DIR}${book}/source/ \
-                ${BUILD_DIR}"
+                ${BUILD_DIR}
             PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
             mkdir -p ${PUBLISH_DIR}
             rsync -a ${DOC_DIR}${book}/build-${tag}/html/ ${PUBLISH_DIR}
@@ -122,11 +122,11 @@ function build_rst {
                 # To use debian only contents, use "debian" tag.
                 BUILD_DIR="${DOC_DIR}${book}-${tag}/build-${tag}/html"
                 DOCTREES="${BUILD_DIR}.doctrees"
-                tox -evenv "sphinx-build -q -E -t debian \
+                tox -evenv -- sphinx-build -q -E -t debian \
                     -D language=${language}
                     -d ${DOCTREES}
                     ${DOC_DIR}${book}-${tag}/source/ \
-                    ${BUILD_DIR}"
+                    ${BUILD_DIR}
                 PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
                 mkdir -p ${PUBLISH_DIR}
                 rsync -a ${DOC_DIR}${book}-${tag}/build-${tag}/html/ \
@@ -150,11 +150,11 @@ function build_rst {
                 # Build the guide
                 BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
                 DOCTREES="${BUILD_DIR}.doctrees"
-                tox -evenv "sphinx-build -q -E -t $tag \
+                tox -evenv -- sphinx-build -q -E -t $tag \
                     -D language=${language}
                     -d ${DOCTREES}
                     ${DOC_DIR}${book}/source/ \
-                    ${BUILD_DIR}"
+                    ${BUILD_DIR}
                 PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
                 mkdir -p ${PUBLISH_DIR}
                 rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
@@ -165,11 +165,11 @@ function build_rst {
     else
         BUILD_DIR="${DOC_DIR}${book}/build/html"
         DOCTREES="${BUILD_DIR}.doctrees"
-        tox -evenv "sphinx-build \
+        tox -evenv -- sphinx-build \
             -q -E -D language=${language} \
             -d ${DOCTREES} \
             ${DOC_DIR}${book}/source/ \
-            ${BUILD_DIR}"
+            ${BUILD_DIR}
         PUBLISH_DIR=publish-docs/${language}/${book}/
         mkdir -p ${PUBLISH_DIR}
         rsync -a ${DOC_DIR}${book}/build/html/ ${PUBLISH_DIR}
