@@ -94,7 +94,7 @@ function build_rst {
             DOCTREES="${BUILD_DIR}.doctrees"
             tox -evenv -- sphinx-build -q -E \
                 -t $tag -D language=${language} \
-                -d ${DOCTREES}
+                -d ${DOCTREES} \
                 ${DOC_DIR}${book}/source/ \
                 ${BUILD_DIR}
             PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
@@ -123,8 +123,8 @@ function build_rst {
                 BUILD_DIR="${DOC_DIR}${book}-${tag}/build-${tag}/html"
                 DOCTREES="${BUILD_DIR}.doctrees"
                 tox -evenv -- sphinx-build -q -E -t debian \
-                    -D language=${language}
-                    -d ${DOCTREES}
+                    -D language=${language} \
+                    -d ${DOCTREES} \
                     ${DOC_DIR}${book}-${tag}/source/ \
                     ${BUILD_DIR}
                 PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
@@ -151,8 +151,8 @@ function build_rst {
                 BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
                 DOCTREES="${BUILD_DIR}.doctrees"
                 tox -evenv -- sphinx-build -q -E -t $tag \
-                    -D language=${language}
-                    -d ${DOCTREES}
+                    -D language=${language} \
+                    -d ${DOCTREES} \
                     ${DOC_DIR}${book}/source/ \
                     ${BUILD_DIR}
                 PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
