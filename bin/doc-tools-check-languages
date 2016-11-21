@@ -17,7 +17,7 @@ FIRSTAPP_TAGS="libcloud dotnet fog openstacksdk pkgcloud shade"
 
 # This marker is needed for Infra publishing and needs to go into the
 # root directory of each translated manual as file ".root-marker".
-MARKER_TEXT="Project: $ZUUL_PROJECT Ref: $ZUUL_REFNAME Build: $ZUUL_UUID"
+MARKER_TEXT="Project: $ZUUL_PROJECT Ref: $ZUUL_REFNAME Build: $ZUUL_UUID Revision: $ZUUL_NEWREV"
 
 function build_rst {
     language=$1
