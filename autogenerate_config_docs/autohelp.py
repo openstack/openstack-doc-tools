@@ -565,8 +565,8 @@ def main():
         description='Manage flag files, to aid in updating documentation.',
         usage='%(prog)s <cmd> <package> [options]')
     parser.add_argument('subcommand',
-                        help='Action (update, docbook, rst, dump).',
-                        choices=['update', 'docbook', 'rst', 'dump'])
+                        help='Action (update, rst, dump).',
+                        choices=['update', 'rst', 'dump'])
     parser.add_argument('package',
                         help='Name of the top-level package.')
     parser.add_argument('-v', '--verbose',
@@ -586,7 +586,7 @@ def main():
                         dest='target',
                         help='Directory or file in which data will be saved.\n'
                              'Defaults to ../../doc/common/tables/ '
-                             'for "docbook".\n'
+                             'for "rst".\n'
                              'Defaults to stdout for "dump"',
                         required=False,
                         type=str,)
@@ -621,7 +621,7 @@ def main():
     if args.subcommand == 'update':
         update_flagmappings(args.package, options, verbose=args.verbose)
 
-    elif args.subcommand in ('docbook', 'rst'):
+    elif args.subcommand == 'rst':
         write_files(args.package, options, args.target, args.subcommand)
 
     elif args.subcommand == 'dump':

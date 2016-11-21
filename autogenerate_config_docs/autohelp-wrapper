@@ -32,11 +32,10 @@ QUIET=0
 usage() {
     echo "Wrapper for autohelp.py"
     echo "Usage:"
-    echo "  $(basename $0) [ OPTIONS ] update|docbook|rst|setup [ project... ]"
+    echo "  $(basename $0) [ OPTIONS ] update|rst|setup [ project... ]"
     echo
     echo "Subcommands:"
     echo "  update:     Update or create the flagmapping files"
-    echo "  docbook:    Generate the options tables in docbook format"
     echo "  rst:        Generate the options tables in RST format"
     echo "  setup:      Install the environment only"
     echo
@@ -149,7 +148,7 @@ if [ $QUIET -eq 1 ]; then
 fi
 
 case $ACTION in
-    update|docbook|rst|dump|setup) ;;
+    update|rst|dump|setup) ;;
     *)
         usage
         exit 1
@@ -248,14 +247,6 @@ for project in $PROJECTS; do
         $AUTOHELP update $project -i $SOURCESDIR/$project/$project \
             $extra_flags $AUTOOPT
         mv $project.flagmappings.new $project.flagmappings
-        ;;
-    docbook)
-        if [ "$project" = "swift" ]; then
-            $EXTRACT_SWIFT docbook -m $MANUALSREPO -s $SOURCESDIR/swift
-        else
-            $AUTOHELP docbook $project -i $SOURCESDIR/$project/$project \
-                $extra_flags $AUTOOPT
-        fi
         ;;
     rst)
         if [ "$project" = "swift" ]; then
