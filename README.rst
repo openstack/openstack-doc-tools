@@ -51,3 +51,9 @@ On Ubuntu::
 * License: Apache License, Version 2.0
 * Source: http://git.openstack.org/cgit/openstack/openstack-doc-tools
 * Bugs: http://bugs.launchpad.net/openstack-manuals
+
+
+Regenerating config option tables
+=================================
+
+See :ref:`autogenerate_config_docs`.

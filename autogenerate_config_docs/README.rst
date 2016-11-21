@@ -1,3 +1,5 @@
+.. _autogenerate_config_docs:
+
 autogenerate_config_docs
 ========================
 
