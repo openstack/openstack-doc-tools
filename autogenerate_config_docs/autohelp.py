@@ -470,8 +470,9 @@ def write_files(package_name, options, target, output_format):
                 option.help = "No help text available for this option."
 
             helptext = option.help.strip()
+
+            helptext = re.sub(r'\n+\s*\* ', '$sentinal$* ', helptext)
             helptext = helptext.replace('\n\n', '$sentinal$')
-            helptext = helptext.replace('\n*', '$sentinal$*')
             helptext = helptext.replace('\n', ' ')
             helptext = ' '.join(helptext.split())
             # TODO(johngarbutt) space matches only the current template :(
