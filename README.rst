@@ -4,8 +4,8 @@ OpenStack Doc Tools
 This repository contains tools used by the OpenStack Documentation
 project.
 
-For more details, see the `OpenStack Documentation wiki page
-<http://wiki.openstack.org/Documentation>`_.
+For more details, see the `OpenStack Documentation Contributor Guide
+<http://docs.openstack.org/contributor-guide/>`_.
 
 Prerequisites
 =============
