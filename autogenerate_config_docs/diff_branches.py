@@ -28,7 +28,7 @@ import jinja2
 PROJECTS = ['aodh', 'ceilometer', 'cinder', 'glance', 'heat', 'ironic',
             'keystone', 'manila', 'neutron', 'nova', 'sahara', 'swift',
             'trove']
-MASTER_RELEASE = 'Mitaka'
+MASTER_RELEASE = 'Ocata'
 CODENAME_TITLE = {'aodh': 'Alarming',
                   'ceilometer': 'Telemetry',
                   'cinder': 'Block Storage',
@@ -262,11 +262,11 @@ def main():
                         type=str,)
     parser.add_argument('-f', '--format',
                         dest='format',
-                        help='Output format (docbook or rst).',
+                        help='Output format (rst).',
                         required=False,
                         default='rst',
                         type=str,
-                        choices=('docbook', 'rst'),)
+                        choices=('rst'),)
     parser.add_argument('-n', '--no-venv-update',
                         dest='novenvupdate',
                         help='Don\'t update the virtual envs.',

@@ -18,8 +18,10 @@ then runs the ``autohelp.py`` script in the virtual environment.
 New and updated flagmappings are generated in the ``openstack-manuals``
 repository (``tools/autogenerate-config-flagmappings/`` directory).
 
-Prior to running the following commands you need to install several development
-packages. For Ubuntu install the required packages with the following command:
+Prior to running the following commands, you need to install several development
+packages.
+
+On Ubuntu:
 
 .. code-block:: console
 
@@ -29,10 +31,21 @@ packages. For Ubuntu install the required packages with the following command:
                            libsqlite3-dev libldap2-dev libsasl2-dev \
                            libjpeg-dev liberasurecode-dev
 
+On RHEL 7 and CentOS 7:
+
+.. code-block:: console
+
+    $ sudo yum install https://www.rdoproject.org/repos/rdo-release.rpm
+    $ sudo yum update
+    $ sudo yum install python-devel python-pip python-virtualenv \
+                           libxml2-devel libxslt-devel zlib-devel \
+                           mariadb-devel postgresql-devel libffi-devel \
+                           sqlite-devel openldap-devel cyrus-sasl-devel \
+                           libjpeg-turbo-devel liberasurecode-devel gcc git
 
 .. note::
     * libjpeg is needed for ironic
-    * liberasurecode-dev is needed for swift
+    * liberasurecode is needed for swift
 
 The workflow is:
 
@@ -45,10 +58,9 @@ The workflow is:
     $ # check the results in sources/openstack-manuals
 
 This will generate the tables for all the known projects.
-Note for Neutron project: If the driver/plugin resides outside the Neutron
-repository in stackforge, then the driver/plugin has to be explicitly
-installed within the virtual environment to generate the configuration
-options.
+Note for neutron project: If the driver/plugin resides outside the neutron
+repository, then the driver/plugin has to be explicitly installed within the
+virtual environment to generate the configuration options.
 
 To generate the mappings and tables for a subset of projects, use the code
 names as arguments:
@@ -72,7 +84,7 @@ The flagmappings files use the following format:
 Groups need to be defined manually to organize the configuration tables.
 
 The group values can only contain alphanumeric characters, _ and - (they will
-be used as docbook IDs).
+be used as document IDs).
 
 To make the table titles more user friendly, create or edit the PROJECT.headers
 file in the manuals repository. Each line of this file is of the form:

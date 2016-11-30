@@ -21,7 +21,7 @@ packages installed.
 To install python-lxml, execute the following based on your
 distribution.
 
-On Fedora::
+On Fedora, RHEL 7, and CentOS 7::
 
     $ yum install python-lxml
 
@@ -35,7 +35,7 @@ On Ubuntu::
 
 For building from source,  install the dependencies of lxml.
 
-On Fedora::
+On Fedora, RHEL 7, and CentOS 7::
 
     $ yum install python-devel libxml2-devel libxslt-devel
 
