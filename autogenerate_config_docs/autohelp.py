@@ -36,7 +36,10 @@ except Exception:
     pass
 
 sys.path.insert(0, '.')
-from hooks import HOOKS  # noqa
+try:
+    from hooks import HOOKS  # noqa
+except ImportError:
+    pass
 
 
 EXTENSIONS = ['oslo.cache',
