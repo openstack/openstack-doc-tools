@@ -1,20 +1,20 @@
 ---
 barbican:
-    name: Key Manager service
+    name: Key Manager service (barbican)
     subcommands: complete
 ceilometer:
-    name: Telemetry service
+    name: Telemetry Data Collection service (ceilometer)
 cinder:
-    name: Block Storage service
+    name: Block Storage service (cinder)
 cloudkitty:
-    name: Rating service
+    name: Rating service (cloudkitty)
 congress:
-    name: Governance service
+    name: Governance service (congress)
 designate:
-    name: DNS service
+    name: DNS service (designate)
     subcommands: complete
 freezer:
-    name: Backup, Restore, and Disaster Recovery service
+    name: Backup, Restore, and Disaster Recovery service (freezer)
     subcommands:
       - job-show
       - job-list
@@ -45,9 +45,9 @@ freezer:
       - action-create
       - action-update
 glance:
-    name: Image service
+    name: Image service (glance)
 gnocchi:
-    name: A time series storage and resources index service
+    name: A time series storage and resources index service (gnocchi)
     subcommands:
       - archive-policy create
       - archive-policy delete
@@ -85,32 +85,32 @@ gnocchi:
       - resource-type show
       - status
 heat:
-    name: Orchestration service
+    name: Orchestration service (heat)
 ironic:
-    name: Bare Metal service
+    name: Bare Metal service (ironic)
 kite:
-    name: A service for managing and distributing message encryption keys
+    name: A service for managing and distributing message encryption keys (kite)
 magnum:
-    name: Container Infrastructure Management service
+    name: Container Infrastructure Management service (magnum)
 manila:
-    name: Shared File Systems service
+    name: Shared File Systems service (manila)
 mistral:
-    name: Workflow service
+    name: Workflow service (mistral)
     subcommands: complete
 monasca:
-    name: Monitoring
+    name: Monitoring (monasca)
 murano:
-    name: Application Catalog service
+    name: Application Catalog service (murano)
 neutron:
-    name: Networking service
+    name: Networking service (neutron)
 nova:
-    name: Compute service
+    name: Compute service (nova)
 senlin:
-    name: Clustering service
+    name: Clustering service (senlin)
 solum:
-    name: Software Development Lifecycle Automation service
+    name: Software Development Lifecycle Automation service (solum)
 swift:
-    name: Object Storage service
+    name: Object Storage service (swift)
     subcommands:
       - auth
       - capabilities
@@ -122,11 +122,11 @@ swift:
       - tempurl
       - upload
 tacker:
-    name: NFV Orchestration service
+    name: NFV Orchestration service (tacker)
 tripleo:
-    name: Deployment service
+    name: Deployment service (tripleo)
 trove:
-    name: Database service
+    name: Database service (trove)
 trove-manage:
     name: Database service management utility
     subcommands:
@@ -140,6 +140,6 @@ trove-manage:
       - db_sync
       - db_upgrade
 watcher:
-    name: Infrastructure Optimization service
+    name: Infrastructure Optimization service (watcher)
 zaqar:
-    name: Message service
+    name: Message service (zaqar)
