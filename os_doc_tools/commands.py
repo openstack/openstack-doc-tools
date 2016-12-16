@@ -96,9 +96,6 @@ def generate_heading(os_command, api_name, title,
         os_file.write(".. warning::\n\n")
         os_file.write("   The " + os_command + " CLI is deprecated\n")
         os_file.write("   in favor of python-openstackclient.\n")
-        os_file.write("   For more information, see :doc:`openstack`.\n")
-        os_file.write("   For a Python library, continue using\n")
-        os_file.write("   python-" + os_command + "client.\n\n")
 
     os_file.write("The " + os_command + " client is the command-line ")
     os_file.write("interface (CLI) for\n")
