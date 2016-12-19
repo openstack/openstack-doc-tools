@@ -13,8 +13,19 @@
 # under the License.
 
 import argparse
+import glob
 import os
 import sys
+
+
+def get_pdf_link(root, publish_path):
+    p = '%s/*.pdf' % root
+    re = glob.glob(p)
+    if len(re) == 0:
+        return ''
+    filename = os.path.basename(re[0])
+    path = os.path.relpath(root, publish_path)
+    return ' <a href="%s/%s">(pdf)</a>' % (path, filename)
 
 
 def generate_index_file(publish_path):
@@ -42,27 +53,12 @@ def generate_index_file(publish_path):
         if root == publish_path:
             continue
 
-        if os.path.isfile(os.path.join(root, 'content/index.html')):
-            path = os.path.relpath(root, publish_path)
-            links[path] = ('<a href="%s/content/index.html">%s</a>\n' %
-                           (path, path))
-        elif os.path.isfile(os.path.join(root, 'index.html')):
-            path = os.path.relpath(root, publish_path)
-            links[path] = ('<a href="%s/index.html">%s</a>\n' %
-                           (path, path.replace('draft/', '')))
+        pdf_link = get_pdf_link(root, publish_path)
 
-        if os.path.isfile(os.path.join(root, 'api-ref.html')):
+        if os.path.isfile(os.path.join(root, 'index.html')):
             path = os.path.relpath(root, publish_path)
-            links[path] = ('<a href="%s/api-ref.html">%s</a>\n' %
-                           (path, path))
-
-        # List PDF files for api-site that have from "bk-api-ref*.pdf"
-        # as well since they have no corresponding html file.
-        for f in files:
-            if f.startswith('bk-api-ref') and f.endswith('.pdf'):
-                path = os.path.relpath(root, publish_path)
-                links[f] = ('<a href="%s/%s">%s</a>\n' %
-                            (path, f, f))
+            links[path] = ('<a href="%s/index.html">%s</a>%s\n' %
+                           (path, path.replace('draft/', ''), pdf_link))
 
     for entry in sorted([s for s in links if not s.startswith('draft/')]):
         index_file.write(links[entry])
