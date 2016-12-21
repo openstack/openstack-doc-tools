@@ -214,7 +214,7 @@ def _sanitize_default(opt):
         return str(opt.sample_default)
 
     if ((type(opt).__name__ == "ListOpt") and (type(opt.default) == list)):
-        return ", ".join(opt.default)
+        return ", ".join(str(item) for item in opt.default)
 
     default = str(opt.default)
 
