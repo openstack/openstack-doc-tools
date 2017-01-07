@@ -670,16 +670,6 @@ def document_single_project(os_command, output_dir, continue_on_error):
     if subcommands == 'complete' and data.get('subcommands'):
         subcommands = data.get('subcommands')
 
-    if os_command == 'cinder':
-        out_file.write("You can select an API version to use by adding the\n")
-        out_file.write(":option:`--os-volume-api-version` parameter or by\n")
-        out_file.write("setting the corresponding environment variable:\n\n")
-
-        out_file.write(".. code-block:: console\n\n")
-        out_file.write("   export OS_VOLUME_API_VERSION=1\n\n")
-
-        out_file.write("This chapter describes the commands with API v2.\n\n")
-
     discover_and_generate_subcommands(os_command, out_file, subcommands,
                                       None, "", "")
 
