@@ -14,7 +14,6 @@
 
 import argparse
 import os
-import re
 import subprocess
 import sys
 import yaml
@@ -39,11 +38,6 @@ def quote_rst(line):
     """Convert special characters for RST output."""
 
     line = line.replace('\\', '\\\\').replace('`', '\\`').replace('*', '\\*')
-
-    if '--' in line:
-        line = re.sub(r'(--[^ .\'\\]*)', r":option:`\1`", line)
-        # work around for "`--`" at murano
-        line = line.replace('\\`:option:`--`\\`', '```--```')
 
     if 'DEPRECATED!' in line:
         line = line.replace('DEPRECATED!', '**DEPRECATED!**')
