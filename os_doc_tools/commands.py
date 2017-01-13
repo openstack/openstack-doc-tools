@@ -89,7 +89,7 @@ def generate_heading(os_command, api_name, title,
     if os_command == "heat":
         os_file.write(".. warning::\n\n")
         os_file.write("   The " + os_command + " CLI is deprecated\n")
-        os_file.write("   in favor of python-openstackclient.\n")
+        os_file.write("   in favor of python-openstackclient.\n\n")
 
     os_file.write("The " + os_command + " client is the command-line ")
     os_file.write("interface (CLI) for\n")
