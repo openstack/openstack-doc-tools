@@ -188,7 +188,7 @@ http://docs.openstack.org/developer/reno/usage.html#creating-new-release-notes.
 * ``autohelp-wrapper``: New tool to simplify the setup of an autohelp.py
   environment.
 * ``diff_branches.py``: Generates a listing of the configuration options
-  changes that occured between 2 openstack releases.
+  changes that occurred between 2 openstack releases.
 * ``autohelp.py``: Add the 'dump' subcommand, include swift.
 * ``jsoncheck.py``: Add public API.
 * Added tool to generate a sitemap.xml file.
