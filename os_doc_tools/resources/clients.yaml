@@ -110,6 +110,8 @@ trove-manage:
       - db_recreate
       - db_sync
       - db_upgrade
+vitrage:
+    name: RCA (Root Cause Analysis) service (vitrage)
 watcher:
     name: Infrastructure Optimization service (watcher)
 zaqar:
