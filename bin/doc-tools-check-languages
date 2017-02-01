@@ -242,8 +242,11 @@ function handle_draft_language {
                 ;;
             install-guide)
                 for tag in $INSTALL_TAGS ; do
-                    mv publish-docs/$language/$book-${tag} \
-                        publish-docs/draft/$language/$book-${tag}
+                    # Not all tags might be build on all branches
+                    if [[ -d publish-docs/$language/$book-${tag} ]] ; then
+                        mv publish-docs/$language/$book-${tag} \
+                            publish-docs/draft/$language/$book-${tag}
+                    fi
                 done
                 rmdir --ignore-fail-on-non-empty publish-docs/$language/
                 ;;

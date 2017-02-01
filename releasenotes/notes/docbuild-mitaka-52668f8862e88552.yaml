@@ -1,0 +1,4 @@
+---
+fixes:
+  - Fix building of translations on older branches where the DebConf
+    Install Guide does not exist.
