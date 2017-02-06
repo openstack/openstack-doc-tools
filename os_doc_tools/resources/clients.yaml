@@ -37,6 +37,7 @@ gnocchi:
       - complete
       - help
       - measures add
+      - measures aggregation
       - measures batch-metrics
       - measures batch-resources-metrics
       - measures show
@@ -44,6 +45,7 @@ gnocchi:
       - metric delete
       - metric list
       - metric show
+      - resource batch delete
       - resource create
       - resource delete
       - resource history
@@ -54,6 +56,7 @@ gnocchi:
       - resource-type delete
       - resource-type list
       - resource-type show
+      - resource-type update
       - status
 heat:
     name: Orchestration service (heat)
