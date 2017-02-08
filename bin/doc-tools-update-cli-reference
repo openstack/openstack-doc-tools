@@ -54,7 +54,9 @@ pip install --upgrade cliff-tablib
 # OSProfiler is an OpenStack cross-project profiling library.
 pip install --upgrade osprofiler
 
-if [[ $project == 'gnocchi' ]]; then
+if [[ $project == 'aodh' ]]; then
+    pip install --upgrade ${project}client
+elif [[ $project == 'gnocchi' ]]; then
     pip install --upgrade ${project}client
 else
     pip install --upgrade python-${project}client

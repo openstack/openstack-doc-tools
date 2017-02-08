@@ -1,4 +1,17 @@
 ---
+aodh:
+    name: Telemetry Alarming service (aodh)
+    subcommands:
+      - alarm create
+      - alarm delete
+      - alarm list
+      - alarm show
+      - alarm state get
+      - alarm state set
+      - alarm update
+      - alarm-history search
+      - alarm-history show
+      - capabilities list
 barbican:
     name: Key Manager service (barbican)
     subcommands: complete
