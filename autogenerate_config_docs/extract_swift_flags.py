@@ -36,28 +36,6 @@ from autohelp import OptionsCache  # noqa
 
 DBK_NS = ".//{http://docbook.org/ns/docbook}"
 
-BASE_XML = '''<?xml version="1.0"?>
-<para xmlns="http://docbook.org/ns/docbook"
-  version="5.0">
-<!-- The tool that generated this table lives in the
-     openstack-doc-tools repository. The editions made in
-     this file will *not* be lost if you run the script again. -->
-  <table rules="all">
-    <caption>Description of configuration options for
-        <literal>[%s]</literal> in <filename>%s.conf</filename>
-    </caption>
-    <col width="50%%"/>
-    <col width="50%%"/>
-    <thead>
-      <tr>
-        <th>Configuration option = Default value</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</para>'''
-
 
 def parse_line(line):
     """Parse a line.
@@ -169,10 +147,10 @@ def extract_descriptions_from_devref(swift_repo, options):
     return option_descs
 
 
-def write_files(options, manuals_repo, output_format):
-    """Create new DocBook tables.
+def write_files(options, manuals_repo):
+    """Create new reStructuredText tables.
 
-    Writes a set of DocBook-formatted tables, one per section in swift
+    Writes a set of reStructuredText-formatted tables, one per section in swift
     configuration files.
     """
     all_options = {}
@@ -191,19 +169,15 @@ def write_files(options, manuals_repo, output_format):
     for full_section, options in all_options.items():
         sample_filename, section = full_section.split('|')
         tmpl_file = os.path.join(os.path.dirname(__file__),
-                                 'templates/swift.%s.j2' % output_format)
+                                 'templates/swift.rst.j2')
         with open(tmpl_file) as fd:
             template = jinja2.Template(fd.read(), trim_blocks=True)
             output = template.render(filename=sample_filename,
                                      section=section,
                                      options=options)
 
-        if output_format == 'docbook':
-            tgt = (manuals_repo + '/doc/common/tables/' + 'swift-' +
-                   sample_filename + '-' + section + '.xml')
-        else:
-            tgt = (manuals_repo + '/doc/config-reference/source/tables/' +
-                   'swift-' + sample_filename + '-' + section + '.rst')
+        tgt = (manuals_repo + '/doc/config-reference/source/tables/' +
+               'swift-' + sample_filename + '-' + section + '.rst')
 
         with open(tgt, 'w') as fd:
             fd.write(output)
@@ -289,11 +263,11 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Update the swift options tables.",
-        usage=("%(prog)s docbook|rst|dump [-v] [-s swift_repo] "
+        usage=("%(prog)s rst|dump [-v] [-s swift_repo] "
                "[-m manuals_repo]"))
     parser.add_argument('subcommand',
-                        help='Action (docbook, rst, dump).',
-                        choices=['docbook', 'dump', 'rst'])
+                        help='Action (rst, dump).',
+                        choices=['dump', 'rst'])
     parser.add_argument('-s', '--swift-repo',
                         dest='swift_repo',
                         help="Location of the swift git repository.",
@@ -327,10 +301,9 @@ def main():
                  args.verbose)
     options = OptionsCache()
 
-    if args.subcommand in ('docbook', 'rst'):
-        write_files(options, args.manuals_repo, args.subcommand)
-
-    elif args.subcommand == 'dump':
+    if args.subcommand == 'rst':
+        write_files(options, args.manuals_repo)
+    else:
         options.dump()
 
     return 0

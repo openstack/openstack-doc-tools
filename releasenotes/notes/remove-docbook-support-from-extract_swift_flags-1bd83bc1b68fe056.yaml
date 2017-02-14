@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    The `extract_swift_flags` tool no longer supports the `docbook` command.
+    This previously allowed outputting of Docbook-formatted text but the
+    feature was broken and unsupported by the community. reStructuredText
+    should be used for everything.
