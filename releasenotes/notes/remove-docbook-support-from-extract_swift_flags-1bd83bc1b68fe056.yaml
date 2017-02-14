@@ -5,3 +5,7 @@ upgrade:
     This previously allowed outputting of Docbook-formatted text but the
     feature was broken and unsupported by the community. reStructuredText
     should be used for everything.
+  - |
+    The `extract_swift_flags` tool no longer supports the `--from` argument.
+    All Swift documentation has been converted to reStructuredText meaning
+    there is no reason to keep this around.

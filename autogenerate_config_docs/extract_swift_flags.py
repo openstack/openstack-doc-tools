@@ -22,7 +22,6 @@ from docutils import core
 from docutils import io
 from docutils import nodes
 import jinja2
-from lxml import etree
 from oslo_config import cfg
 
 from autohelp import OptionsCache  # noqa
@@ -33,8 +32,6 @@ from autohelp import OptionsCache  # noqa
 # options one per line containing =
 # and generally only having a single entry
 # after the equals (the default value)
-
-DBK_NS = ".//{http://docbook.org/ns/docbook}"
 
 
 def parse_line(line):
@@ -60,7 +57,7 @@ def parse_line(line):
     return config, default.strip()
 
 
-def get_existing_options_from_rst(optfiles):
+def get_existing_options(optfiles):
     """Parse an existing RST table to compile a list of existing options."""
     options = {}
     for optfile in optfiles:
@@ -83,29 +80,6 @@ def get_existing_options_from_rst(optfiles):
                 # options[option.split('=',1)[0]] = helptext
                 options[option] = helptext.strip()
 
-    return options
-
-
-def get_existing_options(optfiles):
-    """Parse an existing XML table to compile a list of existing options."""
-    options = {}
-    for optfile in optfiles:
-        if optfile.endswith('/swift-conf-changes.xml'):
-            continue
-        xml = etree.fromstring(open(optfile).read().replace(':ref:', ''))
-        tbody = xml.find(DBK_NS + "tbody")
-        trlist = tbody.findall(DBK_NS + "tr")
-        for tr in trlist:
-            try:
-                col1, col2 = tr.findall(DBK_NS + "td")
-                option = col1.find(DBK_NS + "option").text
-                helptext = etree.tostring(col2, xml_declaration=False,
-                                          method="text")
-            except IndexError:
-                continue
-            if option not in options or 'No help text' in options[option]:
-                # options[option.split('=',1)[0]] = helptext
-                options[option] = helptext.strip()
     return options
 
 
@@ -183,21 +157,15 @@ def write_files(options, manuals_repo):
             fd.write(output)
 
 
-def read_options(swift_repo, manuals_repo, read_from, verbose):
+def read_options(swift_repo, manuals_repo, verbose):
     """Find swift configuration options.
 
     Uses existing tables and swift devref as a source of truth in that order to
     determine helptext for options found in sample config files.
     """
 
-    if read_from == 'rst':
-        options = get_existing_options_from_rst(
-            glob.glob(manuals_repo +
-                      '/doc/config-reference/source/tables/swift*rst'))
-    else:
-        options = get_existing_options(
-            glob.glob(manuals_repo + '/doc/common/tables/swift*xml'))
-
+    options = get_existing_options(glob.glob(
+        manuals_repo + '/doc/config-reference/source/tables/swift*rst'))
     option_descs = extract_descriptions_from_devref(swift_repo, options)
     conf_samples = glob.glob(swift_repo + '/etc/*conf-sample')
     for sample in conf_samples:
@@ -278,12 +246,6 @@ def main():
                         help="Location of the manuals git repository.",
                         required=False,
                         default="./sources/openstack-manuals")
-    parser.add_argument('-f', '--from',
-                        dest='read_from',
-                        help="Source to get defined options (rst or docbook)",
-                        required=False,
-                        default='rst',
-                        choices=['rst', 'docbook'])
     parser.add_argument('-v', '--verbose',
                         action='count',
                         default=0,
@@ -297,7 +259,6 @@ def main():
 
     read_options(args.swift_repo,
                  args.manuals_repo,
-                 args.read_from,
                  args.verbose)
     options = OptionsCache()
 
