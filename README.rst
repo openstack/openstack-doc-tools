@@ -58,8 +58,8 @@ On Ubuntu::
 
 
 * License: Apache License, Version 2.0
-* Source: http://git.openstack.org/cgit/openstack/openstack-doc-tools
-* Bugs: http://bugs.launchpad.net/openstack-manuals
+* Source: https://git.openstack.org/cgit/openstack/openstack-doc-tools
+* Bugs: https://bugs.launchpad.net/openstack-doc-tools
 
 
 Regenerating config option tables
