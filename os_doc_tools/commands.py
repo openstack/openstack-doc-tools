@@ -497,9 +497,10 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
         line_index += 1
         if line.startswith('Usage:') and os_command == "swift":
             line = line[len("Usage: "):]
-        if line.startswith(('Arguments:', 'Positional arguments:',
-                            'positional arguments', 'Optional arguments',
-                            'optional arguments')):
+        if line.startswith(('Arguments:',
+                            'Positional arguments:', 'positional arguments',
+                            'Optional arguments', 'optional arguments',
+                            'Required arguments', 'required arguments')):
             if in_para:
                 in_para = False
                 os_file.write("\n")
@@ -513,7 +514,14 @@ def generate_subcommand(os_command, os_subcommand, os_file, extra_params,
                                   'optional arguments')):
                 format_help('Optional arguments',
                             help_lines[line_index + 1:], os_file)
-                break
+                skip_lines = True
+                continue
+            elif line.startswith(('Required arguments:',
+                                  'required arguments')):
+                format_help('Required arguments',
+                            help_lines[line_index + 1:], os_file)
+                skip_lines = True
+                continue
             else:
                 format_help('Arguments', help_lines[line_index + 1:], os_file)
                 break
