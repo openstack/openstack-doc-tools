@@ -421,16 +421,12 @@ def _get_category_names(package_name):
     return category_names
 
 
-def write_files(package_name, options, target, output_format):
+def write_files(package_name, options, target):
     """Write tables.
 
     Prints a table for every group of options.
     """
-    if not target:
-        if output_format == 'rst':
-            target = '../../doc/config-reference/source/tables'
-        else:
-            target = '../../doc/common/tables/'
+    target = target or '../../doc/config-reference/source/tables'
     options_by_cat = _get_options_by_cat(package_name)
     category_names = _get_category_names(package_name)
 
@@ -502,12 +498,11 @@ def write_files(package_name, options, target, output_format):
         env['items'].append(items)
         env['table_label'] = package_name + '-' + cat
 
-        ext = 'rst' if output_format == 'rst' else 'xml'
-        file_path = ("%(target)s/%(package_name)s-%(cat)s.%(ext)s" %
+        file_path = ("%(target)s/%(package_name)s-%(cat)s.rst" %
                      {'target': target, 'package_name': package_name,
-                      'cat': cat, 'ext': ext})
+                      'cat': cat})
         tmpl_file = os.path.join(os.path.dirname(__file__),
-                                 'templates/autohelp.%s.j2' % output_format)
+                                 'templates/autohelp.rst.j2')
         with open(tmpl_file) as fd:
             template = jinja2.Template(fd.read(), trim_blocks=True)
             output = template.render(filename=file_path, **env)
@@ -626,7 +621,7 @@ def main():
         update_flagmappings(args.package, options, verbose=args.verbose)
 
     elif args.subcommand == 'rst':
-        write_files(args.package, options, args.target, args.subcommand)
+        write_files(args.package, options, args.target)
 
     elif args.subcommand == 'dump':
         options.dump()
