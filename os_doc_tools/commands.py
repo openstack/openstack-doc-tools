@@ -106,8 +106,9 @@ def generate_heading(os_command, api_name, title,
         os_file.write("   in favor of python-openstackclient.\n\n")
 
     os_file.write("The " + os_command + " client is the command-line ")
-    os_file.write("interface (CLI) for\n")
-    os_file.write("the " + api_name + " and its extensions.\n\n")
+    os_file.write("interface (CLI) for the\n")
+    os_file.write(api_name + "\n")
+    os_file.write("and its extensions.\n\n")
 
     os_file.write("This chapter documents :command:`" + os_command + "` ")
     os_file.write("version ``" + version + "``.\n\n")
