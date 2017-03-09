@@ -75,9 +75,12 @@ names as arguments:
 Flagmappings files
 ------------------
 
-The flagmappings files use the following format:
-
-::
+The tool uses flagmapping files to map options to custom categories. Flag
+mapping files can be found in the ``tools/autogenerate-config-flagmappings``
+folder of the openstack-manuals project. Not all projects use flagmapping
+files, as those that do not will be disabled by the presence of a
+``$project.disable`` file in that folder. For those that do, however, the files
+use the following format::
 
     OPTION_SECTION/OPTION_NAME group1 [group2, ...]
 
