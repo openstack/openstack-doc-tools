@@ -400,18 +400,12 @@ def _use_categories(package_name):
     return not os.path.isfile(package_name + '.disable')
 
 
-def pass_through(line):
-    """Whether to ignore the line."""
-    return (not line.strip() or
-            line.startswith('#'))
-
-
 def _get_options_by_cat(package_name):
     options_by_cat = {}
 
     with open(package_name + '.flagmappings') as f:
         for line in f:
-            if pass_through(line):
+            if not line.strip() or line.startswith('#'):
                 continue
             opt, categories = line.split(' ', 1)
             for category in categories.split():
@@ -427,7 +421,7 @@ def _get_category_names(package_name):
         try:
             with open(headers_file) as f:
                 for line in f:
-                    if pass_through(line):
+                    if not line.strip() or line.startswith('#'):
                         continue
                     cat, nice_name = line.split(' ', 1)
                     category_names[cat] = nice_name.strip()
