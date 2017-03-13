@@ -32,9 +32,10 @@ QUIET=0
 usage() {
     echo "Wrapper for autohelp.py"
     echo "Usage:"
-    echo "  $(basename $0) [ OPTIONS ] update|rst|setup [ project... ]"
+    echo "  $(basename $0) [ OPTIONS ] dump|update|rst|setup [ project... ]"
     echo
     echo "Subcommands:"
+    echo "  dump:       Dumps the list of options with their attributes"
     echo "  update:     Update or create the flagmapping files"
     echo "  rst:        Generate the options tables in RST format"
     echo "  setup:      Install the environment only"
