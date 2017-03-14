@@ -194,7 +194,7 @@ def _register_runtime_opts(module, abs_path, verbose):
                               {'obj': opts_var, 'module': module})
                     break
 
-            if register:
+            if register and isinstance(obj, list):
                 for opt in obj:
                     if not isinstance(opt, cfg.Opt):
                         continue
