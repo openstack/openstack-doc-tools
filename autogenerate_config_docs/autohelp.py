@@ -421,6 +421,12 @@ def _get_category_names(package_name):
     return category_names
 
 
+def _remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
+
+
 def write_files(package_name, options, target):
     """Write tables.
 
@@ -468,8 +474,8 @@ def write_files(package_name, options, target):
             if not option.help:
                 option.help = "No help text available for this option."
 
-            helptext = option.help.strip()
-
+            helptext = _remove_prefix(
+                option.help.strip(), 'DEPRECATED').lstrip(':')
             helptext = re.sub(r'\n+\s*\* ', '$sentinal$* ', helptext)
             helptext = helptext.replace('\n\n', '$sentinal$')
             helptext = helptext.replace('\n', ' ')
@@ -477,18 +483,24 @@ def write_files(package_name, options, target):
             # TODO(johngarbutt) space matches only the current template :(
             helptext = helptext.replace('$sentinal$', '\n\n       ')
 
-            if option.deprecated_for_removal:
-                if not option.help.strip().startswith('DEPRECATED'):
-                    helptext = 'DEPRECATED: ' + helptext
-                if getattr(option, 'deprecated_reason', None):
-                    helptext += ' '
-                    helptext += option.deprecated_reason.lstrip().rstrip()
+            if not option.deprecated_reason:
+                option.deprecated_reason = (
+                    'No deprecation reason provided for this option.')
+
+            deprecated_reason = ' '.join([
+                x.strip() for x in
+                option.deprecated_reason.split('\n')]).strip()
 
             opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
+
             flags = []
+            if (option.deprecated_for_removal or
+                    option.help.startswith('DEPRECATED')):
+                flags.append(('Deprecated', deprecated_reason))
             if option.mutable:
                 flags.append(('Mutable', 'This option can be changed without'
                               ' restarting.'))
+
             item = (option.dest,
                     _sanitize_default(option),
                     "(%s) %s" % (opt_type, helptext),
