@@ -480,8 +480,7 @@ def write_files(package_name, options, target):
             helptext = helptext.replace('\n\n', '$sentinal$')
             helptext = helptext.replace('\n', ' ')
             helptext = ' '.join(helptext.split())
-            # TODO(johngarbutt) space matches only the current template :(
-            helptext = helptext.replace('$sentinal$', '\n\n       ')
+            helptext = helptext.split('$sentinal$')
 
             if not option.deprecated_reason:
                 option.deprecated_reason = (
@@ -502,8 +501,9 @@ def write_files(package_name, options, target):
                               ' restarting.'))
 
             item = (option.dest,
+                    opt_type,
                     _sanitize_default(option),
-                    "(%s) %s" % (opt_type, helptext),
+                    helptext,
                     flags)
             items.append(item)
 
