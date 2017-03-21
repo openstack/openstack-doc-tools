@@ -266,6 +266,7 @@ class OptionsCache(object):
     def __init__(self, overrides={}, verbose=0):
         self._verbose = verbose
         self._opts_by_name = {}
+        self._opts_by_group = {}
         self._opt_names = []
         self._overrides = overrides
 
@@ -295,6 +296,11 @@ class OptionsCache(object):
                 return
             self._opts_by_name[optname] = (group, opt)
             self._opt_names.append(optname)
+
+            if group not in self._opts_by_group:
+                self._opts_by_group[group] = []
+
+            self._opts_by_group[group].append(opt)
 
         if optname in self._overrides:
             for new_group in self._overrides[optname]:
@@ -343,8 +349,14 @@ class OptionsCache(object):
         for ext in needed_exts:
             self.load_extension_options(ext)
 
+    def get_group_names(self):
+        return self._opts_by_group.keys()
+
     def get_option_names(self):
         return self._opt_names
+
+    def get_group(self, name):
+        return self._opts_by_group[name]
 
     def get_option(self, name):
         return self._opts_by_name[name]
