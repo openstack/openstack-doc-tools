@@ -65,6 +65,8 @@ fi
 rm -rf output
 mkdir output
 
+# Work around until python-cinderclient use 3.latest as a default
+OS_VOLUME_API_VERSION=3.latest \
 openstack-auto-commands --output-dir output $project
 
 if [[ ! -e openstack-manuals ]]; then
