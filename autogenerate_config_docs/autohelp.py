@@ -433,10 +433,46 @@ def _get_category_names(package_name):
     return category_names
 
 
-def _remove_prefix(text, prefix):
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
+def _format_opt(option):
+
+    def _remove_prefix(text, prefix):
+        if text.startswith(prefix):
+            return text[len(prefix):].lstrip(':')
+        return text
+
+    def _reflow_text(text):
+        text = re.sub(r'\n+\s*\* ', '$sentinal$* ', text)
+        text = text.replace('\n\n', '$sentinal$')
+        text = text.replace('\n', ' ')
+        text = ' '.join(text.split())
+        return text.split('$sentinal$')
+
+    def _strip_indentation(text):
+        return ' '.join([x.strip() for x in text.split('\n')]).strip()
+
+    help_text = option.help or "No help text available for this option."
+    help_text = _remove_prefix(help_text.strip(), 'DEPRECATED')
+    help_text = _reflow_text(help_text)
+
+    deprecated_text = (option.deprecated_reason or
+                       'No deprecation reason provided for this option.')
+    deprecated_text = _strip_indentation(deprecated_text)
+
+    opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
+
+    flags = []
+    if (option.deprecated_for_removal or
+            option.help.startswith('DEPRECATED')):
+        flags.append(('Deprecated', deprecated_text))
+    if option.mutable:
+        flags.append(('Mutable', 'This option can be changed without'
+                      ' restarting.'))
+
+    return (option.dest,
+            opt_type,
+            _sanitize_default(option),
+            help_text,
+            flags)
 
 
 def write_files(package_name, options, target):
@@ -483,41 +519,7 @@ def write_files(package_name, options, target):
                         env['items'].append(items)
                 items = []
 
-            if not option.help:
-                option.help = "No help text available for this option."
-
-            helptext = _remove_prefix(
-                option.help.strip(), 'DEPRECATED').lstrip(':')
-            helptext = re.sub(r'\n+\s*\* ', '$sentinal$* ', helptext)
-            helptext = helptext.replace('\n\n', '$sentinal$')
-            helptext = helptext.replace('\n', ' ')
-            helptext = ' '.join(helptext.split())
-            helptext = helptext.split('$sentinal$')
-
-            if not option.deprecated_reason:
-                option.deprecated_reason = (
-                    'No deprecation reason provided for this option.')
-
-            deprecated_reason = ' '.join([
-                x.strip() for x in
-                option.deprecated_reason.split('\n')]).strip()
-
-            opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
-
-            flags = []
-            if (option.deprecated_for_removal or
-                    option.help.startswith('DEPRECATED')):
-                flags.append(('Deprecated', deprecated_reason))
-            if option.mutable:
-                flags.append(('Mutable', 'This option can be changed without'
-                              ' restarting.'))
-
-            item = (option.dest,
-                    opt_type,
-                    _sanitize_default(option),
-                    helptext,
-                    flags)
-            items.append(item)
+            items.append(_format_opt(option))
 
         env['items'].append(items)
         env['table_label'] = package_name + '-' + cat
