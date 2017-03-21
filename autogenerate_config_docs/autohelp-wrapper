@@ -28,6 +28,7 @@ MANUALS_PROJECTS="openstack-manuals"
 BRANCH=master
 FAST=0
 QUIET=0
+CLONE_MANUALS=1
 
 usage() {
     echo "Wrapper for autohelp.py"
@@ -49,6 +50,8 @@ usage() {
     echo "  -e PATH:    Create the virtualenv in PATH"
     echo "  -v LEVEL:   Verbose message (1 or 2)"
     echo "              (check various python modules imported or not)"
+    echo "  -o OUTDIR:  Path to output openstack-manuals directory "
+    echo "              (defaults to ./sources/openstack-manuals)"
 }
 
 setup_venv() {
@@ -101,7 +104,7 @@ setup_tools() {
     pip install -rrequirements.txt
 }
 
-while getopts :b:g:e:v:cfq opt; do
+while getopts :b:g:e:o:v:cfq opt; do
     case $opt in
     b)
         BRANCH=$OPTARG
@@ -114,6 +117,11 @@ while getopts :b:g:e:v:cfq opt; do
         ;;
     e)
         VENVDIR=$OPTARG
+        ;;
+    o)
+        MANUALSREPO=$OPTARG
+        MAPPINGS_DIR=$OPTARG/tools/autogenerate-config-flagmappings
+        CLONE_MANUALS=0
         ;;
     f)
         FAST=1
@@ -166,7 +174,9 @@ fi
 RELEASE=$(echo $BRANCH | sed 's,^stable.,,')
 
 if [ "$FAST" -eq 0 ] ; then
-    get_project openstack-manuals
+    if [ "$CLONE_MANUALS" -eq 1 ] ; then
+        get_project openstack-manuals
+    fi
 
     for project in $PROJECTS; do
         setup_venv $project
