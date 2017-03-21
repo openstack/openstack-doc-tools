@@ -8,19 +8,15 @@
     autogenerate-config-doc tool from the openstack-doc-tools repository, or
     ask for help on the documentation mailing list, IRC channel or meeting.
 
-.. _{{ table_label }}:
+.. _{{ label }}:
 
-.. list-table:: Description of {{ nice_cat }} configuration options
+.. list-table:: Description of {{ group }} configuration options
    :header-rows: 1
    :class: config-ref-table
 
    * - Configuration option = Default value
      - Description
-{% for group in groups %}
-
-   * - **[{{ group }}]**
-     -
-{% for item in items[loop.index0] %}
+{% for item in items %}
 
 {% if item[2] is equalto '' %}
    * - ``{{ item[0] }}`` =
@@ -40,6 +36,5 @@
        - **{{ flagname }}**
 
          {{ flagdesc }}
-{% endfor %}
 {% endfor %}
 {% endfor %}

@@ -396,6 +396,10 @@ class OptionsCache(object):
             return cmp(x, y)
 
 
+def _use_categories(package_name):
+    return not os.path.isfile(package_name + '.disable')
+
+
 def pass_through(line):
     """Whether to ignore the line."""
     return (not line.strip() or
@@ -478,19 +482,29 @@ def _format_opt(option):
 def write_files(package_name, options, target):
     """Write tables.
 
-    Prints a table for every group of options.
+    Some projects make use of flagmapping files, while others make use
+    of oslo.config's OptGroup to do the same in code. The function will
+    handle both, printing a list of options by either category or group.
     """
     target = target or '../../doc/config-reference/source/tables'
-    options_by_cat = _get_options_by_cat(package_name)
-    category_names = _get_category_names(package_name)
-
     if not os.path.isdir(target):
         os.makedirs(target)
+
+    if _use_categories(package_name):
+        _write_files_by_category(package_name, options, target)
+    else:
+        _write_files_by_group(package_name, options, target)
+
+
+def _write_files_by_category(package_name, options, target):
+    options_by_cat = _get_options_by_cat(package_name)
+    category_names = _get_category_names(package_name)
 
     for cat in options_by_cat.keys():
         env = {
             'pkg': package_name,
             'cat': cat,
+            'label': '-'.join([package_name, cat]),
             'groups': [],
             'items': [],
         }
@@ -522,19 +536,42 @@ def write_files(package_name, options, target):
             items.append(_format_opt(option))
 
         env['items'].append(items)
-        env['table_label'] = package_name + '-' + cat
 
         file_path = ("%(target)s/%(package_name)s-%(cat)s.rst" %
                      {'target': target, 'package_name': package_name,
                       'cat': cat})
         tmpl_file = os.path.join(os.path.dirname(__file__),
-                                 'templates/autohelp.rst.j2')
-        with open(tmpl_file) as fd:
-            template = jinja2.Template(fd.read(), trim_blocks=True)
-            output = template.render(filename=file_path, **env)
+                                 'templates/autohelp-category.rst.j2')
+        _write_template(tmpl_file, file_path, env)
 
-        with open(file_path, 'w') as fd:
-            fd.write(output)
+
+def _write_files_by_group(package_name, options, target):
+    for group in options.get_group_names():
+        env = {
+            'pkg': package_name,
+            'group': group,
+            'label': '-'.join([package_name, group]),
+            'items': [],
+        }
+
+        for option in options.get_group(group):
+            env['items'].append(_format_opt(option))
+
+        file_path = ("%(target)s/%(package_name)s-%(group)s.rst" %
+                     {'target': target, 'package_name': package_name,
+                      'group': group})
+        tmpl_file = os.path.join(os.path.dirname(__file__),
+                                 'templates/autohelp-group.rst.j2')
+        _write_template(tmpl_file, file_path, env)
+
+
+def _write_template(template_path, output_path, env):
+    with open(template_path) as fd:
+        template = jinja2.Template(fd.read(), trim_blocks=True)
+        output = template.render(filename=output_path, **env)
+
+    with open(output_path, 'w') as fd:
+        fd.write(output)
 
 
 def update_flagmappings(package_name, options, verbose=0):
@@ -544,6 +581,9 @@ def update_flagmappings(package_name, options, verbose=0):
     This will create a new file $package_name.flagmappings.new with
     category information merged from the existing $package_name.flagmappings.
     """
+    if not _use_categories:
+        print("This project does not use flagmappings. Nothing to update.")
+
     original_flags = {}
     try:
         with open(package_name + '.flagmappings') as f:
