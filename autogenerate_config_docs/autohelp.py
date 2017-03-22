@@ -459,8 +459,9 @@ def _format_opt(option):
     opt_type = _TYPE_DESCRIPTIONS.get(type(option), 'Unknown')
 
     flags = []
+
     if (option.deprecated_for_removal or
-            option.help.startswith('DEPRECATED')):
+            (option.help and option.help.startswith('DEPRECATED'))):
         flags.append(('Deprecated', deprecated_text))
     if option.mutable:
         flags.append(('Mutable', 'This option can be changed without'
