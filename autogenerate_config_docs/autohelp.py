@@ -578,6 +578,7 @@ def update_flagmappings(package_name, options, verbose=0):
     """
     if not _use_categories:
         print("This project does not use flagmappings. Nothing to update.")
+        return
 
     original_flags = {}
     try:
