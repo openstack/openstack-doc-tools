@@ -69,7 +69,7 @@ class ExportSitemap(object):
 
     def spider_opened(self, spider):
         output = open(os.path.join(os.getcwd(), 'sitemap_%s.xml'
-                      % spider.domain), 'w')
+                                   % spider.domain), 'w')
         self.files[spider] = output
         self.exporter = SitemapItemExporter(output, item_element='url',
                                             root_element='urlset')
@@ -80,7 +80,7 @@ class ExportSitemap(object):
         output = self.files.pop(spider)
         output.close()
         tree = lxml.etree.parse(os.path.join(os.getcwd(), "sitemap_%s.xml"
-                                % spider.domain))
+                                             % spider.domain))
         with open(os.path.join(os.getcwd(), "sitemap_%s.xml" % spider.domain),
                   'w') as pretty:
             pretty.write(lxml.etree.tostring(tree, pretty_print=True))

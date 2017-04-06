@@ -114,4 +114,4 @@ Bugs
 
 * openstack-doc-tools is hosted on Launchpad so you can view current
   bugs at
-  `Bugs : openstack-manuals <https://bugs.launchpad.net/openstack-manuals/>`__
+  `Bugs : openstack-doc-tools <https://bugs.launchpad.net/openstack-doc-tools/>`__

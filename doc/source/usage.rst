@@ -1,7 +1,9 @@
-========
+=====
 Usage
-========
+=====
 
-To use openstack-doc-tools in a project::
+To use openstack-doc-tools in a project:
 
-        import os_doc_tools
+   .. code-block:: python
+
+      import os_doc_tools

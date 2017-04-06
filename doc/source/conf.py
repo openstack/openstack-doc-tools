@@ -14,6 +14,8 @@
 import os
 import sys
 
+import openstackdocstheme
+
 sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ----------------------------------------------------
 
@@ -37,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'openstack-doc-tools'
-copyright = u'2014, OpenStack Foundation'
+copyright = u'2017, OpenStack Foundation'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -51,10 +53,13 @@ pygments_style = 'sphinx'
 
 # -- Options for HTML output --------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  Major themes that come with
-# Sphinx are currently 'default' and 'sphinxdoc'.
-# html_theme_path = ["."]
-# html_theme = '_theme'
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = 'openstackdocs'
+
+# Add any paths that contain custom themes here, relative to this directory.
+html_theme_path = [openstackdocstheme.get_html_theme_path()]
+
 # html_static_path = ['static']
 
 # Output file base name for HTML help builder.

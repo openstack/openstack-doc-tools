@@ -11,8 +11,28 @@
 # under the License.
 
 import mock
+import scrapy
 from sitemap.generator.spiders import sitemap_file
 import unittest
+
+
+class TestSitemapItem(unittest.TestCase):
+
+    def test_class_type(self):
+        self.assertTrue(type(sitemap_file.SitemapItem) is scrapy.item.ItemMeta)
+
+    def test_class_supports_fields(self):
+        with mock.patch.object(scrapy.item, 'Field'):
+            a = sitemap_file.SitemapItem()
+
+        supported_fields = ['loc', 'lastmod', 'priority', 'changefreq']
+        for field in supported_fields:
+            a[field] = field
+
+        not_supported_fields = ['some', 'random', 'fields']
+        for field in not_supported_fields:
+            with self.assertRaises(KeyError):
+                a[field] = field
 
 
 class TestSitemapSpider(unittest.TestCase):
@@ -38,16 +58,18 @@ class TestSitemapSpider(unittest.TestCase):
 
     def test_parse_items_inits_sitemap(self):
         response = mock.MagicMock()
-        with mock.patch.object(sitemap_file.items,
+        with mock.patch.object(sitemap_file,
                                'SitemapItem') as mocked_sitemap_item:
-            with mock.patch.object(sitemap_file, 'time'):
-                self.spider.parse_item(response)
+            with mock.patch.object(sitemap_file.urlparse,
+                                   'urlsplit'):
+                with mock.patch.object(sitemap_file, 'time'):
+                    self.spider.parse_item(response)
 
         self.assertTrue(mocked_sitemap_item.called)
 
     def test_parse_items_gets_path(self):
         response = mock.MagicMock()
-        with mock.patch.object(sitemap_file.items, 'SitemapItem'):
+        with mock.patch.object(sitemap_file, 'SitemapItem'):
             with mock.patch.object(sitemap_file.urlparse,
                                    'urlsplit') as mocked_urlsplit:
                 with mock.patch.object(sitemap_file, 'time'):
@@ -60,7 +82,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.com',
-            path='/kilo',
+            path='/mitaka',
             query='',
             fragment=''
         )
@@ -77,7 +99,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.com',
-            path='/mitaka',
+            path='/ocata',
             query='',
             fragment=''
         )
@@ -94,7 +116,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.com',
-            path='/mitaka',
+            path='/ocata',
             query='',
             fragment=''
         )

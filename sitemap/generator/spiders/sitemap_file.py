@@ -11,7 +11,10 @@
 # under the License.
 
 import time
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 from scrapy import item
 from scrapy.linkextractors import LinkExtractor
@@ -41,7 +44,8 @@ class SitemapSpider(spiders.CrawlSpider):
         'juno',
         'kilo',
         'liberty',
-        'mitaka'
+        'mitaka',
+        'newton'
     ]])
 
     rules = [

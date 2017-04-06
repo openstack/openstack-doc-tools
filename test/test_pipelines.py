@@ -78,26 +78,22 @@ class TestExportSitemap(unittest.TestCase):
     def test_spider_opened_calls_open(self):
         with mock.patch.object(pipelines, 'open',
                                return_value=None) as mocked_open:
-            with mock.patch.object(pipelines,
-                                   'SitemapItemExporter'):
+            with mock.patch.object(pipelines, 'SitemapItemExporter'):
                 self.export_sitemap.spider_opened(self.spider)
 
         self.assertTrue(mocked_open.called)
 
     def test_spider_opened_assigns_spider(self):
         prev_len = len(self.export_sitemap.files)
-        with mock.patch.object(pipelines, 'open',
-                               return_value=None):
-            with mock.patch.object(pipelines,
-                                   'SitemapItemExporter'):
+        with mock.patch.object(pipelines, 'open', return_value=None):
+            with mock.patch.object(pipelines, 'SitemapItemExporter'):
                 self.export_sitemap.spider_opened(self.spider)
 
         after_len = len(self.export_sitemap.files)
         self.assertTrue(after_len - prev_len, 1)
 
     def test_spider_opened_instantiates_exporter(self):
-        with mock.patch.object(pipelines, 'open',
-                               return_value=None):
+        with mock.patch.object(pipelines, 'open', return_value=None):
             with mock.patch.object(pipelines,
                                    'SitemapItemExporter') as mocked_exporter:
                 self.export_sitemap.spider_opened(self.spider)
@@ -105,8 +101,7 @@ class TestExportSitemap(unittest.TestCase):
         self.assertTrue(mocked_exporter.called)
 
     def test_spider_opened_exporter_starts_exporting(self):
-        with mock.patch.object(pipelines, 'open',
-                               return_value=None):
+        with mock.patch.object(pipelines, 'open', return_value=None):
             with mock.patch.object(pipelines.SitemapItemExporter,
                                    'start_exporting') as mocked_start:
                 self.export_sitemap.spider_opened(self.spider)

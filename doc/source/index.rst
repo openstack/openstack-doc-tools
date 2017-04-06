@@ -1,3 +1,4 @@
+==============================================
 Welcome to openstack-doc-tool's documentation!
 ==============================================
 
@@ -6,16 +7,17 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   readme
-   autogenerate_config_docs
-   release_notes
+   doc-tools-readme
    installation
    usage
+   autogenerate_config_docs
+   man/openstack-doc-test
+   sitemap-readme
+   release_notes
 
 Indices and tables
-==================
+~~~~~~~~~~~~~~~~~~
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

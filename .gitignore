@@ -12,6 +12,7 @@ eggs
 sdist
 
 # Unit test / coverage reports
+.cache
 .coverage
 .tox
 .testrepository

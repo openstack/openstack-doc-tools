@@ -8,7 +8,7 @@ Team and repository tags
 .. Change things from this point on
 
 OpenStack Doc Tools
-*******************
+~~~~~~~~~~~~~~~~~~~
 
 This repository contains tools used by the OpenStack Documentation
 project.
@@ -16,8 +16,12 @@ project.
 For more details, see the `OpenStack Documentation Contributor Guide
 <http://docs.openstack.org/contributor-guide/>`_.
 
+* License: Apache License, Version 2.0
+* Source: https://git.openstack.org/cgit/openstack/openstack-doc-tools
+* Bugs: https://bugs.launchpad.net/openstack-doc-tools
+
 Prerequisites
-=============
+-------------
 
 You need to have Python 2.7 installed for using the tools.
 
@@ -57,12 +61,7 @@ On Ubuntu::
     $ apt-get install libxml2-dev libxslt-dev
 
 
-* License: Apache License, Version 2.0
-* Source: https://git.openstack.org/cgit/openstack/openstack-doc-tools
-* Bugs: https://bugs.launchpad.net/openstack-doc-tools
-
-
 Regenerating config option tables
-=================================
+---------------------------------
 
 See :ref:`autogenerate_config_docs`.
