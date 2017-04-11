@@ -1,0 +1,9 @@
+---
+upgrade:
+  - |
+    The `extract_swift_flags.py` script has been removed, and the `autohelp.py`
+    and `diff_branches.py` scripts no longer build config file documentation
+    for the swift project. The swift dev team had been manually maintaining
+    their config files in-tree and to avoid duplication, doc and swift have
+    agreed to link the config ref out to the dev docs. As such, there is
+    therefore no reason to keep this tooling around.
