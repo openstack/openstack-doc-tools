@@ -29,7 +29,7 @@ On Ubuntu:
                            libxml2-dev libxslt1-dev zlib1g-dev \
                            libmysqlclient-dev libpq-dev libffi-dev \
                            libsqlite3-dev libldap2-dev libsasl2-dev \
-                           libjpeg-dev liberasurecode-dev
+                           libjpeg-dev
 
 On RHEL 7 and CentOS 7:
 
@@ -41,11 +41,10 @@ On RHEL 7 and CentOS 7:
                            libxml2-devel libxslt-devel zlib-devel \
                            mariadb-devel postgresql-devel libffi-devel \
                            sqlite-devel openldap-devel cyrus-sasl-devel \
-                           libjpeg-turbo-devel liberasurecode-devel gcc git
+                           libjpeg-turbo-devel gcc git
 
 .. note::
     * libjpeg is needed for ironic
-    * liberasurecode is needed for swift
 
 The workflow is:
 
@@ -111,19 +110,11 @@ to work on another branch:
    which will be left untouched (no ``git branch``, no ``git update``).
 
 
-Updating swift options
-----------------------
-
-Swift configuration tables are generated using the ``extract_swift_flags.py``
-script. This script doesn't use a mapping file, but organize the tables using
-the various configuration files and sections. Most of the options must be
-described manually at the moment.
-
 Generate configuration difference
 ---------------------------------
 
 To generate "New, updated, and deprecated options" for each service,
-run diff_branches.py. For example:
+run ``diff_branches.py``. For example:
 
 .. code-block:: console
 

@@ -26,8 +26,7 @@ import jinja2
 
 
 PROJECTS = ['aodh', 'ceilometer', 'cinder', 'glance', 'heat', 'ironic',
-            'keystone', 'manila', 'neutron', 'nova', 'sahara', 'swift',
-            'trove']
+            'keystone', 'manila', 'neutron', 'nova', 'sahara', 'trove']
 MASTER_RELEASE = 'Ocata'
 CODENAME_TITLE = {'aodh': 'Alarming',
                   'ceilometer': 'Telemetry',
@@ -42,7 +41,6 @@ CODENAME_TITLE = {'aodh': 'Alarming',
                   'nova': 'Compute',
                   'sahara': 'Data Processing service',
                   'senlin': 'Clustering service',
-                  'swift': 'Object Storage service',
                   'trove': 'Database service',
                   'zaqar': 'Message service'}
 
@@ -165,14 +163,7 @@ def format_option_name(name):
         # name without a section ('log_dir')
         return "[DEFAULT] %s" % name
 
-    try:
-        # If we're dealing with swift, we'll have a filename to extract
-        # ('proxy-server|filter:tempurl/use')
-        filename, section = section.split('|')
-        return "%s.conf: [%s] %s" % (filename, section, name)
-    except ValueError:
-        # section but no filename ('database/connection')
-        return "[%s] %s" % (section, name)
+    return "[%s] %s" % (section, name)
 
 
 def release_from_branch(branch):
