@@ -467,11 +467,13 @@ def _format_opt(option):
         flags.append(('Mutable', 'This option can be changed without'
                       ' restarting.'))
 
-    return (option.dest,
-            opt_type,
-            _sanitize_default(option),
-            help_text,
-            flags)
+    return {
+        'name': option.dest,
+        'type': opt_type,
+        'default': _sanitize_default(option),
+        'help': help_text,
+        'flags': flags
+    }
 
 
 def write_files(package_name, options, target):
