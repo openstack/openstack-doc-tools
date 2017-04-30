@@ -41,6 +41,18 @@ master_doc = 'index'
 project = u'openstack-doc-tools'
 copyright = u'2017, OpenStack Foundation'
 
+# A few variables have to be set for the log-a-bug feature.
+#   giturl: The location of conf.py on Git. Must be set manually.
+#   gitsha: The SHA checksum of the bug description. Automatically extracted from git log.
+#   bug_tag: Tag for categorizing the bug. Must be set manually.
+# These variables are passed to the logabug code via html_context.
+giturl = u'https://git.openstack.org/cgit/openstack/openstack-doc-tools/tree/doc/source'
+git_cmd = "/usr/bin/git log | head -n1 | cut -f2 -d' '"
+gitsha = os.popen(git_cmd).read().strip('\n')
+bug_tag = u'openstack-doc-tools'
+html_context = {"gitsha": gitsha, "bug_tag": bug_tag,
+                "giturl": giturl}
+
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
 
@@ -61,6 +73,13 @@ html_theme = 'openstackdocs'
 html_theme_path = [openstackdocstheme.get_html_theme_path()]
 
 # html_static_path = ['static']
+
+# If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
+# using the given strftime format.
+# So that we can enable "log-a-bug" links from each output HTML page, this
+# variable must be set to a format that includes year, month, day, hours and
+# minutes.
+html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
