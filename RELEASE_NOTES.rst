@@ -1,10 +1,20 @@
+=============
 Release notes
 =============
 
+Current release notes
+~~~~~~~~~~~~~~~~~~~~~
+
 Note that this file is now obsolete, we use reno for release note
-management. Add notes to releasenotes/notes directory following the
+management and publish them at
+https://docs.openstack.org/releasenotes/openstack-doc-tools/ .
+
+Add notes to releasenotes/notes directory following the
 documentation in
-http://docs.openstack.org/developer/reno/usage.html#creating-new-release-notes.
+https://docs.openstack.org/developer/reno/usage.html#creating-new-release-notes.
+
+Older release notes
+~~~~~~~~~~~~~~~~~~~
 
 0.32.0
 ------
@@ -305,12 +315,12 @@ Fixes for openstack-doc-test:
 
 * openstack-doc-test:
 
-   - Fix building of identity-api and image-api books.
-   - Add option --debug.
-   - Generate log file for each build.
-   - Do not install build-ha-guide.sh and markdown-docbook.sh in
-     /usr/bin, use special scripts dir instead.
-   - Allow to configure the directory used under publish-doc
+  - Fix building of identity-api and image-api books.
+  - Add option --debug.
+  - Generate log file for each build.
+  - Do not install build-ha-guide.sh and markdown-docbook.sh in
+    /usr/bin, use special scripts dir instead.
+  - Allow to configure the directory used under publish-doc
 
 * generatedocbook and generatepot have been merged into a single
   file, the command has been renamed to
