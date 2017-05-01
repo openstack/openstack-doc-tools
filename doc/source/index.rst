@@ -15,9 +15,7 @@ Contents:
    sitemap-readme
    release_notes
 
-Indices and tables
-~~~~~~~~~~~~~~~~~~
+Search
+~~~~~~
 
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
