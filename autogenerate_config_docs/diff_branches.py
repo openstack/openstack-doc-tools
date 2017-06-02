@@ -251,13 +251,6 @@ def main():
                         required=False,
                         default='.',
                         type=str,)
-    parser.add_argument('-f', '--format',
-                        dest='format',
-                        help='Output format (rst).',
-                        required=False,
-                        default='rst',
-                        type=str,
-                        choices=('rst'),)
     parser.add_argument('-n', '--no-venv-update',
                         dest='novenvupdate',
                         help='Don\'t update the virtual envs.',
@@ -275,10 +268,9 @@ def main():
 
         release = args.new_branch.replace('stable/', '')
         env = get_env(project, release, old_list, new_list)
-        ext = 'rst' if args.format == 'rst' else 'xml'
-        filename = ("%(project)s-conf-changes.%(ext)s" %
-                    {'project': project, 'ext': ext})
-        tmpl_file = 'templates/changes.%s.j2' % args.format
+        filename = ("%(project)s-conf-changes.rst" %
+                    {'project': project})
+        tmpl_file = 'templates/changes.rst.j2'
         if not os.path.exists(args.target):
             os.makedirs(args.target)
         dest = os.path.join(args.target, filename)
