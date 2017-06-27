@@ -14,8 +14,6 @@
 import os
 import sys
 
-import openstackdocstheme
-
 sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ----------------------------------------------------
 
@@ -23,8 +21,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    # 'sphinx.ext.intersphinx',
-    # 'oslo.sphinx'
+    'openstackdocstheme'
 ]
 
 # autodoc generation is a bit aggressive and a nuisance when doing heavy
@@ -38,20 +35,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'openstack-doc-tools'
-copyright = u'2017, OpenStack Foundation'
-
-# A few variables have to be set for the log-a-bug feature.
-#   giturl: The location of conf.py on Git. Must be set manually.
-#   gitsha: The SHA checksum of the bug description. Automatically extracted from git log.
-#   bug_tag: Tag for categorizing the bug. Must be set manually.
-# These variables are passed to the logabug code via html_context.
-giturl = u'https://git.openstack.org/cgit/openstack/openstack-doc-tools/tree/doc/source'
-git_cmd = "/usr/bin/git log | head -n1 | cut -f2 -d' '"
-gitsha = os.popen(git_cmd).read().strip('\n')
+repository_name = 'openstack/openstack-doc-tools'
 bug_tag = u'openstack-doc-tools'
-html_context = {"gitsha": gitsha, "bug_tag": bug_tag,
-                "giturl": giturl}
+project = u'OpenStack-doc-tools'
+copyright = u'2017, OpenStack Foundation'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -70,7 +57,7 @@ pygments_style = 'sphinx'
 html_theme = 'openstackdocs'
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [openstackdocstheme.get_html_theme_path()]
+# html_theme_path = [openstackdocstheme.get_html_theme_path()]
 
 # html_static_path = ['static']
 
