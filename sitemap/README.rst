@@ -19,7 +19,7 @@ recommended.
 
    $ virtualenv venv
    $ source venv/bin/activate
-   $ pip install -r requirements.txt
+   $ pip install Scrapy
 
 When using pip, you may also need to install some development packages. For
 example, on Ubuntu 16.04 install the following packages:
