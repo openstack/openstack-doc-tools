@@ -58,10 +58,17 @@ class TestSitemapSpider(unittest.TestCase):
 
     def test_parse_items_inits_sitemap(self):
         response = mock.MagicMock()
+        path = sitemap_file.urlparse.SplitResult(
+            scheme='https',
+            netloc='docs.openstack.org',
+            path='/ocata/something.html',
+            query='',
+            fragment=''
+        )
         with mock.patch.object(sitemap_file,
                                'SitemapItem') as mocked_sitemap_item:
-            with mock.patch.object(sitemap_file.urlparse,
-                                   'urlsplit'):
+            with mock.patch.object(sitemap_file.urlparse, 'urlsplit',
+                                   return_value=path):
                 with mock.patch.object(sitemap_file, 'time'):
                     self.spider.parse_item(response)
 
@@ -69,9 +76,17 @@ class TestSitemapSpider(unittest.TestCase):
 
     def test_parse_items_gets_path(self):
         response = mock.MagicMock()
+        path = sitemap_file.urlparse.SplitResult(
+            scheme='https',
+            netloc='docs.openstackorg',
+            path='/ocata/something.html',
+            query='',
+            fragment=''
+        )
         with mock.patch.object(sitemap_file, 'SitemapItem'):
             with mock.patch.object(sitemap_file.urlparse,
-                                   'urlsplit') as mocked_urlsplit:
+                                   'urlsplit',
+                                   return_value=path) as mocked_urlsplit:
                 with mock.patch.object(sitemap_file, 'time'):
                     self.spider.parse_item(response)
 
@@ -81,8 +96,8 @@ class TestSitemapSpider(unittest.TestCase):
         response = mock.MagicMock()
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
-            netloc='docs.openstack.com',
-            path='/mitaka',
+            netloc='docs.openstack.org',
+            path='/ocata/something.html',
             query='',
             fragment=''
         )
@@ -91,14 +106,14 @@ class TestSitemapSpider(unittest.TestCase):
             with mock.patch.object(sitemap_file, 'time'):
                 returned_item = self.spider.parse_item(response)
 
-        self.assertEqual('0.5', returned_item['priority'])
+        self.assertEqual('1.0', returned_item['priority'])
         self.assertEqual('weekly', returned_item['changefreq'])
 
     def test_parse_items_high_priority_daily_freq(self):
         response = mock.MagicMock()
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
-            netloc='docs.openstack.com',
+            netloc='docs.openstack.org',
             path='/contributor-guide',
             query='',
             fragment=''
@@ -115,7 +130,7 @@ class TestSitemapSpider(unittest.TestCase):
         response = mock.MagicMock()
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
-            netloc='docs.openstack.com',
+            netloc='docs.openstack.org',
             path='/ocata',
             query='',
             fragment=''
