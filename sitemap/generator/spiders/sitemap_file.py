@@ -33,22 +33,6 @@ class SitemapItem(item.Item):
 class SitemapSpider(spiders.CrawlSpider):
     name = 'sitemap'
 
-    EOL_SERIES = [
-        'austin',
-        'bexar',
-        'cactus',
-        'diablo',
-        'essex',
-        'folsom',
-        'grizzly',
-        'havana',
-        'icehouse',
-        'juno',
-        'kilo',
-        'liberty',
-        'mitaka'
-    ]
-    EOL_RELEASES_PAT = re.compile('^/(' + '|'.join(EOL_SERIES) + ')/')
     MAINT_SERIES = [
         'newton',
         'ocata',
@@ -70,6 +54,19 @@ class SitemapSpider(spiders.CrawlSpider):
                 deny=[
                     r'/trunk/',
                     r'/draft/',
+                    r'/austin/',
+                    r'/bexar/',
+                    r'/cactus/',
+                    r'/diablo/',
+                    r'/essex/',
+                    r'/folsom/',
+                    r'/grizzly/',
+                    r'/havana/',
+                    r'/icehouse/',
+                    r'/juno/',
+                    r'/kilo/',
+                    r'/liberty/',
+                    r'/mitaka/'
                 ]
             ),
             follow=True, callback='parse_item'
@@ -97,13 +94,9 @@ class SitemapSpider(spiders.CrawlSpider):
             item['priority'] = '1.0'
             item['changefreq'] = 'weekly'
         elif self.LATEST_PAT.match(path):
-            # daily changefrequency and high priority for current files
-            item['priority'] = '0.8'
+            # daily changefrequency and normal priority for current files
+            item['priority'] = '0.5'
             item['changefreq'] = 'daily'
-        elif self.EOL_RELEASES_PAT.match(path):
-            # yearly changefrequency and lowest priority for old stable files
-            item['priority'] = '0.1'
-            item['changefreq'] = 'yearly'
         else:
             # These are unversioned documents
             # daily changefrequency and highest priority for current files
