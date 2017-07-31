@@ -69,11 +69,11 @@ mkdir output
 OS_VOLUME_API_VERSION=3.latest \
 openstack-auto-commands --output-dir output $project
 
-if [[ ! -e openstack-manuals ]]; then
-    git clone git://git.openstack.org/openstack/openstack-manuals
+if [[ ! -e "python-${project}client" ]]; then
+    git clone git://git.openstack.org/openstack/python-${project}client
 fi
 
-cd openstack-manuals
+cd python-${project}client
 
 ( git remote -v  | grep -q gerrit ) || git review -s
 
@@ -82,7 +82,7 @@ git pull
 branch=cli-reference
 git branch --list $branch && git branch -D $branch
 git checkout -b $branch
-mv ../output/${project}.rst "doc/cli-reference/source"
+mv ../output/${project}.rst "doc/source/cli/details.rst"
 rm -rf ../output
 version=$($project --version 2>&1)
 version=${version##*\)}
