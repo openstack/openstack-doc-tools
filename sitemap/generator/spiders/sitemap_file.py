@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
 import time
 try:
     import urlparse
@@ -31,7 +32,8 @@ class SitemapItem(item.Item):
 
 class SitemapSpider(spiders.CrawlSpider):
     name = 'sitemap'
-    old_releases = tuple(["/%s" % old_release for old_release in [
+
+    EOL_SERIES = [
         'austin',
         'bexar',
         'cactus',
@@ -44,10 +46,16 @@ class SitemapSpider(spiders.CrawlSpider):
         'juno',
         'kilo',
         'liberty',
-        'mitaka',
+        'mitaka'
+    ]
+    EOL_RELEASES_PAT = re.compile('^/(' + '|'.join(EOL_SERIES) + ')/')
+    MAINT_SERIES = [
         'newton',
-        'ocata'
-    ]])
+        'ocata',
+        'pike'
+    ]
+    MAINT_RELEASES_PAT = re.compile('^/(' + '|'.join(MAINT_SERIES) + ')/')
+    LATEST_PAT = re.compile('^/latest/')
 
     rules = [
         spiders.Rule(
@@ -62,9 +70,6 @@ class SitemapSpider(spiders.CrawlSpider):
                 deny=[
                     r'/trunk/',
                     r'/draft/',
-                    r'/api/',
-                    r'/juno/',
-                    r'/icehouse/'
                 ]
             ),
             follow=True, callback='parse_item'
@@ -86,11 +91,21 @@ class SitemapSpider(spiders.CrawlSpider):
         item['loc'] = response.url
 
         path = urlparse.urlsplit(response.url).path
-        if path.startswith(self.old_releases):
-            # weekly changefrequency and lower priority for old files
-            item['priority'] = '0.5'
+
+        if self.MAINT_RELEASES_PAT.match(path):
+            # weekly changefrequency and highest prio for maintained release
+            item['priority'] = '1.0'
             item['changefreq'] = 'weekly'
+        elif self.LATEST_PAT.match(path):
+            # daily changefrequency and high priority for current files
+            item['priority'] = '0.8'
+            item['changefreq'] = 'daily'
+        elif self.EOL_RELEASES_PAT.match(path):
+            # yearly changefrequency and lowest priority for old stable files
+            item['priority'] = '0.1'
+            item['changefreq'] = 'yearly'
         else:
+            # These are unversioned documents
             # daily changefrequency and highest priority for current files
             item['priority'] = '1.0'
             item['changefreq'] = 'daily'
