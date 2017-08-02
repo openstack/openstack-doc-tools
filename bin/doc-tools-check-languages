@@ -181,8 +181,6 @@ fi
 source $CONF_FILE
 
 if [[ -z $(declare -p BOOKS 2> /dev/null | grep 'declare -A BOOKS') || \
-    -z $(declare -p DIRECTORIES 2> /dev/null | \
-    grep 'declare -A DIRECTORIES') || \
     -z $DOC_DIR ]]; then
     echo "Error: the configuration file '$CONF_FILE' is invalid"
     exit 1
