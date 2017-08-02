@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-INSTALL_TAGS="obs rdo ubuntu debian debconf"
 FIRSTAPP_TAGS="libcloud dotnet fog openstacksdk pkgcloud shade"
 
 # This marker is needed for Infra publishing and needs to go into the
@@ -33,9 +32,6 @@ function build_rst {
     # We need to extract all strings, so add all supported tags
     if [ ${book} = "firstapp" ] ; then
         TAG="-t libcloud -t fog -t dotnet -t openstacksdk -t pkgcloud -t shade"
-    fi
-    if [ ${book} = "install-guide" ] ; then
-        TAG="-t obs -t rdo -t ubuntu -t debian"
     fi
 
     COMMON="common"
@@ -105,69 +101,6 @@ function build_rst {
             rsync -a ${DOC_DIR}${book}/build-${tag}/html/ ${PUBLISH_DIR}
             echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
         done
-    elif [ ${book} = "install-guide" ] ; then
-        # Install Guide has several variations, build all of them
-        INDEX=${DOC_DIR}${book}/source/index.rst
-
-        # For translation work, we should have only one index file,
-        # because our tools generate translation resources from
-        # only one index file.
-        # Therefore, this tool uses one combined index file
-        # while processing title and toctree for each distribution.
-
-        # Save and restore the index file
-        cp -f ${INDEX} ${INDEX}.save
-        trap "mv -f ${INDEX}.save ${INDEX}" EXIT
-
-        for tag in $INSTALL_TAGS; do
-            if [[ "$tag" == "debconf" ]]; then
-                # Not all branches have this directory
-                if [[ -d ${DOC_DIR}${book}-${tag}/source ]] ; then
-                    # Build the guide with debconf
-                    # To use debian only contents, use "debian" tag.
-                    BUILD_DIR="${DOC_DIR}${book}-${tag}/build-${tag}/html"
-                    DOCTREES="${BUILD_DIR}.doctrees"
-                    tox -evenv -- sphinx-build -q -E -t debian \
-                        -D language=${language} \
-                        -d ${DOCTREES} \
-                        ${DOC_DIR}${book}-${tag}/source/ \
-                        ${BUILD_DIR}
-                    PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
-                    mkdir -p ${PUBLISH_DIR}
-                    rsync -a ${DOC_DIR}${book}-${tag}/build-${tag}/html/ \
-                        ${PUBLISH_DIR}
-                    echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
-                fi
-            else
-                ##
-                # Because Sphinx uses the first heading as title regardless of
-                # only directive, replace title directive with the proper title
-                # for each distribution to set the title explicitly.
-                title=$(grep -m 1 -A 5 "^.. only:: ${tag}" ${INDEX} | \
-                    sed -n 4p | sed -e 's/^ *//g')
-                sed -i -e "s/\.\. title::.*/.. title:: ${title}/" ${INDEX}
-
-                ##
-                # Sphinx builds the navigation before processing directives,
-                # so the conditional toctree does not work.
-                # We need to prepare toctree depending on distribution
-                # only with one toctree before exectuing sphinx-build.
-
-                # Build the guide
-                BUILD_DIR="${DOC_DIR}${book}/build-${tag}/html"
-                DOCTREES="${BUILD_DIR}.doctrees"
-                tox -evenv -- sphinx-build -q -E -t $tag \
-                    -D language=${language} \
-                    -d ${DOCTREES} \
-                    ${DOC_DIR}${book}/source/ \
-                    ${BUILD_DIR}
-                PUBLISH_DIR=publish-docs/${language}/${book}-${tag}
-                mkdir -p ${PUBLISH_DIR}
-                rsync -a ${DOC_DIR}${book}/build-${tag}/html/ \
-                    ${PUBLISH_DIR}
-                echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
-            fi
-        done
     else
         BUILD_DIR="${DOC_DIR}${book}/build/html"
         DOCTREES="${BUILD_DIR}.doctrees"
@@ -215,49 +148,6 @@ function test_language {
             fi
         fi
     done
-}
-
-
-function handle_draft_language {
-    language=$1
-
-    echo
-    echo "Moving drafts for language $language"
-    echo
-
-    mkdir -p publish-docs/draft/$language
-    for book in ${DRAFTS["$language"]}; do
-        case "${book}" in
-            config-reference)
-                mv publish-docs/$language/draft/$book \
-                    publish-docs/draft/$language/$book
-                rmdir --ignore-fail-on-non-empty publish-docs/$language/draft
-                ;;
-            firstapp)
-                for tag in $FIRSTAPP_TAGS; do
-                    mv publish-docs/$language/$book-${tag} \
-                        publish-docs/draft/$language/$book-${tag}
-                done
-                rmdir --ignore-fail-on-non-empty publish-docs/$language/
-                ;;
-            install-guide)
-                for tag in $INSTALL_TAGS ; do
-                    # Not all tags might be build on all branches
-                    if [[ -d publish-docs/$language/$book-${tag} ]] ; then
-                        mv publish-docs/$language/$book-${tag} \
-                            publish-docs/draft/$language/$book-${tag}
-                    fi
-                done
-                rmdir --ignore-fail-on-non-empty publish-docs/$language/
-                ;;
-            *)
-                mv publish-docs/$language/$book \
-                    publish-docs/draft/$language/$book
-                ;;
-        esac
-    done
-
-
 }
 
 
@@ -315,17 +205,10 @@ for language in "$@" ; do
             for language in "${!BOOKS[@]}"; do
                 test_language $language
             done
-            # Move draft language guides
-            for language in "${!DRAFTS[@]}"; do
-                handle_draft_language $language
-            done
             ;;
         *)
             if [[ -n ${BOOKS[$language]} ]]; then
                 test_language $language
-                if [ ${DRAFTS["${language}"]+_} ] ; then
-                    handle_draft_language $language
-                fi
             else
                 echo "Error: language $language not handled"
             fi
