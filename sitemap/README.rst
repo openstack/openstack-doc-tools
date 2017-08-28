@@ -18,7 +18,7 @@ recommended.
 .. code-block:: console
 
    $ virtualenv venv
-   $ source venv/bin/activate
+   $ . venv/bin/activate
    $ pip install Scrapy
 
 When using pip, you may also need to install some development packages. For
