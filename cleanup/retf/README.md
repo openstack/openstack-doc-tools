@@ -40,7 +40,7 @@ the ending ```.retf```.
 To fix findings directly in the files add the parameter
 ```--in-place```. Findings will than be fixed directly in the files. A backup file
 with the ending ```.orig``` will be created. To disable backups add the
-paramter ```--no-backup```.
+parameter ```--no-backup```.
 
 To only check if there are findings inside the defined set of files add
 
