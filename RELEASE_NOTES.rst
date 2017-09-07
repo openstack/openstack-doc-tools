@@ -11,7 +11,7 @@ https://docs.openstack.org/releasenotes/openstack-doc-tools/ .
 
 Add notes to releasenotes/notes directory following the
 documentation in
-https://docs.openstack.org/developer/reno/usage.html#creating-new-release-notes.
+https://docs.openstack.org/reno/latest/user/usage.html#creating-new-release-notes
 
 Older release notes
 ~~~~~~~~~~~~~~~~~~~

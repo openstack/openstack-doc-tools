@@ -2,7 +2,7 @@ openstack-doc-tools style commandments
 ======================================
 
 - Step 1: Read the OpenStack Style Commandments
-  http://docs.openstack.org/developer/hacking/
+  http://docs.openstack.org/hacking/latest/
 
 - Step 2: Read on
 
