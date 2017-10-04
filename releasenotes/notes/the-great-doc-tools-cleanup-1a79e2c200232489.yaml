@@ -12,3 +12,14 @@ upgrade:
     superseded by the ``cliff.sphinxext`` `Sphinx extensions`__.
 
     __ https://docs.openstack.org/cliff/latest/user/sphinxext.html
+  - |
+    The following scripts and tools have been removed:
+
+    - prettify.py$
+    - remove_trailing_whitespaces.sh$
+    - remove_unnecessary_spaces.py$
+    - retf$
+
+    These were all indented to cleanup docs once they were already in tree, but
+    our tooling and review process should be sufficient to catch most issues
+    and there's limited value in submitting whitespace-fixup patches.
