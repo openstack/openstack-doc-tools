@@ -59,9 +59,3 @@ On openSUSE::
 On Ubuntu::
 
     $ apt-get install libxml2-dev libxslt-dev
-
-
-Regenerating config option tables
----------------------------------
-
-See :ref:`autogenerate_config_docs`.

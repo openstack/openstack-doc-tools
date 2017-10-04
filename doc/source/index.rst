@@ -10,7 +10,6 @@ Contents:
    doc-tools-readme
    installation
    usage
-   autogenerate_config_docs
    man/openstack-doc-test
    sitemap-readme
    release_notes
