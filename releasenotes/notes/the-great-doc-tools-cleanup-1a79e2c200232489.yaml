@@ -6,3 +6,9 @@ upgrade:
     ``oslo_config.sphinxext`` `Sphinx extension`__.
 
     __ https://docs.openstack.org/oslo.config/latest/reference/sphinxext.html
+  - |
+    The ``openstack-auto-commands`` command and its helper script in
+    ``bin/doc-tools-update-cli-reference`` have been removed. These have been
+    superseded by the ``cliff.sphinxext`` `Sphinx extensions`__.
+
+    __ https://docs.openstack.org/cliff/latest/user/sphinxext.html
