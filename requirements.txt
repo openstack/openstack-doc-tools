@@ -10,4 +10,3 @@ docutils>=0.11 # OSI-Approved Open Source, Public Domain
 sphinx>=1.6.2 # BSD
 demjson>=2.2.2 # GLGPLv3+
 PyYAML>=3.10 # MIT
-cliff-tablib>=1.0 # Apache-2.0
