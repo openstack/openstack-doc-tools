@@ -11,7 +11,7 @@ doc8>=0.6.0 # Apache-2.0
 pylint==1.7.1 # GPLv2
 
 reno>=2.5.0 # Apache-2.0
-openstackdocstheme>=1.17.0 # Apache-2.0
+openstackdocstheme>=1.18.1 # Apache-2.0
 testrepository>=0.0.18 # Apache-2.0/BSD
 
 # mock object framework
