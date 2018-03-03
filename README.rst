@@ -2,8 +2,8 @@
 Team and repository tags
 ========================
 
-.. image:: http://governance.openstack.org/badges/openstack-doc-tools.svg
-    :target: http://governance.openstack.org/reference/tags/index.html
+.. image:: https://governance.openstack.org/tc/badges/openstack-doc-tools.svg
+    :target: https://governance.openstack.org/tc/reference/tags/index.html
 
 .. Change things from this point on
 
@@ -14,7 +14,7 @@ This repository contains tools used by the OpenStack Documentation
 project.
 
 For more details, see the `OpenStack Documentation Contributor Guide
-<http://docs.openstack.org/contributor-guide/>`_.
+<https://docs.openstack.org/contributor-guide/>`_.
 
 * License: Apache License, Version 2.0
 * Source: https://git.openstack.org/cgit/openstack/openstack-doc-tools
