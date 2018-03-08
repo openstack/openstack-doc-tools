@@ -18,7 +18,7 @@ except ImportError:
     import urllib.parse as urlparse
 
 from scrapy import item
-from scrapy.linkextractors import LinkExtractor
+from scrapy import linkextractors
 from scrapy import spiders
 
 
@@ -43,7 +43,7 @@ class SitemapSpider(spiders.CrawlSpider):
 
     rules = [
         spiders.Rule(
-            LinkExtractor(
+            linkextractors.LinkExtractor(
                 allow=[
                     r'.*\.html',
                     r'.*\.pdf',
