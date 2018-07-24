@@ -15,7 +15,7 @@ sdist
 .cache
 .coverage
 .tox
-.testrepository
+.stestr/
 
 # pbr generates these
 AUTHORS
