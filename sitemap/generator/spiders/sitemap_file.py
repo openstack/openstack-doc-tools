@@ -36,10 +36,13 @@ class SitemapSpider(spiders.CrawlSpider):
     MAINT_SERIES = [
         'newton',
         'ocata',
-        'pike'
+        'pike',
+        'queens',
+        'rocky',
+        'stein',
     ]
-    MAINT_RELEASES_PAT = re.compile('^/(' + '|'.join(MAINT_SERIES) + ')/')
-    LATEST_PAT = re.compile('^/latest/')
+    MAINT_RELEASES_PAT = re.compile('^.*/(' + '|'.join(MAINT_SERIES) + ')/')
+    LATEST_PAT = re.compile('^.*/latest/')
 
     rules = [
         spiders.Rule(
