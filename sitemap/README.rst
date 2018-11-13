@@ -2,7 +2,7 @@
 Sitemap Generator
 =================
 
-This script crawls all available sites on http://docs.openstack.org and
+This script crawls all available sites on https://docs.openstack.org and
 extracts all URLs. Based on the URLs the script generates a sitemap for search
 engines according to the `sitemaps protocol
 <http://www.sitemaps.org/protocol.html>`_.
@@ -40,7 +40,7 @@ To generate a new sitemap file, change into your local clone of the
    $ scrapy crawl sitemap
 
 The script takes several minutes to crawl all available
-sites on http://docs.openstack.org. The result is available in the
+sites on https://docs.openstack.org. The result is available in the
 ``sitemap_docs.openstack.org.xml`` file.
 
 Options
@@ -50,7 +50,7 @@ domain=URL
 
    Sets the ``domain`` to crawl. Default is ``docs.openstack.org``.
 
-   For example, to crawl http://developer.openstack.org use the following
+   For example, to crawl https://developer.openstack.org use the following
    command:
 
    .. code-block:: console
@@ -68,7 +68,7 @@ urls=URL
 
    .. code-block:: console
 
-      $ scrapy crawl sitemap -a domain=developer.openstack.org -a urls="http://developer.openstack.org/de/api-guide/quick-start/"
+      $ scrapy crawl sitemap -a domain=developer.openstack.org -a urls="https://developer.openstack.org/de/api-guide/quick-start/"
 
 LOG_FILE=FILE
 

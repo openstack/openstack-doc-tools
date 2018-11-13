@@ -107,7 +107,7 @@ repository:
 SEE ALSO
 ========
 
-* `OpenStack Documentation <http://wiki.openstack.org/wiki/Documentation>`__
+* `OpenStack Documentation <https://wiki.openstack.org/wiki/Documentation>`__
 
 Bugs
 ====
