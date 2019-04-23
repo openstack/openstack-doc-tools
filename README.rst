@@ -17,7 +17,7 @@ For more details, see the `OpenStack Documentation Contributor Guide
 <https://docs.openstack.org/contributor-guide/>`_.
 
 * License: Apache License, Version 2.0
-* Source: https://git.openstack.org/cgit/openstack/openstack-doc-tools
+* Source: https://opendev.org/openstack/openstack-doc-tools
 * Bugs: https://bugs.launchpad.net/openstack-doc-tools
 
 Prerequisites
