@@ -109,13 +109,7 @@ function build_rst {
             -d ${DOCTREES} \
             ${DOC_DIR}${book}/source/ \
             ${BUILD_DIR}
-        # "api-quick-start" has a special location
-        # following https://developer.openstack.org/api-guide/quick-start/
-        if [ ${book} = "api-quick-start" ] ; then
-            PUBLISH_DIR=publish-docs/${language}/api-guide/quick-start/
-        else
-            PUBLISH_DIR=publish-docs/${language}/${book}/
-        fi
+        PUBLISH_DIR=publish-docs/${language}/${book}/
         mkdir -p ${PUBLISH_DIR}
         rsync -a ${DOC_DIR}${book}/build/html/ ${PUBLISH_DIR}
         echo $MARKER_TEXT > ${PUBLISH_DIR}/.root-marker
