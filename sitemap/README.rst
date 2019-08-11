@@ -47,35 +47,32 @@ Options
 ~~~~~~~
 
 domain=URL
+  Sets the ``domain`` to crawl. Default is ``docs.openstack.org``.
 
-   Sets the ``domain`` to crawl. Default is ``docs.openstack.org``.
+  For example, to crawl https://developer.openstack.org use the following
+  command:
 
-   For example, to crawl https://developer.openstack.org use the following
-   command:
+  .. code-block:: console
 
-   .. code-block:: console
+     $ scrapy crawl sitemap -a domain=developer.openstack.org
 
-      $ scrapy crawl sitemap -a domain=developer.openstack.org
-
-   The result is available in the ``sitemap_developer.openstack.org.xml`` file.
+  The result is available in the ``sitemap_developer.openstack.org.xml`` file.
 
 urls=URL
+  You can define a set of additional start URLs using the ``urls`` attribute.
+  Separate multiple URLs with ``,``.
 
-   You can define a set of additional start URLs using the ``urls`` attribute.
-   Separate multiple URLs with ``,``.
+  For example:
 
-   For example:
+  .. code-block:: console
 
-   .. code-block:: console
-
-      $ scrapy crawl sitemap -a domain=developer.openstack.org -a urls="https://developer.openstack.org/de/api-guide/quick-start/"
+     $ scrapy crawl sitemap -a domain=developer.openstack.org -a urls="https://developer.openstack.org/de/api-guide/quick-start/"
 
 LOG_FILE=FILE
+  Write log messages to the specified file.
 
-   Write log messages to the specified file.
+  For example, to write to ``scrapy.log``:
 
-   For example, to write to ``scrapy.log``:
+  .. code-block:: console
 
-   .. code-block:: console
-
-      $ scrapy crawl sitemap -s LOG_FILE=scrapy.log
+     $ scrapy crawl sitemap -s LOG_FILE=scrapy.log

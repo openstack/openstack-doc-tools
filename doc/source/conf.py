@@ -66,7 +66,7 @@ html_theme = 'openstackdocs'
 # So that we can enable "log-a-bug" links from each output HTML page, this
 # variable must be set to a format that includes year, month, day, hours and
 # minutes.
-html_last_updated_fmt = '%Y-%m-%d %H:%M'
+# html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
