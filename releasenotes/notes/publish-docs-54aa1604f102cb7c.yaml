@@ -1,0 +1,4 @@
+critical:
+  - |
+    Change publishing from `publish-docs` to `publish-docs/html`. This needs
+    changing in build and publish CI jobs.

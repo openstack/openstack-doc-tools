@@ -83,7 +83,7 @@ OPTIONS
     check-build.
 
 **--publish**
-    Setup content in publish-docs directory for publishing to
+    Setup content in publish-docs/html directory for publishing to
     external website.
 
 **--verbose**
