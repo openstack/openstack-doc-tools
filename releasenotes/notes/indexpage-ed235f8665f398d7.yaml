@@ -1,0 +1,4 @@
+upgrade:
+  - |
+    The helpers `openstack-indexpage` and `openstack-jsoncheck` are not used
+    anymore and thus have been removed.
