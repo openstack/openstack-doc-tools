@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    Python 2.7 support has been dropped. Last release of openstack-doc-tools
+    to support python 2.7 is 2.0.0. The minimum version of Python now
+    supported by openstack-doc-tools is Python 3.6.
