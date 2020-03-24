@@ -110,6 +110,7 @@ class SitemapSpider(spiders.CrawlSpider):
             timestamp = response.headers['Last-Modified']
         else:
             timestamp = response.headers['Date']
-        lastmod = time.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+        lastmod = time.strptime(timestamp.decode("utf-8"),
+                                "%a, %d %b %Y %H:%M:%S %Z")
         item['lastmod'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", lastmod)
         return item

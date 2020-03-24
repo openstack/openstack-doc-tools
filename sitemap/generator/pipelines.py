@@ -83,7 +83,8 @@ class ExportSitemap(object):
                                              % spider.domain))
         with open(os.path.join(os.getcwd(), "sitemap_%s.xml" % spider.domain),
                   'w') as pretty:
-            pretty.write(lxml.etree.tostring(tree, pretty_print=True))
+            pretty.write(lxml.etree.tostring(tree, pretty_print=True,
+                                             encoding='unicode'))
 
     def process_item(self, item, spider):
         self.exporter.export_item(item)
