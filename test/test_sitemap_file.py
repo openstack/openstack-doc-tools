@@ -10,10 +10,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
 import scrapy
 from sitemap.generator.spiders import sitemap_file
 import unittest
+from unittest import mock
 
 
 class TestSitemapItem(unittest.TestCase):
