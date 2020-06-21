@@ -44,7 +44,7 @@ class TestSitemapSpider(unittest.TestCase):
         domain = 'docs.openstack.org'
         self.assertEqual(self.spider.domain, domain)
         self.assertEqual(self.spider.allowed_domains, [domain])
-        self.assertEqual(self.spider.start_urls, ['http://%s' % domain])
+        self.assertEqual(self.spider.start_urls, ['https://%s' % domain])
 
     def test_start_urls_get_appended(self):
         urls = 'new.openstack.org, old.openstack.org'

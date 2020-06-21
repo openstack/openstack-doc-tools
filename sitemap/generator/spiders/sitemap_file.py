@@ -12,10 +12,7 @@
 
 import re
 import time
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
+import urllib.parse as urlparse
 
 from scrapy import item
 from scrapy import linkextractors
@@ -34,12 +31,13 @@ class SitemapSpider(spiders.CrawlSpider):
     name = 'sitemap'
 
     MAINT_SERIES = [
-        'newton',
         'ocata',
         'pike',
         'queens',
         'rocky',
         'stein',
+        'train',
+        'ussuri',
     ]
     MAINT_RELEASES_PAT = re.compile('^.*/(' + '|'.join(MAINT_SERIES) + ')/')
     LATEST_PAT = re.compile('^.*/latest/')
@@ -69,7 +67,16 @@ class SitemapSpider(spiders.CrawlSpider):
                     r'/juno/',
                     r'/kilo/',
                     r'/liberty/',
-                    r'/mitaka/'
+                    r'/mitaka/',
+                    r'/newton/',
+                ],
+                deny_domains=[
+                    # docs.o.o redirects to a few sites, filter
+                    # them out
+                    'docs.opendev.org',
+                    'opendev.org',
+                    'releases.openstack.org',
+                    'zuul-ci.org',
                 ]
             ),
             follow=True, callback='parse_item'
@@ -80,7 +87,7 @@ class SitemapSpider(spiders.CrawlSpider):
         super(SitemapSpider, self).__init__(*args, **kwargs)
         self.domain = domain
         self.allowed_domains = [domain]
-        self.start_urls = ['http://%s' % domain]
+        self.start_urls = ['https://%s' % domain]
         for url in urls.split(','):
             if not url:
                 continue
@@ -90,13 +97,17 @@ class SitemapSpider(spiders.CrawlSpider):
         item = SitemapItem()
         item['loc'] = response.url
 
-        path = urlparse.urlsplit(response.url).path
+        components = urlparse.urlsplit(response.url)
 
-        if self.MAINT_RELEASES_PAT.match(path):
+        # Filter out any redirected URLs to other domains
+        if self.domain != components.netloc:
+            return
+
+        if self.MAINT_RELEASES_PAT.match(components.path):
             # weekly changefrequency and highest prio for maintained release
             item['priority'] = '1.0'
             item['changefreq'] = 'weekly'
-        elif self.LATEST_PAT.match(path):
+        elif self.LATEST_PAT.match(components.path):
             # daily changefrequency and normal priority for current files
             item['priority'] = '0.5'
             item['changefreq'] = 'daily'
