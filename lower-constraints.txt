@@ -3,7 +3,6 @@ astroid==1.6.2
 Babel==2.3.4
 bashate==0.5.1
 chardet==3.0.4
-demjson==2.2.2
 doc8==0.6.0
 docutils==0.11
 dulwich==0.15.0

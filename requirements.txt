@@ -7,5 +7,4 @@ iso8601>=0.1.11 # MIT
 lxml!=3.7.0,>=3.4.1 # BSD
 docutils>=0.11 # OSI-Approved Open Source, Public Domain
 sphinx>=2.0.0,!=2.1.0 # BSD
-demjson>=2.2.2 # GLGPLv3+
 PyYAML>=3.12 # MIT
