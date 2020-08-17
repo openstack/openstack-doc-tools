@@ -10,9 +10,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
 from sitemap.generator import pipelines
 import unittest
+from unittest import mock
 
 
 class TestSitemapItemExporter(unittest.TestCase):

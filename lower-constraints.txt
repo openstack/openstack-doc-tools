@@ -19,7 +19,6 @@ linecache2==1.0.0
 lxml==4.5.0
 MarkupSafe==1.1.1
 mccabe==0.2.1
-mock==2.0.0
 openstackdocstheme==2.2.1
 pbr==2.0.0
 pep8==1.5.7
