@@ -4,4 +4,3 @@
       - release-notes-jobs-python3
       - openstack-python3-victoria-jobs
       - publish-openstack-docs-pti
-      - openstack-lower-constraints-jobs
