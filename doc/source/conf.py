@@ -39,9 +39,9 @@ master_doc = 'index'
 # General information about the project.
 openstackdocs_repo_name = 'openstack/openstack-doc-tools'
 openstackdocs_auto_name = False
-openstackdocs_bug_tag = u'openstack-doc-tools'
-project = u'OpenStack-doc-tools'
-copyright = u'2017, OpenStack Foundation'
+openstackdocs_bug_tag = 'openstack-doc-tools'
+project = 'OpenStack-doc-tools'
+copyright = '2017, OpenStack Foundation'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -73,8 +73,8 @@ htmlhelp_basename = '%sdoc' % project
 latex_documents = [
     ('index',
      '%s.tex' % project,
-     u'%s Documentation' % project,
-     u'OpenStack Foundation', 'manual'),
+     '%s Documentation' % project,
+     'OpenStack Foundation', 'manual'),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
