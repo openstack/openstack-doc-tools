@@ -3,7 +3,6 @@
 
 libssl-dev [platform:dpkg]
 openssl-devel [platform:rpm]
-python-dev [platform:dpkg]
 python3-all [platform:dpkg !platform:ubuntu-precise]
 python3-all-dev [platform:dpkg !platform:ubuntu-precise]
 python3-devel [platform:fedora]
