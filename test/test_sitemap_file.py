@@ -61,7 +61,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.org',
-            path='/ocata/something.html',
+            path='/2024.1/something.html',
             query='',
             fragment=''
         )
@@ -79,7 +79,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstackorg',
-            path='/ocata/something.html',
+            path='/2024.1/something.html',
             query='',
             fragment=''
         )
@@ -97,7 +97,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.org',
-            path='/ocata/something.html',
+            path='/2024.1/something.html',
             query='',
             fragment=''
         )
@@ -131,7 +131,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.org',
-            path='/ocata',
+            path='/2024.1',
             query='',
             fragment=''
         )

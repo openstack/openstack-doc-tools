@@ -31,13 +31,10 @@ class SitemapSpider(spiders.CrawlSpider):
     name = 'sitemap'
 
     MAINT_SERIES = [
-        'ocata',
-        'pike',
-        'queens',
-        'rocky',
-        'stein',
-        'train',
-        'ussuri',
+        'zed',
+        '2023.1',
+        '2023.2',
+        '2024.1',
     ]
     MAINT_RELEASES_PAT = re.compile('^.*/(' + '|'.join(MAINT_SERIES) + ')/')
     LATEST_PAT = re.compile('^.*/latest/')
@@ -69,6 +66,17 @@ class SitemapSpider(spiders.CrawlSpider):
                     r'/liberty/',
                     r'/mitaka/',
                     r'/newton/',
+                    r'/ocata/',
+                    r'/pike/',
+                    r'/queens/',
+                    r'/rocky/',
+                    r'/stein/',
+                    r'/train/',
+                    r'/ussuri/',
+                    r'/victoria/',
+                    r'/wallaby/',
+                    r'/xena/',
+                    r'/yoga/',
                 ],
                 deny_domains=[
                     # docs.o.o redirects to a few sites, filter
