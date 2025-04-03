@@ -31,11 +31,10 @@ class SitemapSpider(spiders.CrawlSpider):
     name = 'sitemap'
 
     MAINT_SERIES = [
-        'zed',
-        '2023.1',
         '2023.2',
         '2024.1',
         '2024.2',
+        '2025.1',
     ]
     MAINT_RELEASES_PAT = re.compile('^.*/(' + '|'.join(MAINT_SERIES) + ')/')
     LATEST_PAT = re.compile('^.*/latest/')
