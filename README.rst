@@ -19,10 +19,10 @@ For more details, see the `OpenStack Documentation Contributor Guide
 Prerequisites
 -------------
 
-You need to have Python 2.7 installed for using the tools.
+You need to have Python 3 installed for using the tools.
 
 This package needs a few external dependencies including lxml. If you
-do not have lxml installed, you can either install python-lxml or have
+do not have lxml installed, you can either install python3-lxml or have
 it installed automatically and build from sources. To build lxml from
 sources, you need a C compiler and the xml and xslt development
 packages installed.
@@ -30,27 +30,19 @@ packages installed.
 To install python-lxml, execute the following based on your
 distribution.
 
-On Fedora, RHEL 7, and CentOS 7::
+On Fedora, RHEL and CentOS Stream::
 
-    $ yum install python-lxml
-
-On openSUSE::
-
-    $ zypper in python-lxml
+    $ dnf install python3-lxml
 
 On Ubuntu::
 
-    $ apt-get install python-lxml
+    $ apt-get install python3-lxml
 
 For building from source,  install the dependencies of lxml.
 
-On Fedora, RHEL 7, and CentOS 7::
+On Fedora, RHEL and CentOS Stream::
 
-    $ yum install python-devel libxml2-devel libxslt-devel
-
-On openSUSE::
-
-    $ zypper in libxslt-devel
+    $ dnf install python3-devel libxml2-devel libxslt-devel
 
 On Ubuntu::
 
