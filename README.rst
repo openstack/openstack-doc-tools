@@ -1,14 +1,10 @@
-========================
-Team and repository tags
-========================
+===================
+OpenStack Doc Tools
+===================
 
 .. image:: https://governance.openstack.org/tc/badges/openstack-doc-tools.svg
-    :target: https://governance.openstack.org/tc/reference/tags/index.html
 
 .. Change things from this point on
-
-OpenStack Doc Tools
-~~~~~~~~~~~~~~~~~~~
 
 This repository contains tools used by the OpenStack Documentation
 project.
