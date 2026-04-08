@@ -131,5 +131,11 @@ class SitemapSpider(spiders.CrawlSpider):
             timestamp = response.headers['Date']
         lastmod = time.strptime(timestamp.decode("utf-8"),
                                 "%a, %d %b %Y %H:%M:%S %Z")
-        item['lastmod'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", lastmod)
+        formatted_lastmod = time.strftime("%Y-%m-%dT%H:%M:%S%z", lastmod)
+        # the sitemap protocol expects W3C Datetime format, which uses
+        # a colon between the hours and minutes of the time zone offset
+        # https://www.sitemaps.org/protocol.html
+        formatted_lastmod = (
+            formatted_lastmod[:-2] + ":" + formatted_lastmod[-2:])
+        item['lastmod'] = formatted_lastmod
         return item
