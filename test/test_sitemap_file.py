@@ -97,7 +97,7 @@ class TestSitemapSpider(unittest.TestCase):
         path = sitemap_file.urlparse.SplitResult(
             scheme='https',
             netloc='docs.openstack.org',
-            path='/2024.1/something.html',
+            path='/2026.1/something.html',
             query='',
             fragment=''
         )
