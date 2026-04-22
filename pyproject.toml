@@ -34,12 +34,12 @@ Repository = "https://opendev.org/openstack/openstack-doc-tools"
 
 [tool.setuptools]
 packages = ["os_doc_tools"]
+script-files = [
+    "bin/doc-tools-check-languages",
+    "bin/doc-tools-build-rst",
+]
 
 [tool.setuptools.data-files]
 "share/openstack-doc-tools/sitemap" = [
     "/sitemap/*",
-]
-"scripts" = [
-    "bin/doc-tools-check-languages",
-    "bin/doc-tools-build-rst",
 ]
