@@ -1,39 +1,29 @@
-# We from the Oslo project decided to pin repos based on the
-# commit hash instead of the version tag to prevend arbitrary
-# code from running in developer's machines.  To update to a
-# newer version, run `pre-commit autoupdate` and then replace
-# the newer versions with their commit hash.
-
-default_language_version:
-  python: python3
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 9136088a246768144165fcc3ecc3d31bb686920a # v3.3.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       # Replaces or checks mixed line ending
       - id: mixed-line-ending
         args: ['--fix', 'lf']
         exclude: '.*\.(svg)$'
-      # Forbid files which have a UTF-8 byte-order marker
-      - id: check-byte-order-marker
-      # Checks that non-binary executables have a proper shebang
+      - id: fix-byte-order-marker
       - id: check-executables-have-shebangs
-      # Check for files that contain merge conflict strings.
       - id: check-merge-conflict
-      # Check for debugger imports and py37+ breakpoint()
-      # calls in python source
       - id: debug-statements
       - id: check-yaml
         files: .*\.(yaml|yml)$
-  - repo: local
+  - repo: https://github.com/PyCQA/doc8
+    rev: v2.0.0
     hooks:
-      - id: flake8
-        name: flake8
-        additional_dependencies:
-          - hacking>=3.0.1,<3.1.0
-        language: python
-        entry: flake8
-        files: '^.*\.py$'
-        exclude: '^(doc|releasenotes|tools)/.*$'
+      - id: doc8
+  - repo: https://github.com/openstack/bashate
+    rev: 2.1.1
+    hooks:
+      - id: bashate
+        files: ^bin/
+  - repo: https://opendev.org/openstack/hacking
+    rev: 8.1.0
+    hooks:
+      - id: hacking
+        additional_dependencies: []

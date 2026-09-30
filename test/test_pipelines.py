@@ -53,12 +53,12 @@ class TestIgnoreDuplicateUrls(unittest.TestCase):
             self.ignore_urls.process_item(item, spider)
 
     def test_url_added_to_processed(self):
-        self.assertFalse('url' in self.ignore_urls.processed)
+        self.assertNotIn('url', self.ignore_urls.processed)
 
         item = {'loc': 'url'}
         spider = mock.MagicMock()
         self.ignore_urls.process_item(item, spider)
-        self.assertTrue('url' in self.ignore_urls.processed)
+        self.assertIn('url', self.ignore_urls.processed)
 
     def test_item_is_returned(self):
         item = {'loc': 'url'}
@@ -128,13 +128,13 @@ class TestExportSitemap(unittest.TestCase):
         self.export_sitemap.exporter = mock.MagicMock()
         self.export_sitemap.files[self.spider] = mock.MagicMock()
 
-        self.assertTrue(self.spider in self.export_sitemap.files)
+        self.assertIn(self.spider, self.export_sitemap.files)
 
         with mock.patch.object(pipelines, 'lxml'):
             with mock.patch.object(pipelines, 'open'):
                 self.export_sitemap.spider_closed(self.spider)
 
-        self.assertFalse(self.spider in self.export_sitemap.files)
+        self.assertNotIn(self.spider, self.export_sitemap.files)
 
     def test_spider_closed_parses_with_lxml(self):
         self.export_sitemap.exporter = mock.MagicMock()
