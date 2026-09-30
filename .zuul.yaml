@@ -3,4 +3,5 @@
       - check-requirements
       - release-notes-jobs-python3
       - openstack-python3-jobs
+      - openstack-python3-next-jobs
       - publish-openstack-docs-pti
