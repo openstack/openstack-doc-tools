@@ -38,7 +38,7 @@ class IgnoreDuplicateUrls(object):
     def __init__(self):
         self.processed = set()
 
-    def process_item(self, item, spider):
+    def process_item(self, item):
         '''Check if a URL was already found.'''
         if item['loc'] in self.processed:
             raise scrapy.exceptions.DropItem("Duplicate URL found: %s."
@@ -69,7 +69,7 @@ class ExportSitemap(object):
 
     def spider_opened(self, spider):
         output = open(os.path.join(os.getcwd(), 'sitemap_%s.xml'
-                                   % spider.domain), 'w')
+                                   % spider.domain), 'wb')
         self.files[spider] = output
         self.exporter = SitemapItemExporter(output, item_element='url',
                                             root_element='urlset')
@@ -86,6 +86,6 @@ class ExportSitemap(object):
             pretty.write(lxml.etree.tostring(tree, pretty_print=True,
                                              encoding='unicode'))
 
-    def process_item(self, item, spider):
+    def process_item(self, item):
         self.exporter.export_item(item)
         return item

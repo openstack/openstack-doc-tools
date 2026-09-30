@@ -47,23 +47,20 @@ class TestIgnoreDuplicateUrls(unittest.TestCase):
     def test_duplicate_url(self):
         self.ignore_urls.processed.add('url')
         item = {'loc': 'url'}
-        spider = mock.MagicMock()
 
         with self.assertRaises(pipelines.scrapy.exceptions.DropItem):
-            self.ignore_urls.process_item(item, spider)
+            self.ignore_urls.process_item(item)
 
     def test_url_added_to_processed(self):
         self.assertNotIn('url', self.ignore_urls.processed)
 
         item = {'loc': 'url'}
-        spider = mock.MagicMock()
-        self.ignore_urls.process_item(item, spider)
+        self.ignore_urls.process_item(item)
         self.assertIn('url', self.ignore_urls.processed)
 
     def test_item_is_returned(self):
         item = {'loc': 'url'}
-        spider = mock.MagicMock()
-        returned_item = self.ignore_urls.process_item(item, spider)
+        returned_item = self.ignore_urls.process_item(item)
         self.assertEqual(item, returned_item)
 
 
@@ -174,16 +171,16 @@ class TestExportSitemap(unittest.TestCase):
         self.assertTrue(mocked_lxml_tostring.called)
 
     def test_process_item_exports_item(self):
-        item = spider = self.export_sitemap.exporter = mock.MagicMock()
+        item = self.export_sitemap.exporter = mock.MagicMock()
         self.export_sitemap.exporter.export_item = mock.MagicMock()
-        self.export_sitemap.process_item(item, spider)
+        self.export_sitemap.process_item(item)
 
         self.assertTrue(self.export_sitemap.exporter.export_item.called)
 
     def test_process_item_returns_item(self):
-        spider = self.export_sitemap.exporter = mock.MagicMock()
+        self.export_sitemap.exporter = mock.MagicMock()
         item = {'random': 'item'}
-        returned_item = self.export_sitemap.process_item(item, spider)
+        returned_item = self.export_sitemap.process_item(item)
 
         self.assertEqual(item, returned_item)
 
