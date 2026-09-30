@@ -34,6 +34,7 @@ class SitemapSpider(spiders.CrawlSpider):
         '2025.1',
         '2025.2',
         '2026.1',
+        '2026.2',
     ]
     MAINT_RELEASES_PAT = re.compile('^.*/(' + '|'.join(MAINT_SERIES) + ')/')
     LATEST_PAT = re.compile('^.*/latest/')
